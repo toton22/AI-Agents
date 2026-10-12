@@ -1,0 +1,75 @@
+<!--META {"title":"Concept map","h1":"Every way to build an <em>AI agent</em>, on one map","eyebrow":"Orientation · Concept map","lede":"Eleven branches, sixty-odd leaves: the tools you can build with, the parts every agent is made of, the protocols that connect them, the patterns that arrange them, and the places they reach users. Click any node to read about it and jump to its page.","minutes":15,"wide":true,"scripts":["assets/mindmap.js"]} -->
+<section id="map">
+<h2>The interactive map</h2>
+<p>Click a branch to open or close it. Click a leaf to see what it is and where it's taught. Use the filter to see only what you could build with your current skills.</p>
+<div class="mm-wrap">
+  <div class="mm-bar">
+    <button class="btn sm ghost" type="button" data-mm="expand">Expand all</button>
+    <button class="btn sm ghost" type="button" data-mm="collapse">Collapse all</button>
+    <span class="sp"></span>
+    <label for="mm-filter">Show</label>
+    <select id="mm-filter">
+      <option value="all">Everything</option>
+      <option value="nocode">No-code only</option>
+      <option value="lowcode">Low-code only</option>
+      <option value="code">Code only</option>
+      <option value="concept">Concepts only</option>
+    </select>
+  </div>
+  <div class="mm-canvas" id="mm-canvas"><p class="muted" style="padding:16px">The interactive map needs JavaScript. The full outline is below.</p></div>
+  <div class="mm-detail" id="mm-detail" aria-live="polite"></div>
+</div>
+</section>
+
+<section id="read">
+<h2>How to read it</h2>
+<p>The first seven branches answer "what do I build with?" They run roughly from least to most engineering. Branch 1 needs a browser and an afternoon. Branch 6 needs Python and a willingness to read error messages.</p>
+<p>Branches 8 to 11 cut across all of them. Whatever tool you pick, you're still assembling a model, instructions, tools, knowledge, memory and guardrails (branch 8). You'll still need to connect to company systems, ideally through a standard like MCP (branch 9). You'll still choose an arrangement, from one agent with tools up to a team of agents (branch 10). And you'll still put it somewhere people can reach it (branch 11).</p>
+<p>That's the reason the course is split into modules and method pages. The modules teach branch 8 to 11 once. The method pages show how each tool in branches 1 to 7 implements them.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 380" role="img" aria-label="Build methods plotted by speed to first agent against control and integration depth">
+  <path class="fx-ar" d="M60,340 L700,340"/>
+  <path class="fx-ar" d="M60,340 L60,24"/>
+  <text class="fx-ts" x="700" y="364" text-anchor="end">More control, deeper integration, more engineering →</text>
+  <text class="fx-ts" x="20" y="190" transform="rotate(-90 20 190)" text-anchor="middle">Faster to a first working agent →</text>
+  <rect class="fx-box k1" x="78" y="40" width="170" height="54" rx="6"/>
+  <text class="fx-tb" x="163" y="63" text-anchor="middle">Configured assistants</text>
+  <text class="fx-ts" x="163" y="81" text-anchor="middle">GPT agents · Projects · Gems</text>
+  <rect class="fx-box k4" x="200" y="112" width="180" height="54" rx="6"/>
+  <text class="fx-tb" x="290" y="135" text-anchor="middle">Workflow automation</text>
+  <text class="fx-ts" x="290" y="153" text-anchor="middle">n8n · Zapier · Make</text>
+  <rect class="fx-box k2" x="250" y="178" width="180" height="54" rx="6"/>
+  <text class="fx-tb" x="340" y="201" text-anchor="middle">Low-code builders</text>
+  <text class="fx-ts" x="340" y="219" text-anchor="middle">Copilot Studio · Agentforce</text>
+  <rect class="fx-box k6" x="392" y="104" width="160" height="54" rx="6"/>
+  <text class="fx-tb" x="472" y="127" text-anchor="middle">Enterprise platforms</text>
+  <text class="fx-ts" x="472" y="145" text-anchor="middle">where your data lives</text>
+  <rect class="fx-box k3" x="430" y="200" width="160" height="54" rx="6"/>
+  <text class="fx-tb" x="510" y="223" text-anchor="middle">Agent frameworks</text>
+  <text class="fx-ts" x="510" y="241" text-anchor="middle">LangGraph · CrewAI · SDKs</text>
+  <rect class="fx-box k5" x="536" y="266" width="156" height="54" rx="6"/>
+  <text class="fx-tb" x="614" y="289" text-anchor="middle">Raw API loop</text>
+  <text class="fx-ts" x="614" y="307" text-anchor="middle">you write everything</text>
+  <path class="fx-ln fx-dash" d="M90,110 C260,170 450,250 690,330"/>
+  <text class="fx-ts" x="96" y="290">Most companies use two or three of these at once:</text>
+  <text class="fx-ts" x="96" y="306">assistants for individuals, a platform for teams,</text>
+  <text class="fx-ts" x="96" y="322">code for the few agents that run core processes.</text>
+</svg>
+<figcaption>The trade-off behind the map. Moving right buys control and integration depth at the cost of time and skills. Neither end is "better"; the right spot depends on the process, the risk and who will maintain it.</figcaption>
+</figure>
+</section>
+
+<section id="outline">
+<h2>The map as an outline</h2>
+<p>Same content, readable top to bottom. Handy for printing as notes or for screen readers.</p>
+<div id="mm-outline"></div>
+</section>
+
+<section id="next">
+<h2>Where to go next</h2>
+<div class="cards">
+  <a class="card" href="{{root}}modules/m01-what-is-an-agent.html"><span class="card-kicker">Module 01</span><b>What an AI agent is</b><span>Start the tutorial from the beginning.</span></a>
+  <a class="card" href="{{root}}methods/index.html"><span class="card-kicker">Methods</span><b>Choose your method</b><span>Answer six questions and get a ranked shortlist.</span></a>
+  <a class="card" href="{{root}}roadmap.html"><span class="card-kicker">Roadmap</span><b>Learning paths</b><span>Manager, analyst or builder track, plus a semester plan.</span></a>
+</div>
+</section>

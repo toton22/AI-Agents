@@ -1,0 +1,387 @@
+<!--META {"title":"Google ADK","h1":"Google Agent Development Kit: agents that <em>deploy</em> in one command","eyebrow":"Method · Code","lede":"Build the Meridian Deal Desk agent with Google's Agent Development Kit, test it in the adk web dev UI with a built-in approval step, and choose between Cloud Run and Agent Runtime for production.","minutes":45} -->
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Intermediate (Python; also TypeScript, Go, Java, Kotlin)</dd></div><div><dt>Time to first agent</dt><dd>30 to 60 minutes</dd></div><div><dt>Typical cost</dt><dd>Framework is free and open source; you pay for model calls and any Google Cloud hosting</dd></div><div><dt>Best for</dt><dd>Multi-agent systems, teams on Google Cloud, anyone who wants a dev UI and one-command deploy</dd></div><div><dt>Runs where</dt><dd>Your laptop, Cloud Run, GKE, Agent Runtime on Gemini Enterprise Agent Platform</dd></div><div><dt>Lock-in risk</dt><dd>Low to medium: open source and works with non-Gemini models, but smoothest on Google Cloud</dd></div></dl>
+<p>The Agent Development Kit, ADK for short, is Google's open-source framework for building agents. You describe an agent in a few lines of Python (a name, a model, an instruction, a list of tools) and ADK runs the loop, keeps the conversation in a session, and gives you a browser-based dev UI to poke at it. When it works, one command ships it to Google Cloud.</p>
+<p>Google released it as open source in 2025. As of October 2026 it ships for Python, TypeScript, Go, Java and Kotlin, and the docs have moved to <a href="https://adk.dev/" target="_blank" rel="noopener">adk.dev</a>. This page uses Python, pinned to <code>google-adk==2.11.0</code>.</p>
+<p>The big change this year was ADK 2.0, generally available for Python from 19 May 2026. Under the hood, ADK moved from a tree of agents calling each other to a graph-based execution engine. For you that means a new <code>Workflow</code> class where agents and plain Python functions are nodes joined by edges. The older <code>SequentialAgent</code>, <code>ParallelAgent</code> and <code>LoopAgent</code> classes still work, but in 2.11 they log a deprecation warning pointing you to <code>Workflow</code>.</p>
+<p>Names on the Google Cloud side changed too. In April 2026 Vertex AI became part of the Gemini Enterprise Agent Platform, and Vertex AI Agent Engine was renamed Agent Runtime. You will see both names in tutorials for a while; the ADK command is still <code>adk deploy agent_engine</code>.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>ADK's pitch is a short path from laptop to a governed cloud service. If your company already runs on Google Cloud, with identity, billing and logging sorted, ADK lets a small team ship an agent into that estate without a separate platform project. If you are on Azure or AWS, the framework still works, but you lose much of that advantage.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Pick ADK when you expect more than one agent. Its core idea is composition: an agent can hold sub-agents, a workflow can chain agents with ordinary functions, and an agent on another server can join over the A2A protocol. A sales-operations assistant that hands pricing questions to a Deal Desk agent and contract questions to a legal agent is a natural ADK shape.</p>
+<p>Pick it, too, when you want developer tooling in the box. <code>adk web</code> gives a local chat UI with a trace of every event, tool call and state change. <code>adk eval</code> runs saved test conversations. <code>adk deploy</code> packages and ships. Most other code frameworks leave you to assemble these yourself.</p>
+<p>Think twice if your team has no Python skills and no plans to hire them; <a href="{{root}}methods/enterprise-platforms.html">Gemini Enterprise and Agent Builder</a> give you the Google stack with less code. And if your agent is mostly about searching long documents, <a href="{{root}}methods/llamaindex.html">LlamaIndex</a> has deeper document tooling.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>Tools are plain Python functions; docstrings become tool descriptions</li><li>Multi-agent composition and graph workflows are built in</li><li>Excellent local dev UI, plus evaluation and deploy commands</li><li>Sessions and state handled for you, with persistent options</li><li>A2A support for agents on other servers or other frameworks</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Moving fast: 2.0 changed the runtime and deprecated older workflow classes</li><li>Tool confirmation is experimental and not supported with every session store</li><li>The dev UI is unauthenticated and must never face the internet</li><li>Best experience assumes Google Cloud</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>Four pieces. An <b>agent</b> (<code>Agent</code>, also called <code>LlmAgent</code>) holds the model, instruction and tools. A <b>Runner</b> takes a user message, runs the agent and yields a stream of events. A <b>SessionService</b> stores the conversation and a dictionary called state. And <b>tools</b> are the functions the model may call.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 340" role="img" aria-label="ADK architecture: the dev UI or your app calls a Runner, which runs the root agent against a model, using a session service for state, tools, sub-agents and deployment targets">
+  <rect class="fx-box" x="12" y="40" width="150" height="60" rx="6"/>
+  <text class="fx-tb" x="87" y="65" text-anchor="middle">adk web</text>
+  <text class="fx-ts" x="87" y="85" text-anchor="middle">adk run · your app</text>
+  <rect class="fx-box" x="200" y="40" width="140" height="60" rx="6"/>
+  <text class="fx-tb" x="270" y="65" text-anchor="middle">Runner</text>
+  <text class="fx-ts" x="270" y="85" text-anchor="middle">streams events</text>
+  <rect class="fx-box fx-hi" x="378" y="40" width="170" height="60" rx="6"/>
+  <text class="fx-tb" x="463" y="65" text-anchor="middle">root_agent</text>
+  <text class="fx-ts" x="463" y="85" text-anchor="middle">model + instruction</text>
+  <rect class="fx-box k1" x="586" y="40" width="122" height="60" rx="6"/>
+  <text class="fx-tb" x="647" y="65" text-anchor="middle">Model</text>
+  <text class="fx-ts" x="647" y="85" text-anchor="middle">Gemini, others</text>
+  <rect class="fx-box k2" x="200" y="150" width="140" height="74" rx="6"/>
+  <text class="fx-tb" x="270" y="174" text-anchor="middle">SessionService</text>
+  <text class="fx-ts" x="270" y="194" text-anchor="middle">events · state</text>
+  <text class="fx-ts" x="270" y="211" text-anchor="middle">memory</text>
+  <rect class="fx-box k3" x="378" y="150" width="170" height="74" rx="6"/>
+  <text class="fx-tb" x="463" y="174" text-anchor="middle">Tools</text>
+  <text class="fx-ts" x="463" y="194" text-anchor="middle">Python functions</text>
+  <text class="fx-ts" x="463" y="211" text-anchor="middle">confirmation gate</text>
+  <rect class="fx-box k3" x="586" y="150" width="122" height="74" rx="6"/>
+  <text class="fx-tb" x="647" y="174" text-anchor="middle">Sub-agents</text>
+  <text class="fx-ts" x="647" y="194" text-anchor="middle">Workflow graph</text>
+  <text class="fx-ts" x="647" y="211" text-anchor="middle">A2A remote</text>
+  <rect class="fx-box k5" x="200" y="266" width="508" height="60" rx="6"/>
+  <text class="fx-tb" x="454" y="290" text-anchor="middle">Deploy</text>
+  <text class="fx-ts" x="454" y="310" text-anchor="middle">adk deploy cloud_run · agent_engine (Agent Runtime) · gke · A2A</text>
+  <path class="fx-ar" d="M162 70 L196 70"/>
+  <path class="fx-ar" d="M340 70 L374 70"/>
+  <path class="fx-ar" d="M548 70 L582 70"/>
+  <path class="fx-ar" d="M270 100 L270 146"/>
+  <path class="fx-ar" d="M463 100 L463 146"/>
+  <path class="fx-ar" d="M530 100 L620 146"/>
+  <path class="fx-ln fx-dash" d="M454 224 L454 266"/>
+</svg>
+<figcaption>The Runner is the engine; the agent is the configuration. Swap the session store or the deploy target without touching the agent definition.</figcaption>
+</figure>
+<h3>Tools are just functions</h3>
+<p>Give an agent a Python function and ADK reads its name, type hints and docstring to build the tool description the model sees. Write the docstring for the model, not for a programmer: say when to use the tool. Wrap a function in <code>FunctionTool(..., require_confirmation=True)</code> and ADK pauses before running it until a human confirms. You can also pass a function instead of <code>True</code>, so only risky inputs need a human.</p>
+<h3>Composition: sub-agents and workflows</h3>
+<p>There are two ways to combine agents, and the difference matters. With <code>sub_agents</code>, the model decides at run time whether to hand the conversation to a specialist. Flexible, but you are trusting the model's routing. With a <code>Workflow</code>, you draw the graph yourself: the analyst always runs, then the writer always runs. Predictable, auditable and usually what compliance wants for a defined process. ADK's old <code>SequentialAgent</code>, <code>ParallelAgent</code> and <code>LoopAgent</code> are fixed patterns of the same idea and remain in the docs as template workflows.</p>
+<h3>Sessions and state</h3>
+<p>Each conversation is a session holding the event history and a <code>state</code> dictionary. Set <code>output_key="verdict"</code> on an agent and its final answer is saved into state, where the next agent can read it with <code>{verdict}</code> inside its instruction. Prefixes change the scope: <code>user:</code> keys follow the user across sessions, <code>app:</code> keys are shared across the app, <code>temp:</code> keys last one turn. The default store is in memory; for production you switch to a database or Agent Runtime sessions. <a href="{{root}}modules/m06-memory-and-state.html">M06</a> covers the concepts.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk</h2>
+<ol class="steps">
+<li><b>Install and lay out the folder</b><p>ADK expects one folder per agent, containing <code>agent.py</code> with a variable called <code>root_agent</code>. <code>adk create meridian_deal_desk</code> builds the skeleton and asks for your key.</p>
+<pre class="code"><code class="language-bash">python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install "google-adk==2.11.0"
+
+# Folder layout ADK expects (adk create meridian_deal_desk builds this for you)
+# meridian_deal_desk/
+#   __init__.py      contains:  from . import agent
+#   agent.py         defines root_agent (below)
+#   .env             GOOGLE_API_KEY=...   (ADK adds .env to .gitignore)</code></pre></li>
+<li><b>Add your key</b><p>Use a Gemini API key from Google AI Studio for a pilot, or your Google Cloud project for anything serious. Keys stay in <code>.env</code>, which ADK adds to <code>.gitignore</code>.</p>
+<pre class="code"><code class="language-bash"># meridian_deal_desk/.env  -- Gemini API key from Google AI Studio
+GOOGLE_GENAI_USE_ENTERPRISE=0
+GOOGLE_API_KEY=your-key-here
+
+# ...or run on your company's Google Cloud project instead of an API key
+# GOOGLE_GENAI_USE_ENTERPRISE=1
+# GOOGLE_CLOUD_PROJECT=meridian-ai-prod
+# GOOGLE_CLOUD_LOCATION=asia-south1</code></pre></li>
+<li><b>Write the agent</b><p>Save this as <code>meridian_deal_desk/agent.py</code>:</p>
+<pre class="code"><code class="language-python">import os
+from datetime import datetime
+
+from google.adk.agents import Agent
+from google.adk.tools import FunctionTool, ToolContext
+
+MODEL = os.getenv("MODEL", "gemini-flash-latest")
+
+# --- Meridian data (in production: your CRM and ERP) ---
+CUSTOMERS = {
+    "C-101": {"id": "C-101", "name": "Sahyadri Hospitals", "tier": "Gold",
+              "annual_revenue_lakh": 48, "late_payments_fy": 0, "gross_margin_pct": 22},
+    "C-102": {"id": "C-102", "name": "Bluewave Logistics", "tier": "Silver",
+              "annual_revenue_lakh": 19, "late_payments_fy": 2, "gross_margin_pct": 18},
+    "C-103": {"id": "C-103", "name": "Orchid Schools Trust", "tier": "Gold",
+              "annual_revenue_lakh": 31, "late_payments_fy": 0, "gross_margin_pct": 25},
+    "C-104": {"id": "C-104", "name": "Kite Fintech", "tier": "Bronze",
+              "annual_revenue_lakh": 6, "late_payments_fy": 0, "gross_margin_pct": 16},
+    "C-105": {"id": "C-105", "name": "Trident Engineering", "tier": "Silver",
+              "annual_revenue_lakh": 22, "late_payments_fy": 1, "gross_margin_pct": 20},
+}
+
+POLICY = """Meridian discount policy
+1. Maximum discount by tier: Bronze 5%, Silver 8%, Gold 12%.
+2. Customers with 2 or more late payments this financial year are capped at 3%.
+3. Gross margin after discount must stay at or above 12%
+   (margin_after = current_margin - discount).
+4. Anything above the cap needs Sales Manager approval;
+   anything above 15% needs Regional Head approval."""
+
+
+def get_customer(customer_id: str) -&gt; dict:
+    """Return the customer record for an id such as 'C-101'."""
+    return CUSTOMERS.get(customer_id.strip().upper(),
+                         {"error": f"No customer with id {customer_id}"})
+
+
+def find_customer(name: str) -&gt; dict:
+    """Find a customer by (part of) their name, e.g. 'Sahyadri'."""
+    hits = [c for c in CUSTOMERS.values() if name.lower() in c["name"].lower()]
+    if len(hits) == 1:
+        return hits[0]
+    return {"error": f"{len(hits)} matches for '{name}'",
+            "candidates": [c["name"] for c in hits]}
+
+
+def get_discount_policy() -&gt; str:
+    """Return Meridian's current discount policy text."""
+    return POLICY
+
+
+def margin_after_discount(current_margin_pct: float, discount_pct: float) -&gt; float:
+    """Gross margin % left after a discount (simplified: margin minus discount)."""
+    return round(current_margin_pct - discount_pct, 2)
+
+
+def request_approval(customer_id: str, discount_pct: float, approver: str,
+                     reason: str, tool_context: ToolContext) -&gt; str:
+    """Raise an approval request to 'Sales Manager' or 'Regional Head'.
+    Use whenever a discount breaks the tier cap, late-payment cap or margin floor."""
+    ticket = f"APR-{datetime.now():%Y%m%d-%H%M%S}"
+    log = tool_context.state.get("approvals", [])
+    log.append({"ticket": ticket, "customer_id": customer_id,
+                "discount_pct": discount_pct, "approver": approver, "reason": reason})
+    tool_context.state["approvals"] = log
+    return f"{ticket}: {approver} approved {discount_pct}% for {customer_id}."
+
+
+INSTRUCTION = """You are the Meridian Deal Desk assistant for the sales team.
+For every discount request:
+1. Identify the customer with find_customer or get_customer.
+2. Read the policy with get_discount_policy.
+3. Work out the cap: tier cap, or 3% if late_payments_fy &gt;= 2.
+4. Call margin_after_discount and compare with the 12% floor.
+5. If the discount is within the cap AND the margin stays &gt;= 12%, approve it
+   and draft a two-line reply the salesperson can send.
+6. Otherwise call request_approval with the right approver (Sales Manager,
+   or Regional Head if the discount is above 15%) and a one-line reason.
+Never promise a discount above policy unless request_approval came back approved.
+Show the numbers you used."""
+
+root_agent = Agent(
+    name="meridian_deal_desk",
+    model=MODEL,
+    description="Checks discount requests against Meridian's policy.",
+    instruction=INSTRUCTION,
+    tools=[
+        get_customer,
+        find_customer,
+        get_discount_policy,
+        margin_after_discount,
+        FunctionTool(request_approval, require_confirmation=True),
+    ],
+)</code></pre></li>
+<li><b>Open the dev UI</b><p>From the parent folder, start the dev server and chat with the agent in your browser. The events panel shows every tool call, its arguments and the state after each step.</p>
+<pre class="code"><code class="language-bash"># run from the folder that CONTAINS meridian_deal_desk/
+adk web --port 8000      # browser dev UI at http://localhost:8000
+adk run meridian_deal_desk   # or chat in the terminal</code></pre></li>
+</ol>
+<h3>What this code does, in plain English</h3>
+<ul>
+<li><b><code>MODEL</code></b> comes from an environment variable, defaulting to <code>gemini-flash-latest</code>, so IT can switch models without a code change.</li>
+<li><b>The data block</b> holds Meridian's five customers and the policy text. Swap these for CRM and document calls later.</li>
+<li><b>Five functions</b> become five tools. Notice there is no decorator. ADK reads the function name, the types (<code>customer_id: str</code>) and the docstring. Lookups return a dictionary with an <code>error</code> key instead of crashing, so the model can recover by asking a clarifying question.</li>
+<li><b><code>request_approval</code></b> takes an extra parameter, <code>tool_context</code>. ADK fills that in itself; the model never sees it. We use it to append each approval to session state, which gives a per-conversation record of exceptions.</li>
+<li><b><code>INSTRUCTION</code></b> spells out the procedure: identify, read policy, work out the cap, check margin, then approve or escalate. It ends with the one rule that can never bend.</li>
+<li><b><code>root_agent</code></b> wires it up. The last tool is wrapped in <code>FunctionTool(..., require_confirmation=True)</code>, which is the human checkpoint. Every call to <code>request_approval</code> pauses until someone clicks confirm or reject.</li>
+</ul>
+<h3>A run in the dev UI</h3>
+<p>Here is Kite Fintech asking for 5%. The approval dialog is ADK's confirmation feature; whoever clicks it is acting as the Sales Manager. Wording is illustrative.</p>
+<div class="trace">
+  <div class="t-user">Kite Fintech wants 5% off. Can we do it?</div>
+  <div class="t-act">find_customer(name="Kite Fintech")</div>
+  <div class="t-obs">{"id":"C-104","tier":"Bronze","late_payments_fy":0,"gross_margin_pct":16}</div>
+  <div class="t-act">get_discount_policy()</div>
+  <div class="t-obs">1. Bronze 5%, Silver 8%, Gold 12%. ... 3. Gross margin after discount must stay at or above 12% ...</div>
+  <div class="t-think">Bronze cap is 5%, so the tier rule passes. Now the margin.</div>
+  <div class="t-act">margin_after_discount(current_margin_pct=16, discount_pct=5)</div>
+  <div class="t-obs">11</div>
+  <div class="t-think">11% is below the 12% floor. 5% is not above 15%, so the Sales Manager decides.</div>
+  <div class="t-act">request_approval(customer_id="C-104", discount_pct=5, approver="Sales Manager", reason="Margin after discount 11%, below 12% floor")</div>
+  <div class="t-human">adk web shows a confirmation dialog for request_approval. Sales Manager clicks Confirm.</div>
+  <div class="t-obs">APR-20261012-114502: Sales Manager approved 5% for C-104.</div>
+  <div class="t-final">Approved by exception. Kite is within the Bronze 5% cap, but margin would fall to 11% against a 12% floor, so I raised it with the Sales Manager, who approved (ticket APR-20261012-114502). Draft reply: "Hi team, we can confirm 5% off your next order, valid for 30 days."</div>
+</div>
+<p>Run the other reference cases too. Sahyadri at 10% should be approved with no dialog. Bluewave at 6% should trigger a dialog because two late payments cap them at 3%; click Reject and watch the agent fall back to offering 3%.</p>
+<h3>Running it from your own code</h3>
+<p>The dev UI is for building. Inside an application you drive the agent through a Runner and a session. This script starts a session with some state, asks a question and prints tool calls and the final answer:</p>
+<pre class="code"><code class="language-python">import asyncio
+
+from google.adk.runners import InMemoryRunner
+from google.genai import types
+
+from meridian_deal_desk.agent import root_agent
+
+
+async def main():
+    runner = InMemoryRunner(agent=root_agent, app_name="deal_desk")
+    session = await runner.session_service.create_session(
+        app_name="deal_desk", user_id="priya.sales",
+        state={"region": "West", "salesperson": "Priya"},   # starting state
+    )
+    question = types.Content(role="user", parts=[types.Part(
+        text="Sahyadri Hospitals wants 10% off their next order. Can we do it?")])
+    async for event in runner.run_async(user_id="priya.sales",
+                                        session_id=session.id, new_message=question):
+        for call in event.get_function_calls():
+            print(f"-&gt; {call.name}({call.args})")
+        if event.is_final_response() and event.content and event.content.parts:
+            print(event.content.parts[0].text)
+
+asyncio.run(main())</code></pre>
+<p>In plain English: the Runner bundles the agent with an in-memory session store; <code>create_session</code> opens a conversation for one user with starting state; <code>run_async</code> streams events, and we print the function calls and whichever event is marked final. Outside the dev UI, a confirmation pause arrives as a special event; your app shows its own approval screen and sends the answer back as a function response named <code>adk_request_confirmation</code>.</p>
+<h3>Two agents in a fixed order</h3>
+<p>Now split the work: an analyst decides, a writer drafts. With ADK 2.x, a <code>Workflow</code> makes the order explicit. Put this in its own folder, <code>meridian_pipeline/agent.py</code>:</p>
+<pre class="code"><code class="language-python">from google.adk import Agent, Workflow
+
+from meridian_deal_desk.agent import MODEL, find_customer, get_discount_policy, margin_after_discount
+
+analyst = Agent(
+    name="deal_analyst",
+    model=MODEL,
+    instruction="Check the discount request against policy. Output: customer, cap, "
+                "margin after discount, and APPROVE or ESCALATE with one reason.",
+    tools=[find_customer, get_discount_policy, margin_after_discount],
+    output_key="verdict",            # saved into session state
+)
+
+writer = Agent(
+    name="reply_writer",
+    model=MODEL,
+    instruction="The analyst's verdict is: {verdict}\n"
+                "Write a two-line reply the salesperson can send. If the verdict "
+                "is ESCALATE, say the request is with the Sales Manager.",
+    output_key="reply",
+)
+
+# A fixed pipeline: analyst always runs first, writer always second.
+root_agent = Workflow(name="deal_pipeline", edges=[("START", analyst, writer)])</code></pre>
+<p>The analyst's answer lands in state as <code>verdict</code>; the writer's instruction pulls it in with <code>{verdict}</code>. The edge list <code>("START", analyst, writer)</code> is the whole process map. You can add plain Python functions as nodes too, which is how you put a deterministic policy check between two model steps.</p>
+<h3>Letting a coordinator route</h3>
+<p>When you can't predict the order, let a coordinator choose. Here a general sales-operations assistant hands discount questions to the Deal Desk:</p>
+<pre class="code"><code class="language-python">from google.adk.agents import Agent
+
+from meridian_deal_desk.agent import MODEL, root_agent as deal_desk
+
+root_agent = Agent(
+    name="sales_ops_assistant",
+    model=MODEL,
+    instruction="You help Meridian's sales team. Send any discount or pricing "
+                "question to meridian_deal_desk. Answer general questions yourself.",
+    sub_agents=[deal_desk.clone()],  # a copy, so the original app stays independent
+)</code></pre>
+<p>ADK gives the coordinator a transfer ability; the sub-agent's description and name tell it when to use it. We pass a <code>clone()</code> so the original Deal Desk app keeps working on its own in the same dev UI.</p>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<h3>Hosting: two good choices</h3>
+<p><b>Cloud Run</b> packages the agent as a container service in your project. You control networking, scaling and who can call it. <b>Agent Runtime</b> (formerly Vertex AI Agent Engine) is Google's managed home for agents, with sessions, memory and scaling handled for you. Both are one command:</p>
+<pre class="code"><code class="language-bash"># Option A: Cloud Run (you manage the service; good when IT wants it in your VPC)
+adk deploy cloud_run --project=meridian-ai-prod --region=asia-south1 \
+  meridian_deal_desk -- --no-allow-unauthenticated
+
+# Option B: Agent Runtime (formerly Vertex AI Agent Engine; managed sessions and scaling)
+adk deploy agent_engine --project=meridian-ai-prod --region=asia-south1 \
+  --display_name="Meridian Deal Desk" meridian_deal_desk</code></pre>
+<p>The <code>--no-allow-unauthenticated</code> flag after <code>--</code> is passed through to Cloud Run so the service rejects anonymous calls. Pick <code>asia-south1</code> (Mumbai) or <code>asia-south2</code> (Delhi) if you want the service hosted in India; check which models are offered in your chosen region before you commit.</p>
+<h3>Identity and data access</h3>
+<p>Users sign in through your front end with Google Workspace or another SSO provider; the agent service trusts only that front end, enforced by Cloud Run IAM. The agent itself runs as a Google Cloud service account. Give that account read access to the CRM connector and nothing else. Keep API keys and connector secrets in Secret Manager, not in <code>.env</code> files baked into images.</p>
+<h3>Approvals in production</h3>
+<p>Here's the catch. ADK's tool confirmation is labelled experimental, and the docs say it is not supported with <code>DatabaseSessionService</code> or <code>VertexAiSessionService</code>, the persistent stores you'd use in production. So for a deployed Deal Desk, make <code>request_approval</code> create a ticket in your workflow system and return "PENDING". The agent tells the salesperson the request is with the manager; a webhook or a second conversation picks it up when the manager decides. ADK 2.0's graph workflows also include a human-input pattern for pausing a defined process. Either way, approval is a business process, and it should live where your other approvals live.</p>
+<h3>Cost and monitoring</h3>
+<p>Choose the smallest Gemini model that passes your test set, and set output limits through <code>generate_content_config</code>. Turn on <code>--trace_to_cloud</code> or <code>--otel_to_cloud</code> when deploying to get traces in Google Cloud's observability tools. Save the three reference cases as an eval set and run <code>adk eval</code> before every release; <a href="{{root}}modules/m10-evaluation.html">M10</a> shows how to grow that set.</p>
+<h3>Opening up to other agents with A2A</h3>
+<p>If another team's agent (built on a different framework, perhaps) needs Deal Desk decisions, expose it over the Agent2Agent protocol. ADK can wrap any agent as an A2A server, and <code>adk deploy cloud_run --a2a</code> adds an A2A endpoint at deploy time. ADK marks parts of its A2A support as experimental. <a href="{{root}}modules/m09-protocols-mcp-a2a.html">M09</a> explains what A2A is for.</p>
+<pre class="code"><code class="language-python"># pip install "google-adk[a2a]==2.11.0"
+from google.adk.a2a.utils.agent_to_a2a import to_a2a
+
+from meridian_deal_desk.agent import root_agent
+
+# An ASGI app that serves an A2A agent card plus the A2A endpoints.
+# Run with:  uvicorn a2a_server:app --port 8001
+app = to_a2a(root_agent, port=8001)</code></pre>
+<div class="callout warn"><b>Watch out</b><p><code>adk web</code> and <code>adk api_server</code> are unauthenticated development servers. Run them on your laptop or a trusted network only. Every year somebody puts a dev server on a public IP; don't let it be your Deal Desk.</p></div>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<p>ADK earns its keep when several specialised agents share work, or when a process has fixed steps with model judgement in between.</p>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales</td><td>Sales-ops coordinator</td><td>Routes pricing to the Deal Desk, stock queries to an inventory agent, contract questions to legal</td><td>Sales Manager approves discounts above policy</td></tr>
+<tr><td>Supply chain</td><td>Stock-out response</td><td>Workflow: detect low stock, check alternate vendors in parallel, draft a purchase recommendation</td><td>Category manager approves the purchase order</td></tr>
+<tr><td>Customer service</td><td>Complaint triage</td><td>Classifies tickets, pulls order history, drafts a reply and a proposed credit note</td><td>Supervisor approves any credit above the agent's limit</td></tr>
+<tr><td>Marketing</td><td>Campaign brief to assets</td><td>Writer and reviewer agents in a loop until the brand checklist passes</td><td>Brand manager signs off before launch</td></tr>
+<tr><td>HR</td><td>Onboarding concierge</td><td>Answers joiner questions from the handbook, raises IT and access requests</td><td>HR operations confirms access to sensitive systems</td></tr>
+<tr><td>Finance</td><td>Vendor payment queries</td><td>Looks up invoice status in the ERP and explains holds to vendors</td><td>Accounts payable lead approves any release of a hold</td></tr>
+</tbody></table></div>
+<div class="case"><span class="case-tag">Case · Supply chain</span><h4>A fixed process with three judgement calls</h4><p>Consider an anonymised FMCG distributor in western India. Its stock-out process had five steps, three of them needing judgement (which substitute, which vendor, how much). A Workflow gives each judgement step its own small agent, while the arithmetic steps are plain Python nodes. Auditors can read the edge list and see the process exactly as documented in the SOP.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Confirm only when it matters</b><p>Replace <code>require_confirmation=True</code> with a function so that only discounts above 15% need confirmation in the dev UI, while smaller exceptions are logged and approved automatically. Is that a good policy for Meridian?</p><details><summary>Hint / model answer</summary><p>Write <code>def needs_human(customer_id: str, discount_pct: float, approver: str, reason: str, tool_context) -&gt; bool: return discount_pct &gt; 15</code> and pass it as <code>require_confirmation=needs_human</code>. Technically easy; as policy, it breaks Meridian's rule that anything above the cap needs the Sales Manager. Code should implement policy, not quietly rewrite it.</p></details></li>
+<li><b>Add a deterministic check node</b><p>In the Workflow version, add a plain Python function between the analyst and the writer that recomputes the cap and margin from the customer record and overrides the analyst if it disagrees.</p><details><summary>Hint / model answer</summary><p>Workflow nodes can be functions that take <code>node_input</code>. Have the analyst output structured fields (customer id, discount), recompute with the same rules as <code>margin_after_discount</code>, and pass a corrected verdict forward. This "model proposes, code verifies" pattern is covered in <a href="{{root}}modules/m07-design-patterns.html">M07</a>.</p></details></li>
+<li><b>Write an eval set</b><p>Use the dev UI to save the three reference conversations (Sahyadri 10%, Bluewave 6%, Kite 5%) as an eval set, then run <code>adk eval</code> against it after changing the instruction.</p><details><summary>Hint / model answer</summary><p>The dev UI has an Eval tab where you can add the current session to an eval set. Check both the final response and the tool trajectory: an agent that reaches the right answer without calling <code>margin_after_discount</code> got lucky and will fail on the next customer.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="b">
+    <p class="q-text">How does ADK know what a plain Python function tool does?</p>
+    <ol class="q-opts"><li data-k="a">You must write a JSON schema by hand</li><li data-k="b">It reads the function name, type hints and docstring</li><li data-k="c">It asks the model to guess from the code</li><li data-k="d">Only from a YAML config file</li></ol>
+    <p class="q-why">ADK builds the tool declaration from the signature and docstring, which is why a clear docstring is the most important line of each tool.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">In ADK 2.x Python, what is the recommended way to run an analyst agent and then a writer agent in a fixed order?</p>
+    <ol class="q-opts"><li data-k="a">Put both in <code>sub_agents</code> and hope</li><li data-k="b">Two separate Runners</li><li data-k="c">A <code>Workflow</code> with edges from START to analyst to writer</li><li data-k="d">A LoopAgent with max one iteration</li></ol>
+    <p class="q-why"><code>SequentialAgent</code> still works but is deprecated in favour of graph <code>Workflow</code>. <code>sub_agents</code> lets the model choose, which is the opposite of fixed.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">An agent has <code>output_key="verdict"</code>. How does the next agent use it?</p>
+    <ol class="q-opts"><li data-k="a">By writing <code>{verdict}</code> in its instruction, which ADK fills from session state</li><li data-k="b">By calling a tool named verdict</li><li data-k="c">It can't; agents don't share data</li><li data-k="d">Through an environment variable</li></ol>
+    <p class="q-why">Session state is the shared notebook. Templated keys in instructions are filled from state at run time.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Why does this page recommend a ticket-based <code>request_approval</code> for the production Deal Desk rather than relying on <code>require_confirmation</code>?</p>
+    <ol class="q-opts"><li data-k="a">Confirmation dialogs are too slow</li><li data-k="b">Confirmation only works with Gemini</li><li data-k="c">Managers dislike dialogs</li><li data-k="d">The feature is experimental and not supported with the database or Agent Runtime session stores used in production</li></ol>
+    <p class="q-why">The ADK docs list those limitations. Approvals that can take hours belong in your workflow system anyway.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">A colleague wants to share the <code>adk web</code> URL with the sales team for a quick trial. Your advice?</p>
+    <ol class="q-opts"><li data-k="a">Fine, it has a login page</li><li data-k="b">Fine if the laptop has antivirus</li><li data-k="c">No: it is an unauthenticated dev server; deploy to Cloud Run with IAM instead</li><li data-k="d">Only on weekends</li></ol>
+    <p class="q-why">The CLI help states the dev server is unauthenticated and for trusted networks only. A pilot deserves a proper deploy with access control.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="adk"></div>
+<div class="res-list">
+  <a class="res" href="https://adk.dev/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Agent Development Kit documentation</span><span class="res-by">Google · the new home of the ADK docs</span></a>
+  <a class="res" href="https://adk.dev/get-started/python/" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Python quickstart</span><span class="res-by">Google · folder layout, adk run and adk web</span></a>
+  <a class="res" href="https://adk.dev/2.0/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">What's new in ADK 2.0</span><span class="res-by">Google · graph workflows and breaking changes</span></a>
+  <a class="res" href="https://adk.dev/tools-custom/confirmation/" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Tool confirmation</span><span class="res-by">Google · human-in-the-loop for tool calls, with limitations</span></a>
+  <a class="res" href="https://adk.dev/deploy/cloud-run/" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Deploy to Cloud Run</span><span class="res-by">Google · options, flags and authentication</span></a>
+  <a class="res" href="https://adk.dev/a2a/" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">ADK and A2A</span><span class="res-by">Google · exposing and consuming remote agents</span></a>
+  <a class="res" href="https://github.com/google/adk-python" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">adk-python</span><span class="res-by">Google on GitHub · source, samples and release notes</span></a>
+</div>
+<div class="cards">
+  <a class="card" href="{{root}}methods/langgraph.html"><span class="card-kicker">Method · Code</span><b>LangGraph</b><span>The other graph-first framework; compare the approval patterns.</span></a>
+  <a class="card" href="{{root}}modules/m08-multi-agent-systems.html"><span class="card-kicker">Module 08</span><b>Multi-agent systems</b><span>When several agents beat one, and when they don't.</span></a>
+  <a class="card" href="{{root}}methods/mcp.html"><span class="card-kicker">Method · Code</span><b>Build an MCP server</b><span>ADK can use MCP tools through McpToolset.</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>ADK turns Python functions into tools and gives you a dev UI, evals and deploy commands in one kit.</li><li>ADK 2.0 introduced graph Workflows; the older sequential, parallel and loop agents are deprecated in Python.</li><li>Use <code>sub_agents</code> when the model should route and <code>Workflow</code> when the process is fixed.</li><li>Tool confirmation is handy in development, but production approvals belong in a ticketing flow.</li><li>Deploy to Cloud Run or Agent Runtime (formerly Vertex AI Agent Engine), never expose the dev server.</li></ul></div>
+</section>

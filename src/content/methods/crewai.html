@@ -1,0 +1,418 @@
+<!--META {"title":"CrewAI","h1":"Build the Deal Desk as a <em>crew</em> with CrewAI","eyebrow":"Method · Code","lede":"Build the Meridian Deal Desk as a three-agent CrewAI crew (Account Analyst, Policy Officer, Deal Writer) with a human review step, then rebuild it as a CrewAI Flow where code makes the decision, and judge honestly whether this job needs multiple agents at all.","minutes":50} -->
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Beginner to intermediate Python</dd></div><div><dt>Time to first agent</dt><dd>1 hour</dd></div><div><dt>Typical cost</dt><dd>Library free (MIT); model tokens; CrewAI AMP is a paid platform</dd></div><div><dt>Best for</dt><dd>Role-based teams of agents; content and research pipelines</dd></div><div><dt>Runs where</dt><dd>Your own servers, or CrewAI AMP (managed)</dd></div><div><dt>Lock-in risk</dt><dd>Low for the code; medium on the managed platform</dd></div></dl>
+<p>CrewAI is an open-source Python framework, from the company CrewAI Inc., built around a simple metaphor: you hire a small team. Each <b>agent</b> has a role, a goal and a backstory. Each <b>task</b> has a description and an expected output, and is given to an agent. A <b>crew</b> puts agents and tasks together and runs them under a <b>process</b>: sequential (task one, then two, then three) or hierarchical (a manager agent hands out the work and checks it).</p>
+<p>The metaphor is why CrewAI is popular with business users. "An analyst, a policy officer and a writer" maps onto how a manager already thinks about a job. You can read a CrewAI file and understand who does what without knowing much Python.</p>
+<p>The second half of CrewAI is <b>Flows</b>: event-driven workflows where ordinary Python methods run in a defined order, with routers for branching and a shared, typed state. Flows are how you get deterministic control, and you can call a crew or a single agent from inside any step. As of 2026, CrewAI also offers a <code>@human_feedback</code> decorator for Flows and a commercial platform, <b>CrewAI AMP</b> (Agent Management Platform), for deploying and monitoring crews.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>The org-chart metaphor is a gift and a trap. It makes agents easy to explain to stakeholders. It also tempts teams to build three agents where one would do, because that is how the human team is organised. Every extra agent is extra model calls, extra cost and one more place for a misunderstanding. Ask "would one competent person do this alone?" before approving a crew.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>CrewAI shines when the work genuinely splits into different skills with different tools: one agent researches with web search, another analyses numbers, a third writes. Market scans, content pipelines, due-diligence first drafts and report generation are the classic fits. It is also a fast way to prototype: a working crew takes an afternoon.</p>
+<p>Pick Flows (or a Flow that calls a crew) when the process has rules that must hold every time, such as the Deal Desk's discount policy. Flows give you the same predictability as a LangGraph graph with less ceremony.</p>
+<p>Skip a multi-agent crew when the job is a short chain of lookups and one decision. Skip CrewAI altogether if you need fine-grained control over every model message, or long pauses for approval across days; <a href="{{root}}methods/langgraph.html">LangGraph</a> is stronger there.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>Easy to read: roles, goals and tasks in plain English</li><li>Fast prototyping of multi-step, multi-skill work</li><li>Flows add deterministic routing and typed state</li><li>Works with most model providers</li><li>Optional YAML config separates prompts from code</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Multi-agent setups multiply model calls and cost</li><li>Agents passing text to agents can drift from the facts</li><li>Hierarchical process adds a manager model that can misroute work</li><li>Console-based human input needs rework for a web app</li><li>Fast release cadence: pin versions and re-test</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>Here are the two ways this page builds the Deal Desk.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 300" role="img" aria-label="Top: a sequential crew of Account Analyst, Policy Officer, a human review, and Deal Writer. Bottom: a Flow where code looks up and routes, a person approves exceptions, and one agent writes the reply">
+  <text class="fx-th" x="12" y="28">Crew (sequential process)</text>
+  <rect class="fx-box" x="12" y="45" width="150" height="56" rx="6"/>
+  <text class="fx-tb" x="87" y="69" text-anchor="middle">Account Analyst</text>
+  <text class="fx-ts" x="87" y="89" text-anchor="middle">CRM tools</text>
+  <rect class="fx-box k2" x="200" y="45" width="150" height="56" rx="6"/>
+  <text class="fx-tb" x="275" y="69" text-anchor="middle">Policy Officer</text>
+  <text class="fx-ts" x="275" y="89" text-anchor="middle">policy + margin</text>
+  <rect class="fx-box k4" x="388" y="45" width="130" height="56" rx="6"/>
+  <text class="fx-tb" x="453" y="69" text-anchor="middle">human_input</text>
+  <text class="fx-ts" x="453" y="89" text-anchor="middle">person reviews</text>
+  <rect class="fx-box k1" x="556" y="45" width="152" height="56" rx="6"/>
+  <text class="fx-tb" x="632" y="69" text-anchor="middle">Deal Writer</text>
+  <text class="fx-ts" x="632" y="89" text-anchor="middle">drafts reply</text>
+  <path class="fx-ar" d="M162 73 L200 73"/>
+  <path class="fx-ar" d="M350 73 L388 73"/>
+  <path class="fx-ar" d="M518 73 L556 73"/>
+  <text class="fx-th" x="12" y="150">Flow (code decides)</text>
+  <rect class="fx-box" x="12" y="190" width="130" height="56" rx="6"/>
+  <text class="fx-tb" x="77" y="214" text-anchor="middle">lookup</text>
+  <text class="fx-ts" x="77" y="234" text-anchor="middle">code</text>
+  <rect class="fx-box fx-hi" x="180" y="190" width="150" height="56" rx="6"/>
+  <text class="fx-tb" x="255" y="214" text-anchor="middle">check_policy</text>
+  <text class="fx-ts" x="255" y="234" text-anchor="middle">router, code</text>
+  <rect class="fx-box k2" x="370" y="166" width="140" height="44" rx="6"/>
+  <text class="fx-tb" x="440" y="184" text-anchor="middle">approve</text>
+  <text class="fx-ts" x="440" y="200" text-anchor="middle">within policy</text>
+  <rect class="fx-box k4" x="370" y="228" width="140" height="44" rx="6"/>
+  <text class="fx-tb" x="440" y="246" text-anchor="middle">ask_approver</text>
+  <text class="fx-ts" x="440" y="262" text-anchor="middle">a person decides</text>
+  <rect class="fx-box k1" x="556" y="190" width="152" height="56" rx="6"/>
+  <text class="fx-tb" x="632" y="214" text-anchor="middle">write_reply</text>
+  <text class="fx-ts" x="632" y="234" text-anchor="middle">one agent</text>
+  <path class="fx-ar" d="M142 218 L180 218"/>
+  <path class="fx-ar" d="M330 208 L370 190"/>
+  <path class="fx-ar" d="M330 228 L370 248"/>
+  <path class="fx-ar" d="M510 188 L556 208"/>
+  <path class="fx-ar" d="M510 250 L556 230"/>
+</svg>
+<figcaption>Same job, two designs. In the crew, three model-driven agents pass text along. In the Flow, code does the lookup and the routing, and the only model call is the one that writes.</figcaption>
+</figure>
+<h3>Agents, tasks, crews</h3>
+<p>An agent's role, goal and backstory become part of its prompt. They shape tone and focus, but they are not controls: a backstory saying "you never bend the policy" is a request, like any prompt. Tools are attached per agent, so the Account Analyst can read the CRM and nobody else can. That per-agent tool list is a real control, and it is one of the better arguments for splitting work across agents.</p>
+<p>Tasks carry the actual instructions. <code>context=[...]</code> passes earlier task outputs into a later task, which is how the Policy Officer sees the Analyst's record. <code>human_input=True</code> on a task makes CrewAI ask a person to review the agent's answer before the crew moves on; the agent revises using the feedback.</p>
+<h3>Processes</h3>
+<p>Sequential runs tasks in the order listed. Hierarchical adds a manager (either a model you name with <code>manager_llm</code> or an agent you define with <code>manager_agent</code>) that decides which agent does which task, reviews the outputs and decides when the job is done. Hierarchical is flexible, and that flexibility is exactly what you do not want for a discount policy.</p>
+<h3>Flows</h3>
+<p>A Flow is a Python class. <code>@start()</code> marks the first step, <code>@listen(...)</code> runs a method after another finishes, and <code>@router(...)</code> returns a label that picks which listeners run next. State is a Pydantic model, so every step reads and writes typed fields. Inside any step you can call plain code, one agent or a whole crew.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk</h2>
+<ol class="steps">
+<li><b>Install and set keys</b><p>Python 3.10 to 3.13 (CrewAI 1.15 does not yet support 3.14).</p></li>
+<li><b>Write the tools in plain Python</b><p>The same <code>meridian_tools.py</code> as every method page.</p></li>
+<li><b>Build the three-agent crew</b><p>Account Analyst, Policy Officer with human review, Deal Writer.</p></li>
+<li><b>Rebuild it as a Flow</b><p>Code looks up and routes; a person approves exceptions; one agent writes.</p></li>
+<li><b>Run both and compare</b><p>Same Bluewave request, two very different call counts.</p></li>
+</ol>
+<h3>Step 1: install</h3>
+<pre class="code"><code class="language-bash">python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install "crewai[anthropic]==1.15.27"      # checked Oct 2026; the extra adds the Claude connector
+export ANTHROPIC_API_KEY="your-key"
+export CREW_MODEL="anthropic/claude-sonnet-5-5"  # provider/model-id; e.g. openai/gpt-5.5 with OPENAI_API_KEY</code></pre>
+<p>What this does: installs CrewAI with its native Anthropic connector at the version this page was checked against. Without the <code>[anthropic]</code> extra, CrewAI raises an import error when you name a Claude model. The model is read from <code>CREW_MODEL</code>, so you can switch providers without editing code.</p>
+<h3>Step 2: the tools (meridian_tools.py)</h3>
+<pre class="code"><code class="language-python">"""meridian_tools.py - the Deal Desk agent's tools, in plain Python.
+
+In a real company these functions would call the CRM and the ERP.
+Here they read a small in-memory table so the whole agent runs on a laptop.
+"""
+import difflib
+from datetime import datetime
+
+CUSTOMERS = {
+    "C-101": {"id": "C-101", "name": "Sahyadri Hospitals", "tier": "Gold",
+              "annual_revenue_lakh": 48, "late_payments_fy": 0, "gross_margin_pct": 22},
+    "C-102": {"id": "C-102", "name": "Bluewave Logistics", "tier": "Silver",
+              "annual_revenue_lakh": 19, "late_payments_fy": 2, "gross_margin_pct": 18},
+    "C-103": {"id": "C-103", "name": "Orchid Schools Trust", "tier": "Gold",
+              "annual_revenue_lakh": 31, "late_payments_fy": 0, "gross_margin_pct": 25},
+    "C-104": {"id": "C-104", "name": "Kite Fintech", "tier": "Bronze",
+              "annual_revenue_lakh": 6, "late_payments_fy": 0, "gross_margin_pct": 16},
+    "C-105": {"id": "C-105", "name": "Trident Engineering", "tier": "Silver",
+              "annual_revenue_lakh": 22, "late_payments_fy": 1, "gross_margin_pct": 20},
+}
+
+POLICY = """Meridian Supplies discount policy (FY 2026-27)
+1. Maximum discount by tier: Bronze 5%, Silver 8%, Gold 12%.
+2. Customers with 2 or more late payments this financial year are capped at 3%.
+3. Gross margin after discount must stay at or above 12%
+   (margin_after = current_margin - discount).
+4. Anything above the cap needs Sales Manager approval;
+   anything above 15% needs Regional Head approval."""
+
+TIER_CAP = {"Bronze": 5, "Silver": 8, "Gold": 12}
+MARGIN_FLOOR = 12
+APPROVALS = []  # stands in for your ticketing system
+
+
+def get_customer(customer_id: str) -&gt; dict:
+    """Return the customer record for an id such as C-101."""
+    record = CUSTOMERS.get(customer_id.strip().upper())
+    return record or {"error": f"No customer with id {customer_id}"}
+
+
+def find_customer(name: str) -&gt; dict:
+    """Fuzzy lookup by customer name. Returns the best-matching record."""
+    by_name = {c["name"].lower(): c for c in CUSTOMERS.values()}
+    query = name.strip().lower()
+    for full_name, record in by_name.items():
+        if query and (query in full_name or full_name in query):
+            return record
+    close = difflib.get_close_matches(query, list(by_name), n=1, cutoff=0.5)
+    return by_name[close[0]] if close else {"error": f"No customer matching '{name}'"}
+
+
+def get_discount_policy() -&gt; str:
+    """Return the current discount policy text."""
+    return POLICY
+
+
+def margin_after_discount(current_margin_pct: float, discount_pct: float) -&gt; float:
+    """Gross margin % left after the discount (simplified: margin minus discount)."""
+    return round(current_margin_pct - discount_pct, 2)
+
+
+def request_approval(customer_id: str, discount_pct: float, approver: str, reason: str) -&gt; str:
+    """Log an approval request for a discount above policy. A named person must decide."""
+    ticket = f"APR-{len(APPROVALS) + 1:04d}"
+    APPROVALS.append({"ticket": ticket, "customer_id": customer_id, "discount_pct": discount_pct,
+                      "approver": approver, "reason": reason,
+                      "raised_at": datetime.now().isoformat(timespec="seconds")})
+    return f"{ticket} logged with {approver} for {discount_pct}% on {customer_id}."
+
+
+def evaluate_request(customer: dict, discount_pct: float) -&gt; dict:
+    """The policy written as code: the same rules, checked the same way every time."""
+    cap = 3 if customer["late_payments_fy"] &gt;= 2 else TIER_CAP[customer["tier"]]
+    margin_after = margin_after_discount(customer["gross_margin_pct"], discount_pct)
+    problems = []
+    if discount_pct &gt; cap:
+        problems.append(f"{discount_pct}% is above the {cap}% cap")
+    if margin_after &lt; MARGIN_FLOOR:
+        problems.append(f"margin after discount would be {margin_after}%, below the {MARGIN_FLOOR}% floor")
+    approver = None
+    if problems:
+        approver = "Regional Head" if discount_pct &gt; 15 else "Sales Manager"
+    return {"within_policy": not problems, "cap_pct": cap, "margin_after_pct": margin_after,
+            "problems": problems, "approver": approver}</code></pre>
+<p>What this does: the customer table and discount policy from the course case, five plain functions the agents can call, and <code>evaluate_request</code>, the policy expressed as code, which the Flow version uses to make the decision without a model.</p>
+<h3>Step 3: the crew (crew_deal_desk.py)</h3>
+<pre class="code"><code class="language-python">"""crew_deal_desk.py - Deal Desk as a three-agent CrewAI crew."""
+import os
+
+from crewai import LLM, Agent, Crew, Process, Task
+from crewai.tools import tool
+
+import meridian_tools as mt
+
+llm = LLM(model=os.getenv("CREW_MODEL", "anthropic/claude-sonnet-5-5"))   # provider/model-id
+
+# Plain Python functions become CrewAI tools; the docstring is what the agent reads.
+find_customer = tool("find_customer")(mt.find_customer)
+get_customer = tool("get_customer")(mt.get_customer)
+get_discount_policy = tool("get_discount_policy")(mt.get_discount_policy)
+margin_after_discount = tool("margin_after_discount")(mt.margin_after_discount)
+
+analyst = Agent(
+    role="Account Analyst",
+    goal="Pull the exact customer record the deal depends on, with no guesswork",
+    backstory="You have run Meridian's CRM for years. You quote records, never memory.",
+    tools=[find_customer, get_customer], llm=llm, verbose=True)
+
+policy_officer = Agent(
+    role="Policy Officer",
+    goal="Decide whether the discount is within policy and, if not, who must approve it",
+    backstory="You apply Meridian's discount policy word for word. You never bend it.",
+    tools=[get_discount_policy, margin_after_discount], llm=llm, verbose=True)
+
+writer = Agent(
+    role="Deal Writer",
+    goal="Write a short, warm, accurate reply the salesperson can send",
+    backstory="You write for B2B buyers in hospitals, schools and logistics firms.",
+    llm=llm, verbose=True)
+
+lookup_task = Task(
+    description="Find the customer in this request and return their full record: {request}",
+    expected_output="The customer record as JSON: id, name, tier, revenue, late payments, margin.",
+    agent=analyst)
+
+policy_task = Task(
+    description=("Using the record, check the discount asked for in '{request}' against the "
+                 "policy. Compute the margin with the tool. State WITHIN POLICY or ESCALATE, "
+                 "the cap, the margin after discount, and the approver if any."),
+    expected_output="Verdict, cap %, margin after discount %, approver (or none), one-line reason.",
+    agent=policy_officer, context=[lookup_task],
+    human_input=True)   # a person reviews the verdict before the writer starts
+
+reply_task = Task(
+    description=("Draft the reply. If the verdict was ESCALATE, do not promise the discount: "
+                 "say it is with the approver and give the human reviewer's decision if stated."),
+    expected_output="A reply of under 120 words.",
+    agent=writer, context=[lookup_task, policy_task])
+
+crew = Crew(agents=[analyst, policy_officer, writer],
+            tasks=[lookup_task, policy_task, reply_task],
+            process=Process.sequential)
+
+if __name__ == "__main__":
+    result = crew.kickoff(inputs={"request": input("Salesperson: ")})
+    print(result.raw)</code></pre>
+<p>What this does:</p>
+<ul>
+<li><code>tool("find_customer")(mt.find_customer)</code> wraps an ordinary function as a CrewAI tool. The docstring becomes the tool description the agent reads. (You will usually see the same thing written as <code>@tool("...")</code> above a function.)</li>
+<li>Three agents, each with a role, goal and backstory. Only the Analyst gets CRM tools; only the Policy Officer gets the policy and margin tools; the Writer gets none. Least privilege, applied to agents.</li>
+<li>Three tasks. <code>{request}</code> is filled in from <code>kickoff(inputs=...)</code>. <code>context</code> chains the outputs: the Policy Officer sees the record, the Writer sees both.</li>
+<li><code>human_input=True</code> on the policy task pauses the crew in the terminal after the verdict. A Sales Manager can type "Approved at 4%" or "Agreed, escalate", and the Policy Officer folds that into its final answer before the Writer starts.</li>
+<li><code>Process.sequential</code> runs the tasks in order. <code>result.raw</code> is the Writer's reply.</li>
+</ul>
+<p>Notice that <code>request_approval</code> is not given to any agent here. In this design the human review is the approval, and the escalation ticket is better raised by your app after a person has seen the verdict. If you do hand an agent an action tool, put the human review on that agent's task.</p>
+<p>For a hierarchical version, drop the <code>agent=</code> from each task, add <code>process=Process.hierarchical</code> and <code>manager_llm=llm</code> to the <code>Crew</code>, and a manager model will assign the tasks. Try it once to see how it behaves, then keep the sequential version for anything involving money.</p>
+<h3>Step 4: the Flow (crew_flow.py)</h3>
+<pre class="code"><code class="language-python">"""crew_flow.py - the same job as a CrewAI Flow: code makes the decision, one agent writes."""
+from crewai import Agent
+from crewai.flow.flow import Flow, listen, router, start
+from pydantic import BaseModel
+
+import meridian_tools as mt
+from crew_deal_desk import llm
+
+
+class DealState(BaseModel):
+    customer_name: str = ""
+    discount_pct: float = 0
+    customer: dict = {}
+    verdict: dict = {}
+    decision: str = ""
+    reply: str = ""
+
+
+class DealDeskFlow(Flow[DealState]):
+
+    @start()
+    def lookup(self):
+        self.state.customer = mt.find_customer(self.state.customer_name)
+
+    @router(lookup)
+    def check_policy(self):
+        if "error" in self.state.customer:
+            return "not_found"
+        self.state.verdict = mt.evaluate_request(self.state.customer, self.state.discount_pct)
+        return "within_policy" if self.state.verdict["within_policy"] else "escalate"
+
+    @listen("escalate")
+    def ask_approver(self):
+        v, c = self.state.verdict, self.state.customer
+        print(mt.request_approval(c["id"], self.state.discount_pct, v["approver"],
+                                  "; ".join(v["problems"])))
+        self.state.decision = input(f"{v['approver']}, your decision (e.g. 'approve 4%' or 'reject'): ")
+        self.write_reply()
+
+    @listen("within_policy")
+    def approve(self):
+        self.state.decision = "approved within policy"
+        self.write_reply()
+
+    @listen("not_found")
+    def report_missing(self):
+        self.state.reply = f"Could not find '{self.state.customer_name}'. Please check the name."
+
+    def write_reply(self):
+        writer = Agent(role="Deal Writer", goal="Write a short, accurate reply to the customer",
+                       backstory="You write for Meridian's B2B buyers.", llm=llm)
+        result = writer.kickoff(
+            f"Facts: {self.state.customer}, asked {self.state.discount_pct}%, "
+            f"verdict {self.state.verdict}, decision '{self.state.decision}'. "
+            "Draft a reply under 120 words. Offer only what the decision allows.")
+        self.state.reply = result.raw
+
+if __name__ == "__main__":
+    flow = DealDeskFlow()
+    flow.kickoff(inputs={"customer_name": "Bluewave Logistics", "discount_pct": 6})
+    print(flow.state.reply)</code></pre>
+<p>What this does:</p>
+<ul>
+<li><code>DealState</code> is the typed state the whole Flow shares.</li>
+<li><code>lookup</code> is the <code>@start()</code> step: plain code calling <code>find_customer</code>. In practice the salesperson fills a small form in the CRM, so the Flow receives the customer name and percentage as structured inputs and no model is needed to parse them.</li>
+<li><code>check_policy</code> is a <code>@router</code>: it runs <code>evaluate_request</code> and returns <code>"within_policy"</code>, <code>"escalate"</code> or <code>"not_found"</code>. Those labels pick the next step.</li>
+<li><code>ask_approver</code> raises the ticket and asks the named approver for a decision. The demo uses <code>input()</code> so you can see the mechanism; CrewAI's <code>@human_feedback</code> decorator (CrewAI 1.8 and later) is the built-in alternative, with outcomes such as "approved" or "rejected" routed to different listeners.</li>
+<li><code>write_reply</code> is the only model call: one Deal Writer agent, given the facts and the decision, asked to offer nothing beyond them.</li>
+</ul>
+<div class="callout warn"><b>Watch out</b><p>A Flow method cannot listen to a label with its own name (CrewAI rejects it as an infinite loop). That is why the "not_found" route is handled by a method called <code>report_missing</code>.</p></div>
+<h3>Step 5: run both and compare</h3>
+<p>Here is the crew handling the Bluewave request. Agent wording varies run to run.</p>
+<div class="trace">
+  <div class="t-user">kickoff(inputs={"request": "Bluewave Logistics wants 6% off their next order. Can we do it?"})</div>
+  <div class="t-think">[Account Analyst] I need the customer's record from the CRM.</div>
+  <div class="t-act">find_customer(name="Bluewave Logistics")</div>
+  <div class="t-obs">{"id":"C-102","name":"Bluewave Logistics","tier":"Silver","annual_revenue_lakh":19,"late_payments_fy":2,"gross_margin_pct":18}</div>
+  <div class="t-think">[Policy Officer] Silver cap 8%, but 2 late payments cap them at 3%. Let me check margin.</div>
+  <div class="t-act">get_discount_policy() · margin_after_discount(current_margin_pct=18, discount_pct=6)</div>
+  <div class="t-obs">policy text · 12</div>
+  <div class="t-think">[Policy Officer] Verdict: ESCALATE. Cap 3%, margin after 12%, approver Sales Manager. Reason: 2 late payments this FY.</div>
+  <div class="t-human">human_input: Sales Manager types "Approved at 4% as a one-off. Payment terms unchanged."</div>
+  <div class="t-think">[Policy Officer] Final verdict updated: approved by Sales Manager at 4%.</div>
+  <div class="t-final">[Deal Writer] "Thank you for your continued business. We can offer a one-off 4% discount on your next order..."</div>
+</div>
+<p>Now the Flow for the same request: <code>lookup</code> (code) → <code>check_policy</code> returns "escalate" (code) → <code>ask_approver</code> raises APR-0001 and the Sales Manager types "approve 4%" → <code>write_reply</code> (one model call). Sahyadri at 10% routes to <code>approve</code>; Kite at 5% routes to <code>escalate</code> because the margin would be 11%.</p>
+<h3>Does the Deal Desk need three agents?</h3>
+<p>To be honest, no. Count the model work. The crew runs three agents, each with its own reasoning loop, and the Policy Officer applies the rules from prose, so it can still get Kite wrong. The Flow makes one model call, applies the rules in code and can never approve Kite at 5%. It is cheaper, faster and easier to audit.</p>
+<p>The crew is still a useful exercise. It shows how roles and per-agent tools work, and it is the right shape for jobs that really need different skills. But for a rule-bound decision with one approval, the single-agent or Flow design wins. A good test: if your agents mostly pass a record from one to the next without adding judgement, you have built a relay race, not a team.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>When a vendor or an internal team shows you a multi-agent design, ask for the single-agent baseline and the cost per request for both. If they have not built the baseline, they do not know whether the extra agents add anything.</p></div>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<h3>Hosting</h3>
+<p>A crew or Flow is a Python program, so it runs anywhere Python runs: behind a FastAPI endpoint on your cloud, in a container, or as a scheduled job. CrewAI AMP is the managed alternative. As of 2026 it deploys crews to managed infrastructure, exposes them through a REST API, records execution traces and logs, and includes Crew Studio, a low-code builder. Check the <a href="https://docs-platform.crewai.com/platform/en/introduction" target="_blank" rel="noopener">AMP docs</a> for current hosting regions and plans.</p>
+<h3>Identity and SSO</h3>
+<p>Put the endpoint behind company login and pass the user id in the Flow's inputs so it appears in logs. The console-based <code>human_input</code> and <code>input()</code> do not survive the move to a web app: replace them with an approval card in Teams or Slack, and have the Flow wait for or resume on the decision. Take the approver's identity from SSO.</p>
+<h3>Data access</h3>
+<p>Give each agent only the tools its role needs, and give the tools a read-only service account. Keep customer data minimal in task descriptions, because everything in them is sent to the model. Review what your traces store against the DPDP Act 2023 and your customer contracts.</p>
+<h3>Cost control</h3>
+<p>Multi-agent crews are the most expensive design on this site for the same job. Set <code>max_iter</code> on agents and <code>max_rpm</code> to cap request rates, use a smaller model for the Analyst, and prefer Flows with code for the deterministic steps. Track tokens per request; CrewAI reports usage metrics on the crew after a run.</p>
+<h3>Monitoring and approvals</h3>
+<p>Turn on tracing (<code>Crew(tracing=True)</code> or AMP's traces) during the pilot and review a sample weekly. Watch for drift between agents: the Writer offering a number the Policy Officer did not approve is the failure to look for. Approval rules stay the same as on every page: named approver, expiry, no self-approval.</p>
+<ul class="checklist"><li>Rules in Flow code, not only in backstories</li><li>Per-agent tool lists reviewed by security</li><li>Console human input replaced with an approval service</li><li><code>max_iter</code>, rate limits and token tracking set</li><li>Versions pinned; regression tests on every upgrade</li></ul>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<p>Use crews where the skills really differ; use Flows where the rules must hold.</p>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Strategy</td><td>Market entry scan</td><td>Researcher gathers sources, Analyst sizes the market, Writer drafts a memo</td><td>Strategy lead checks sources before circulation</td></tr>
+<tr><td>Marketing</td><td>Campaign content pipeline</td><td>Planner drafts angles, Writer drafts posts, Reviewer checks brand rules</td><td>Brand manager approves before publishing</td></tr>
+<tr><td>Sales</td><td>Account plan preparation</td><td>Analyst pulls CRM history, Researcher scans news, Writer drafts the plan</td><td>Account owner edits and owns the plan</td></tr>
+<tr><td>Procurement</td><td>Supplier due diligence first draft</td><td>Checks registrations, news, financial summaries; flags risks</td><td>Procurement head decides on onboarding</td></tr>
+<tr><td>Sales ops</td><td>Deal Desk (this page, as a Flow)</td><td>Code applies policy, one agent drafts the reply</td><td>Sales Manager approves exceptions</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Count the calls</b><p>For the Bluewave request, estimate the number of model calls in the crew version and in the Flow version. What does that imply for cost at 2,000 requests a month?</p><details><summary>Hint / model answer</summary><p>The crew: each agent runs its own loop, typically two to four calls each, so roughly six to twelve calls. The Flow: one call (the writer). At 2,000 requests a month, the crew uses several times more tokens for the same outcome, and has more chances to get the policy wrong.</p></details></li>
+<li><b>Write the backstory, then distrust it</b><p>Rewrite the Policy Officer's backstory to make it stricter. Then list two things the backstory cannot guarantee, and where in the code you would enforce them.</p><details><summary>Hint / model answer</summary><p>A backstory cannot guarantee the margin rule is applied, or that a discount above cap is never promised. Enforce the first with <code>evaluate_request</code> in a Flow router, and the second by routing every failed check through <code>ask_approver</code> before <code>write_reply</code> can run.</p></details></li>
+<li><b>When a crew is right</b><p>Describe one task in your own organisation where a three-agent crew would beat a single agent. What makes the roles genuinely different?</p><details><summary>Hint / model answer</summary><p>Good answers have roles with different tools and different judgement: for example, a researcher with web search, a financial analyst with spreadsheet tools, and a writer with the house style guide. If the roles share the same tools and data, one agent is probably enough.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="c">
+    <p class="q-text">What does human_input=True on a CrewAI task do?</p>
+    <ol class="q-opts"><li data-k="a">Lets the salesperson type the request</li><li data-k="b">Forces the agent to ask the user a clarifying question first</li><li data-k="c">Asks a person to review the agent's answer for that task before the crew continues</li><li data-k="d">Sends the final reply to a human for sending</li></ol>
+    <p class="q-why">It adds a human review of the task's final answer; the agent can revise using the feedback before later tasks run.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">Which design guarantees that Kite Fintech at 5% is escalated, whatever the model thinks?</p>
+    <ol class="q-opts"><li data-k="a">A Flow whose router calls evaluate_request</li><li data-k="b">A crew with a stricter Policy Officer backstory</li><li data-k="c">A hierarchical crew with a manager LLM</li><li data-k="d">Giving the Deal Writer the policy tool</li></ol>
+    <p class="q-why">Only code-based routing is deterministic. Backstories and manager models are prompts and can still miss the 11% margin.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">What does a hierarchical process add to a crew?</p>
+    <ol class="q-opts"><li data-k="a">A database for state</li><li data-k="b">Parallel execution of all tasks</li><li data-k="c">A human approver for every task</li><li data-k="d">A manager (manager_llm or manager_agent) that assigns tasks and reviews outputs</li></ol>
+    <p class="q-why">The manager plans, delegates and validates. Flexible, but less predictable than a fixed sequence.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">Why is per-agent tool assignment a genuine benefit of splitting work across agents?</p>
+    <ol class="q-opts"><li data-k="a">It makes the agents faster</li><li data-k="b">It limits which agent can touch which system, a real access control</li><li data-k="c">It removes the need for a human checkpoint</li><li data-k="d">It reduces token usage to zero for tool-less agents</li></ol>
+    <p class="q-why">Roles and backstories are prompts; tool lists are enforced by the framework. Only the Analyst can read the CRM.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">The honest verdict on a three-agent crew for the Deal Desk is:</p>
+    <ol class="q-opts"><li data-k="a">Essential, because three roles exist in the human team</li><li data-k="b">Better, because more agents means more checking</li><li data-k="c">Unnecessary: a Flow with code rules and one writing agent is cheaper and more reliable</li><li data-k="d">Impossible, because CrewAI needs at least four agents</li></ol>
+    <p class="q-why">The job is lookups plus one rule-bound decision. More agents add cost and drift without adding judgement.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="crewai"></div>
+<div class="res-list">
+  <a class="res" href="https://docs.crewai.com" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">CrewAI documentation</span><span class="res-by">CrewAI · agents, tasks, crews, tools</span></a>
+  <a class="res" href="https://docs.crewai.com/en/concepts/flows" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Flows</span><span class="res-by">CrewAI · start, listen, router and typed state</span></a>
+  <a class="res" href="https://docs.crewai.com/en/concepts/processes" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Processes</span><span class="res-by">CrewAI · sequential versus hierarchical</span></a>
+  <a class="res" href="https://docs.crewai.com/en/learn/human-feedback-in-flows" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Human feedback in Flows</span><span class="res-by">CrewAI · the @human_feedback decorator</span></a>
+  <a class="res" href="https://docs-platform.crewai.com/platform/en/introduction" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">CrewAI AMP</span><span class="res-by">CrewAI · managed deployment, traces and Crew Studio</span></a>
+  <a class="res" href="https://github.com/crewAIInc/crewAI" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">crewAIInc/crewAI</span><span class="res-by">GitHub · source and examples</span></a>
+</div>
+<div class="cards">
+  <a class="card" href="{{root}}modules/m08-multi-agent-systems.html"><span class="card-kicker">Module 08</span><b>Multi-agent systems</b><span>When several agents beat one, and when they don't.</span></a>
+  <a class="card" href="{{root}}methods/langgraph.html"><span class="card-kicker">Method · Code</span><b>LangGraph</b><span>Explicit graphs with durable pause and resume.</span></a>
+  <a class="card" href="{{root}}methods/microsoft-agent-framework.html"><span class="card-kicker">Method · Code</span><b>Microsoft Agent Framework</b><span>Agents and workflows for Microsoft shops.</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>CrewAI models work as a team: agents with roles, tasks with expected outputs, crews with a process.</li><li>Per-agent tool lists are a real control; roles and backstories are only prompts.</li><li>Flows give deterministic routing and typed state; call agents or crews inside steps.</li><li>For the Deal Desk, a Flow with code rules and one writer beats a three-agent crew.</li><li>Always compare a multi-agent design against a single-agent baseline on cost and accuracy.</li></ul></div>
+</section>

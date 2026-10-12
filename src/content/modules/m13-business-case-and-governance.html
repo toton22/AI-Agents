@@ -1,0 +1,419 @@
+<!--META {"title":"M13 Business case and governance","h1":"Business case, ROI and <em>governance</em>","eyebrow":"Module 13 · Level 3 · Corporate","lede":"Pick agent use cases that pay, build an honest rupee ROI model for the Meridian Deal Desk agent, and set up the KPIs, operating model, governance and change plan that keep agents valuable and under control after launch.","minutes":60} -->
+<section id="m13-idea">
+<h2>The big idea</h2>
+<p>Most agent projects that fail do not fail on technology. They fail on value, cost or risk. The agent works, more or less, but nobody can say what it is worth, the bill grows, the risk team gets nervous, and the project is quietly shelved.</p>
+<p>This is not a hunch. In June 2025 Gartner predicted that <a href="https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027" target="_blank" rel="noopener">over 40% of agentic AI projects will be cancelled by the end of 2027</a>, citing escalating costs, unclear business value or inadequate risk controls. The same release warned about "agent washing", estimating that only about 130 of the thousands of vendors calling their products agentic actually are. And McKinsey's <a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank" rel="noopener">2026 State of AI survey</a> found that 37% of respondents attribute at least some EBIT impact to AI, essentially unchanged from the year before. Lots of activity; much less proven value.</p>
+<p>The fix is unglamorous management work, done before and after the build: choose use cases where agents fit, model the value with assumptions everyone can see, measure against a baseline, give every agent an owner, and govern the whole portfolio so risk is managed rather than discovered.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>You are the person who will be asked "was it worth it?" twelve months from now. You can only answer if you write down three things before the build starts: the baseline (how long, how costly, how error-prone the work is today), the assumptions behind the benefit, and the metric you will use to check. Everything in this module serves that conversation.</p></div>
+</section>
+
+<section id="m13-how">
+<h2>How it works</h2>
+<h3>Finding the right use cases</h3>
+<p>Do not start with "where can we use agents?" Start with work. Take a role or a process and break it into tasks, then ask of each task: how often does it happen, how rule-bound is it, how much judgement does it need, what does a mistake cost, and can the data and systems be reached? This is <b>task decomposition</b>, and it nearly always shows that an agent should take some tasks, not the whole job.</p>
+<div class="table-wrap"><table><thead><tr><th>Deal desk task at Meridian</th><th>Volume</th><th>Nature</th><th>Agent fit</th></tr></thead><tbody>
+<tr><td>Look up customer tier, payment history, margin</td><td>Every request</td><td>Pure retrieval</td><td>High: tools do it in seconds</td></tr>
+<tr><td>Check the request against discount policy</td><td>Every request</td><td>Rules</td><td>High, with the rule enforced in code</td></tr>
+<tr><td>Draft the reply or the approval note</td><td>Every request</td><td>Writing with context</td><td>High: the model's strength</td></tr>
+<tr><td>Decide on exceptions above policy</td><td>About a third of requests</td><td>Judgement, accountability</td><td>Low: a manager decides; the agent prepares the case</td></tr>
+<tr><td>Negotiate with the customer's procurement team</td><td>Occasional</td><td>Relationship, tactics</td><td>None: human work</td></tr>
+</tbody></table></div>
+<p>The pattern generalises into a sweet spot: <b>boring, high-volume, rules-plus-judgement</b> work. Boring means stable and well understood, so you can write a golden set. High-volume means small savings per task add up. Rules-plus-judgement means pure rules are better served by ordinary automation, while pure judgement is too risky to delegate; agents earn their keep in the middle, where they read messy inputs, apply rules, and hand a well-prepared decision to a human. OpenAI's practical guide to building agents lands in the same place: complex decisions, rules that are hard to maintain, and heavy use of unstructured data. Anthropic's advice adds the counterweight: use the simplest thing that works, which is often a single model call or a fixed workflow rather than an agent.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 400" role="img" aria-label="Value versus feasibility matrix plotting six Meridian candidate use cases in four quadrants">
+  <text class="fx-ts" x="16" y="20">Business value</text>
+  <rect class="fx-box k3" x="80" y="30" width="310" height="160" rx="6"/>
+  <rect class="fx-box fx-hi" x="390" y="30" width="310" height="160" rx="6"/>
+  <rect class="fx-box k5" x="80" y="190" width="310" height="160" rx="6"/>
+  <rect class="fx-box k2" x="390" y="190" width="310" height="160" rx="6"/>
+  <text class="fx-tb" x="96" y="54">Big bets</text>
+  <text class="fx-tb" x="684" y="54" text-anchor="end">Start here</text>
+  <text class="fx-tb" x="96" y="334">Avoid</text>
+  <text class="fx-tb" x="684" y="334" text-anchor="end">Quick wins</text>
+  <circle class="fx-dot" cx="600" cy="90" r="6"/>
+  <text class="fx-ts" x="590" y="94" text-anchor="end">Deal Desk approvals</text>
+  <circle class="fx-dot" cx="560" cy="150" r="6"/>
+  <text class="fx-ts" x="550" y="154" text-anchor="end">Invoice query triage</text>
+  <circle class="fx-dot" cx="620" cy="260" r="6"/>
+  <text class="fx-ts" x="610" y="264" text-anchor="end">HR policy questions</text>
+  <circle class="fx-dot" cx="250" cy="130" r="6"/>
+  <text class="fx-ts" x="260" y="134">RFP drafting</text>
+  <circle class="fx-dot" cx="200" cy="90" r="6"/>
+  <text class="fx-ts" x="210" y="94">Autonomous price talks</text>
+  <circle class="fx-dot" cx="180" cy="280" r="6"/>
+  <text class="fx-ts" x="190" y="284">Board strategy memos</text>
+  <path class="fx-ar" d="M80 362 H700"/>
+  <path class="fx-ar" d="M70 350 V36"/>
+  <text class="fx-ts" x="390" y="384" text-anchor="middle">Feasibility: data access, clear rules, tolerable risk, integration effort</text>
+</svg>
+<figcaption>Plot candidates on value and feasibility, then start top-right. Quick wins build confidence; big bets need a platform and governance first.</figcaption>
+</figure>
+<p>Score each axis with a few simple 1-to-5 questions rather than gut feel. Value: hours at stake, money at stake (leakage, revenue, penalties), and strategic importance. Feasibility: are the data and systems reachable through APIs, are the rules written down, what does an error cost, and how many systems must be integrated? The Deal Desk lands top-right because the rules are written, the data sits in two systems, and a wrong answer is caught by an approval step.</p>
+
+<h3>Build, buy or partner</h3>
+<div class="table-wrap"><table><thead><tr><th>Route</th><th>Choose it when</th><th>Watch-outs</th></tr></thead><tbody>
+<tr><td><b>Buy</b> (agent inside a suite you own, or a specialist product)</td><td>The process is standard (IT tickets, HR queries, CRM updates) and your data already lives in that vendor's platform</td><td>Agent washing; per-conversation pricing that scales badly; your process bent to fit the product</td></tr>
+<tr><td><b>Build</b> (your team, on a platform or framework)</td><td>The process is specific to you and a source of advantage, like Meridian's pricing rules; you have or can hire the skills</td><td>You own maintenance, evals and on-call forever; underestimating integration effort</td></tr>
+<tr><td><b>Partner</b> (a systems integrator or specialist firm builds with you)</td><td>You need speed and skills now but want to own the result</td><td>Knowledge leaving with the partner; insist on documentation, the golden set and a handover plan in the contract</td></tr>
+</tbody></table></div>
+<p>In practice most companies end up with a mix: buy for commodity processes, build for the few that differentiate, and partner to get the first builds done while internal skills grow.</p>
+
+<h3>The ROI model</h3>
+<p>An honest agent ROI model has six moving parts. On the benefit side: <b>hours saved</b>, <b>cycle time</b> (faster answers, sometimes worth more than the hours), <b>quality</b> (fewer errors, less leakage, better compliance) and <b>revenue uplift</b>. On the cost side: <b>run cost</b> (models, hosting, tools, the people who own and review it), <b>build cost</b> and <b>change cost</b> (training, process redesign, communication). Here it is for the Deal Desk. Every number is an assumption, labelled so you can challenge it; none is a claim about any real company.</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Assumption</th><th>Value</th></tr></thead><tbody>
+<tr><td>B1</td><td>Discount requests a month</td><td>40 reps × 3 a day × 22 days = 2,640</td></tr>
+<tr><td>B2</td><td>Effort per request today (rep chasing data, analyst checking policy, emails)</td><td>25 minutes combined</td></tr>
+<tr><td>B3</td><td>Effort per request with the agent (rep reviews the draft)</td><td>5 minutes</td></tr>
+<tr><td>B4</td><td>Loaded cost of that time</td><td>₹600 an hour</td></tr>
+<tr><td>B5</td><td>Share of saved time that becomes real value</td><td>50% (people do other work; nobody is let go)</td></tr>
+<tr><td>B6</td><td>Requests today approved above policy informally</td><td>2%, averaging 2 points too much, on ₹1.5 lakh orders</td></tr>
+<tr><td>B7</td><td>Share of that leakage the agent and approval gate stop</td><td>75%</td></tr>
+<tr><td>C1</td><td>Run cost a month</td><td>₹36,280 platform (from <a href="{{root}}modules/m12-deployment-and-llmops.html">M12</a>) + ₹50,000 agent-owner time + ₹20,000 upkeep = ₹1,06,280</td></tr>
+<tr><td>C2</td><td>One-time cost</td><td>Build ₹18 lakh + ERP/CRM integration ₹6 lakh + change ₹4 lakh = ₹28 lakh</td></tr>
+<tr><td>C3</td><td>Ramp-up</td><td>Months 1 to 3 at half benefit (pilot)</td></tr>
+</tbody></table></div>
+<p>Hours saved: 2,640 × 20 minutes = 880 hours a month. At ₹600 that is ₹5.28 lakh, but at 50% realisation we count ₹2.64 lakh. Leakage: 2,640 × 2% ≈ 53 requests × ₹1.5 lakh × 2% = ₹1.58 lakh a month, of which 75% is ₹1.19 lakh. Total benefit at full run: ₹3.83 lakh a month against ₹1.06 lakh of run cost.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 320" role="img" aria-label="Year-one waterfall in rupees lakh: time saved plus 27.7, leakage cut plus 12.5, run cost minus 12.8, build minus 24.0, change minus 4.0, net minus 0.6">
+  <text class="fx-th" x="16" y="30">Deal Desk, year 1 (₹ lakh)</text>
+  <path class="fx-ln" d="M60 270 H700"/>
+  <rect class="fx-box k2" x="70" y="131" width="76" height="139" rx="3"/>
+  <text class="fx-tb" x="108" y="125" text-anchor="middle">+27.7</text>
+  <rect class="fx-box k2" x="178" y="69" width="76" height="62" rx="3"/>
+  <text class="fx-tb" x="216" y="63" text-anchor="middle">+12.5</text>
+  <rect class="fx-box k5" x="286" y="69" width="76" height="64" rx="3"/>
+  <text class="fx-tb" x="324" y="63" text-anchor="middle">−12.8</text>
+  <rect class="fx-box k5" x="394" y="133" width="76" height="120" rx="3"/>
+  <text class="fx-tb" x="432" y="127" text-anchor="middle">−24.0</text>
+  <rect class="fx-box k5" x="502" y="253" width="76" height="20" rx="3"/>
+  <text class="fx-tb" x="540" y="247" text-anchor="middle">−4.0</text>
+  <rect class="fx-box fx-hi" x="610" y="270" width="76" height="3" rx="1"/>
+  <text class="fx-tb" x="648" y="262" text-anchor="middle">−0.6</text>
+  <path class="fx-ln fx-dash" d="M146 131 H178"/>
+  <path class="fx-ln fx-dash" d="M254 69 H286"/>
+  <path class="fx-ln fx-dash" d="M362 133 H394"/>
+  <path class="fx-ln fx-dash" d="M470 253 H502"/>
+  <path class="fx-ln fx-dash" d="M578 273 H610"/>
+  <text class="fx-ts" x="108" y="296" text-anchor="middle">Time saved</text>
+  <text class="fx-ts" x="216" y="296" text-anchor="middle">Leakage cut</text>
+  <text class="fx-ts" x="324" y="296" text-anchor="middle">Run cost</text>
+  <text class="fx-ts" x="432" y="296" text-anchor="middle">Build</text>
+  <text class="fx-ts" x="540" y="296" text-anchor="middle">Change</text>
+  <text class="fx-ts" x="648" y="296" text-anchor="middle">Net year 1</text>
+</svg>
+<figcaption>Year 1 roughly breaks even because the one-time costs land up front. Build includes integration. The return comes in years 2 and 3, if the assumptions hold.</figcaption>
+</figure>
+<div class="table-wrap"><table><thead><tr><th>Scenario</th><th>What changes</th><th>Year-1 net</th><th>3-year ROI</th><th>Payback</th></tr></thead><tbody>
+<tr><td>Base case</td><td>Assumptions as above</td><td>−₹0.6 lakh</td><td>99%</td><td>Month 13</td></tr>
+<tr><td>Pessimistic</td><td>25% time realisation, no leakage benefit</td><td>−₹26.9 lakh</td><td>−31%</td><td>Not within 3 years</td></tr>
+<tr><td>Optimistic</td><td>75% time realisation</td><td>₹13.3 lakh</td><td>168%</td><td>Month 9</td></tr>
+</tbody></table></div>
+<p>Three lessons hide in that table. First, the realisation assumption swings everything; "hours saved" is not cash unless the hours go somewhere useful, so say where they go (more customer calls, faster quotes) and track it. Second, the quality benefit (leakage) is what makes the base case work; agents that enforce a policy often pay through control, not speed. Third, revenue uplift is not in the base case at all. Faster quotes probably win some deals, but count that as upside and measure it, rather than putting it in the business case as fact.</p>
+
+<h3>KPIs and a value-tracking dashboard</h3>
+<p>Track four layers, and only the last one is money. If adoption is low, nothing else matters; if quality slips, the savings are fake.</p>
+<div class="table-wrap"><table><thead><tr><th>Layer</th><th>KPI</th><th>Baseline</th><th>Target (month 6)</th><th>Owner · cadence</th></tr></thead><tbody>
+<tr><td>Adoption</td><td>Share of discount requests that go through the agent</td><td>0%</td><td>80%</td><td>Sales ops · weekly</td></tr>
+<tr><td>Efficiency</td><td>Median minutes from request to answer</td><td>25 min effort, about a day elapsed</td><td>5 min effort, under 1 hour elapsed</td><td>Agent owner · weekly</td></tr>
+<tr><td>Quality and risk</td><td>Discounts granted above policy without approval</td><td>About 2% of requests</td><td>0</td><td>Finance controller · monthly</td></tr>
+<tr><td>Quality and risk</td><td>Escalation precision; golden-set pass rate</td><td>n/a</td><td>90%+; 100% on critical cases</td><td>Agent owner · each release</td></tr>
+<tr><td>Financial</td><td>Net monthly benefit versus business case</td><td>₹0</td><td>₹2.77 lakh</td><td>Business sponsor · quarterly</td></tr>
+<tr><td>Financial</td><td>All-in cost per request</td><td>n/a</td><td>Under ₹15</td><td>Agent owner · monthly</td></tr>
+</tbody></table></div>
+
+<h3>The operating model</h3>
+<p>Someone has to own each agent after the launch party. Companies that scale agents settle on a small set of roles, usually around a central team.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 320" role="img" aria-label="Operating model: AI centre of excellence connected to business sponsor, agent owner, human reviewers, product owner, risk and compliance, IT and security">
+  <rect class="fx-box k1" x="16" y="30" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="116" y="56" text-anchor="middle">Business sponsor</text>
+  <text class="fx-ts" x="116" y="75" text-anchor="middle">owns the value case</text>
+  <rect class="fx-box k1" x="16" y="135" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="116" y="161" text-anchor="middle">Agent owner</text>
+  <text class="fx-ts" x="116" y="180" text-anchor="middle">runs one agent daily</text>
+  <rect class="fx-box k1" x="16" y="240" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="116" y="266" text-anchor="middle">Human reviewers</text>
+  <text class="fx-ts" x="116" y="285" text-anchor="middle">approve and correct</text>
+  <rect class="fx-box fx-hi" x="280" y="135" width="160" height="60" rx="6"/>
+  <text class="fx-tb" x="360" y="161" text-anchor="middle">AI CoE</text>
+  <text class="fx-ts" x="360" y="180" text-anchor="middle">platform, standards</text>
+  <rect class="fx-box k4" x="504" y="30" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="604" y="56" text-anchor="middle">Product owner</text>
+  <text class="fx-ts" x="604" y="75" text-anchor="middle">backlog, adoption</text>
+  <rect class="fx-box k5" x="504" y="135" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="604" y="161" text-anchor="middle">Risk and compliance</text>
+  <text class="fx-ts" x="604" y="180" text-anchor="middle">tiering, approvals</text>
+  <rect class="fx-box k6" x="504" y="240" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="604" y="266" text-anchor="middle">IT and security</text>
+  <text class="fx-ts" x="604" y="285" text-anchor="middle">identity, hosting, data</text>
+  <path class="fx-ln" d="M280 160 L216 60"/>
+  <path class="fx-ln" d="M280 165 H216"/>
+  <path class="fx-ln" d="M280 170 L216 270"/>
+  <path class="fx-ln" d="M440 160 L504 60"/>
+  <path class="fx-ln" d="M440 165 H504"/>
+  <path class="fx-ln" d="M440 170 L504 270"/>
+</svg>
+<figcaption>Business roles on the left, control roles on the right, a small central team in the middle that sets standards and runs the shared platform.</figcaption>
+</figure>
+<ul>
+<li>The <b>AI Centre of Excellence (CoE)</b> is a small central team. It runs the shared platform, sets standards (eval, guardrail and deployment checklists from M10 to M12), keeps the agent registry, and coaches business teams. It should not build every agent itself, or it becomes a bottleneck.</li>
+<li>The <b>business sponsor</b> owns the value case and is accountable for the benefit actually landing. For the Deal Desk, Meridian's head of sales.</li>
+<li>The <b>product owner</b> manages the backlog and adoption: which requests to support next, what users complain about.</li>
+<li>The <b>agent owner</b> runs one agent day to day: watches the dashboard, triages incidents, keeps the golden set current when policy changes. Often a sales-ops analyst with part of their week set aside.</li>
+<li><b>Risk and compliance</b> sets the risk tier, approves launches of higher-tier agents, and audits.</li>
+<li><b>IT and security</b> own identity, hosting, data access and integration.</li>
+<li><b>Human reviewers</b> are the managers and specialists in the loop. It is a real role, so give it time, training and its own metrics.</li>
+</ul>
+
+<h3>Agent governance</h3>
+<p>Governance is how a company knows what agents it has, how risky each is, who approved it, and whether it still behaves. Five mechanisms cover most of it.</p>
+<p><b>1. An inventory or registry.</b> You cannot govern what you cannot list. Every agent, including the no-code ones built in a department, gets an entry.</p>
+<div class="table-wrap"><table><thead><tr><th>Registry field</th><th>Deal Desk entry</th></tr></thead><tbody>
+<tr><td>Name, version, platform</td><td>Meridian Deal Desk 1.4.0, Python container</td></tr>
+<tr><td>Business sponsor; agent owner</td><td>Head of Sales; Sales Ops analyst (West)</td></tr>
+<tr><td>Purpose and users</td><td>Discount checks for 40 sales reps; internal only</td></tr>
+<tr><td>Tools and permissions</td><td>5 tools; read-only CRM/ERP; creates approval tickets</td></tr>
+<tr><td>Data touched; personal data?</td><td>Customer master, margins; minimal personal data, redacted</td></tr>
+<tr><td>Models and vendors</td><td>One hosted LLM; tracing vendor; India-region hosting</td></tr>
+<tr><td>Risk tier; last review</td><td>Tier 2; reviewed at each release</td></tr>
+<tr><td>Eval and guardrail evidence</td><td>Golden set 100% on critical cases; red-team list passed</td></tr>
+</tbody></table></div>
+<p><b>2. Risk tiering.</b> Not every agent needs a committee. Tier by impact and autonomy, and scale the controls to match.</p>
+<div class="table-wrap"><table><thead><tr><th>Tier</th><th>Typical agent</th><th>Controls</th></tr></thead><tbody>
+<tr><td>Tier 1: low</td><td>Internal Q&amp;A over public or non-sensitive documents; drafts that a person always edits</td><td>Registry entry, standard checklist, owner sign-off</td></tr>
+<tr><td>Tier 2: medium</td><td>Acts in business systems within limits, touches confidential data (the Deal Desk)</td><td>Golden set and red-team evidence, CoE review, human approval above thresholds, quarterly review</td></tr>
+<tr><td>Tier 3: high</td><td>Affects individuals' rights or money (hiring, credit, claims), customer-facing at scale, or high autonomy</td><td>Approval board, impact assessment, bias testing, legal review, EU AI Act and DPDP checks, ongoing audit</td></tr>
+</tbody></table></div>
+<p><b>3. An approval board</b> for Tier 3 and for exceptions: a small group from the business, risk, legal, IT and the CoE that meets on a fixed cadence and decides quickly. Its job is a documented yes, no or "yes with conditions", not endless review.</p>
+<p><b>4. Model and agent cards.</b> A one-to-two page document per agent saying what it does, what it must not do, which models and data it uses, known limitations, eval results and the human checkpoints. Write it for a reader in audit or legal, not for engineers.</p>
+<p><b>5. Audit.</b> Periodic checks that the agent still matches its card: sample the logs, re-run the golden set, confirm permissions have not crept. If you want an external frame, NIST's AI RMF (Govern, Map, Measure, Manage) gives you the vocabulary, and ISO/IEC 42001 gives you a certifiable management system; <a href="{{root}}modules/m11-guardrails-and-responsible-ai.html">M11</a> covers both alongside the EU AI Act and India's DPDP rules.</p>
+
+<h3>Change management and the workforce</h3>
+<p>Here's the bit business cases usually skip. People decide whether an agent succeeds, and the people most affected often hear about it last.</p>
+<p><b>Redesign the job as well as the task.</b> If the deal-desk analyst no longer checks policy by hand, what does the role become? At Meridian a sensible answer is: handle the exceptions the agent escalates, own the golden set, analyse discount patterns, coach reps on pricing. That is a better job, but only if someone designs it and says so.</p>
+<p><b>Reskill deliberately.</b> Reviewers need training on what agents get wrong and how to check them. Agent owners need basic skills in evals, dashboards and prompt changes. Budget time for it in the change cost; it is not free.</p>
+<p><b>Tell people early and honestly.</b> Staff will assume the worst if you say nothing. Explain what the agent will do, what it will not, what happens to roles, and how they can raise problems. If no jobs are being cut, say so; if some are changing, say how. A vague message invites quiet resistance and workarounds.</p>
+<p><b>Make "human in the loop" a real role.</b> Approving an agent's escalation is a decision with accountability. Give reviewers clear criteria, a reasonable volume, and feedback on their own accuracy. A reviewer who rubber-stamps 200 approvals a day is not a control.</p>
+<p>Here is what that role looks like when it works. The agent does the legwork and frames the decision; the manager spends three minutes deciding, not thirty minutes gathering.</p>
+<div class="trace">
+  <div class="t-user">Orchid Schools Trust wants 14% on the annual stationery contract.</div>
+  <div class="t-act">find_customer(name="Orchid Schools Trust")</div>
+  <div class="t-obs">{"id":"C-103","tier":"Gold","late":0,"margin":25}</div>
+  <div class="t-act">margin_after_discount(current_margin_pct=25, discount_pct=14)</div>
+  <div class="t-obs">11.0</div>
+  <div class="t-think">14% is above the 12% Gold cap and leaves 11% margin, under the 12% floor. The Sales Manager decides. I should hand over everything needed to decide quickly, including an in-policy alternative.</div>
+  <div class="t-act">request_approval(customer_id="C-103", discount_pct=14, approver="Sales Manager", reason="Above Gold cap of 12%; margin after discount 11%, below floor. No late payments. In-policy option: 12%.")</div>
+  <div class="t-human">Sales Manager: approve 12% now; 14% only with a two-year commitment. Decided in 3 minutes.</div>
+  <div class="t-final">Draft reply for the rep: offer Orchid 12% on this order, or 14% on a two-year contract, as approved under ticket reference.</div>
+</div>
+
+<h3>Procurement checklist for agent vendors</h3>
+<ul class="checklist">
+<li>Show it working on our data and our golden set, not a scripted demo</li>
+<li>What exactly is agentic here: which decisions and tool calls does it make on its own?</li>
+<li>Which models are used, where are they hosted, and can we choose or pin versions?</li>
+<li>Where are prompts, logs, memory and traces stored; is India-region hosting available?</li>
+<li>Data processing agreement, sub-processor list, DPDP and breach-notification commitments</li>
+<li>Is our data used for training? Default and contractual position</li>
+<li>Identity: SSO support, on-behalf-of access, role-based permissions</li>
+<li>Guardrails: tool allow-lists, approval steps, spend and rate limits we control</li>
+<li>Observability: can we export traces and logs, ideally via OpenTelemetry?</li>
+<li>Evaluation: can we run our own test sets and see results per release?</li>
+<li>Pricing model at 10× our pilot volume; caps and alerts</li>
+<li>Certifications and frameworks (ISO/IEC 27001, ISO/IEC 42001, SOC 2) and evidence</li>
+<li>Exit: data export, and what happens to our agents if we leave</li>
+</ul>
+</section>
+
+<section id="m13-build">
+<h2>Hands-on: build the case</h2>
+<p>You will build the Deal Desk ROI model with sensitivity cases, then fill in a one-page business case. Pick the path that suits you; the numbers are the same.</p>
+<div class="tabs">
+<div class="tab" data-label="Spreadsheet">
+<ol class="steps">
+<li><b>Make an Assumptions tab</b><p>One row per assumption from B1 to C3 above: a label, a value, a source ("sales ops estimate", "finance", "vendor quote") and an owner. Name each value cell (for example <code>Requests</code>, <code>MinBefore</code>, <code>Realisation</code>) so formulas read like sentences.</p></li>
+<li><b>Compute monthly benefits</b><p>Time value: <code>=Requests*(MinBefore-MinAfter)/60*CostPerHour*Realisation</code>. Leakage avoided: <code>=Requests*LeakShare*AvgOrder*LeakPoints*LeakPrevented</code>.</p></li>
+<li><b>Lay out 36 months</b><p>Columns for months 1 to 36. Benefit row: full benefit times 0.5 in months 1 to 3, times 1 after. Run cost row: <code>=-RunCost</code>. Net row: benefit plus run cost. Put the one-time cost in a month-0 column.</p></li>
+<li><b>Add the summary</b><p>Cumulative cash row; payback is the first month the cumulative turns positive (<code>=MATCH(TRUE, INDEX(CumRow&gt;=0,0), 0)</code>). Year-1 net is the sum of months 1 to 12 plus month 0. Three-year ROI is total net divided by total cost.</p></li>
+<li><b>Add scenarios</b><p>Copy the assumptions into Base, Pessimistic and Optimistic columns and switch between them with a dropdown, or use Excel's Scenario Manager. Show all three to decision-makers, always.</p></li>
+</ol>
+</div>
+<div class="tab" data-label="Python">
+<p>No packages needed. Save as <code>roi_model.py</code> and run <code>python roi_model.py</code>.</p>
+<pre class="code"><code class="language-python">"""Deal Desk agent ROI model. All inputs are assumptions: change them, not the formulas."""
+
+A = {
+    "requests_per_month": 40 * 3 * 22,   # reps x requests a day x working days
+    "minutes_before": 25,                # rep + analyst effort per request today
+    "minutes_after": 5,                  # rep reviews the agent's draft
+    "cost_per_hour": 600,                # loaded cost of that time, Rs
+    "realisation": 0.50,                 # share of saved time that turns into value
+    "leak_share": 0.02,                  # requests approved above policy today
+    "avg_order": 150_000,                # Rs per order with a discount request
+    "leak_points": 0.02,                 # average excess discount on those orders
+    "leak_prevented": 0.75,              # share of leakage the agent stops
+    "run_cost_month": 36_280 + 50_000 + 20_000,  # platform (M12) + owner time + upkeep
+    "one_time": 18_00_000 + 6_00_000 + 4_00_000,  # build + integration + change
+    "pilot_months": 3,                   # months at half benefit while ramping
+}
+
+
+def monthly_benefit(a):
+    hours = a["requests_per_month"] * (a["minutes_before"] - a["minutes_after"]) / 60
+    time_value = hours * a["cost_per_hour"] * a["realisation"]
+    leakage = (a["requests_per_month"] * a["leak_share"] * a["avg_order"]
+               * a["leak_points"] * a["leak_prevented"])
+    return time_value, leakage
+
+
+def cash_flows(a, months=36):
+    time_value, leakage = monthly_benefit(a)
+    flows = []
+    for m in range(1, months + 1):
+        ramp = 0.5 if m &lt;= a["pilot_months"] else 1.0
+        flows.append((time_value + leakage) * ramp - a["run_cost_month"])
+    return flows
+
+
+def summary(a, label):
+    flows = cash_flows(a)
+    cum, payback = -a["one_time"], None
+    for m, f in enumerate(flows, start=1):
+        cum += f
+        if payback is None and cum &gt;= 0:
+            payback = m
+    year1 = sum(flows[:12]) - a["one_time"]
+    total_cost = a["one_time"] + a["run_cost_month"] * 36
+    roi3 = (sum(flows) - a["one_time"]) / total_cost
+    lakh = lambda x: f"Rs {x / 1e5:,.1f} lakh"
+    print(f"{label:&lt;14} year-1 net {lakh(year1):&gt;17}   3-yr ROI {roi3:6.0%}   "
+          f"payback month {payback or 'none in 3 yrs'}")
+
+
+if __name__ == "__main__":
+    t, l = monthly_benefit(A)
+    print(f"Monthly benefit at full run: time Rs {t:,.0f} + leakage Rs {l:,.0f}\n")
+    summary(A, "Base case")
+    summary({**A, "realisation": 0.25, "leak_prevented": 0.0}, "Pessimistic")
+    summary({**A, "realisation": 0.75}, "Optimistic")</code></pre>
+<p>Output:</p>
+<pre class="code"><code class="language-plaintext">Monthly benefit at full run: time Rs 264,000 + leakage Rs 118,800
+
+Base case      year-1 net      Rs -0.6 lakh   3-yr ROI    99%   payback month 13
+Pessimistic    year-1 net     Rs -26.9 lakh   3-yr ROI   -31%   payback month none in 3 yrs
+Optimistic     year-1 net      Rs 13.3 lakh   3-yr ROI   168%   payback month 9</code></pre>
+<p>What this does, in plain English:</p>
+<ul>
+<li><code>A</code> holds every assumption in one place, written in Indian notation (<code>18_00_000</code> is ₹18 lakh). Change assumptions here, never inside the formulas.</li>
+<li><code>monthly_benefit()</code> turns hours saved into rupees at the realisation rate, and computes the leakage the agent stops.</li>
+<li><code>cash_flows()</code> builds 36 months of net cash, at half benefit during the pilot months.</li>
+<li><code>summary()</code> finds the payback month, the year-1 net and the three-year ROI, and prints one line per scenario.</li>
+<li>The last lines run three scenarios by overriding a couple of assumptions each. Add your own, for example "integration costs double".</li>
+</ul>
+</div>
+</div>
+<h3>The one-page business case</h3>
+<p>Whatever the model says, decision-makers want one page. Here is a template with the Deal Desk filled in.</p>
+<div class="table-wrap"><table><thead><tr><th>Section</th><th>Deal Desk example</th></tr></thead><tbody>
+<tr><td>Problem and baseline</td><td>2,640 discount requests a month take 25 minutes of effort each and about a day to answer; around 2% are approved above policy.</td></tr>
+<tr><td>Proposed agent and scope</td><td>Agent checks customer, policy and margin, approves within policy, escalates the rest with a prepared case. Internal only; no customer-facing messages.</td></tr>
+<tr><td>Out of scope</td><td>Negotiation, credit limits, pricing changes, any message sent directly to customers.</td></tr>
+<tr><td>Benefits (with assumptions)</td><td>₹2.64 lakh a month of time at 50% realisation; ₹1.19 lakh a month of leakage avoided. Revenue uplift tracked, not counted.</td></tr>
+<tr><td>Costs</td><td>₹28 lakh one-time; ₹1.06 lakh a month to run.</td></tr>
+<tr><td>Financials and sensitivity</td><td>Payback month 13; 3-year ROI 99% (pessimistic −31%, optimistic 168%).</td></tr>
+<tr><td>Risks and controls</td><td>Tier 2. Code-enforced policy check, human approval above cap, PII redaction, audit log, golden set in CI.</td></tr>
+<tr><td>KPIs</td><td>Adoption 80%, effort 5 minutes, zero unapproved above-policy discounts, cost per request under ₹15.</td></tr>
+<tr><td>People and change</td><td>Deal-desk analyst role redesigned around exceptions and golden-set ownership; training for 40 reps and 6 managers.</td></tr>
+<tr><td>Plan and decision points</td><td>30-60-90 plan from <a href="{{root}}modules/m12-deployment-and-llmops.html">M12</a>; go/no-go at day 30 and day 90.</td></tr>
+<tr><td>Ask</td><td>Approval for ₹28 lakh and a 25% allocation of one sales-ops analyst as agent owner.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="m13-business">
+<h2>In the business</h2>
+<div class="case"><span class="case-tag">Case · HR</span><h4>Hours saved that went nowhere</h4><p>A shared-services centre deployed an HR query agent and reported thousands of hours saved in its first quarter. Finance asked where the hours had gone. Nobody knew: team size, overtime and backlog were unchanged. The second business case was rebuilt around a concrete use of the time (clearing a long-standing backlog of employee record corrections) and tracked that, which made the value visible and defensible.</p></div>
+<div class="case"><span class="case-tag">Case · Finance</span><h4>Control was the real return</h4><p>A manufacturing group's agent for checking travel and expense claims against policy saved modest reviewer time. The bigger win, which the original case had not counted, was consistency: out-of-policy claims that used to slip through on busy days were now flagged every time. The CFO's team re-based the business case on leakage prevented and audit findings closed, and expanded the agent to supplier invoices on that basis.</p></div>
+<div class="case"><span class="case-tag">Case · Customer service</span><h4>The vendor demo versus the golden set</h4><p>A telecom operator shortlisted three vendors for a billing-dispute agent. All three demos looked excellent. The procurement team then gave each vendor the same 200 anonymised real disputes as a golden set and scored the results. One vendor's pass rate was far below its demo impression, largely because its product could not handle the operator's bundled-plan rules. The checklist question "show it working on our data" saved a costly mistake.</p></div>
+<div class="case"><span class="case-tag">Case · Supply chain</span><h4>A registry found seventeen agents</h4><p>A consumer-goods company set up an agent registry and asked every department to declare what it had built. The CoE expected four or five. It found seventeen, including no-code agents in procurement with write access to vendor master data and no named owner. Within a quarter, each had an owner and a risk tier, three were retired, and two were rebuilt on the shared platform with proper approvals.</p></div>
+</section>
+
+<section id="m13-pitfalls">
+<h2>Pitfalls</h2>
+<p><b>No baseline.</b> If you did not measure the "before", you cannot prove the "after". Measure during the pilot at the latest.</p>
+<p><b>Hours equal rupees.</b> Saved hours only turn into value if they are redeployed or remove a cost. Use a realisation rate and say where the time goes.</p>
+<p><b>Counting revenue you hope for.</b> Faster quotes may win more deals. Put that in the upside and measure it with a comparison group, not in the base case.</p>
+<p><b>Forgetting run and people costs.</b> Model tokens are often the smallest line. Owner time, reviewer time, platform fees and upkeep are what make or break the case.</p>
+<p><b>Use cases chosen by enthusiasm.</b> The most exciting idea is rarely top-right on the matrix. Score candidates the same way and start where value and feasibility are both high.</p>
+<p><b>Governance as a gate, not a service.</b> If getting an agent approved takes six months, departments will build in the shadows. Tier the controls so low-risk agents move fast and high-risk ones get real scrutiny.</p>
+<p><b>Silence with staff.</b> An agent launched without explaining what happens to people's jobs meets resistance that no ROI model predicts.</p>
+<div class="callout warn"><b>Watch out</b><p>Be careful with headline statistics in your own business case. Survey numbers and analyst predictions describe other companies. Your board needs your baseline, your assumptions and your pilot results.</p></div>
+</section>
+
+<section id="m13-practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Decompose a job</b><p>Pick a role you know (accounts payable clerk, HR business partner, inside-sales rep). List eight tasks, rate each for volume, rules, judgement and error cost, and mark which an agent should take, assist with, or leave alone.</p><details><summary>Hint / model answer</summary><p>For an AP clerk: invoice data capture (take), three-way match (take, code-enforced), vendor queries about payment status (take), exception investigation (assist), vendor bank-detail changes (leave: fraud risk), month-end accrual judgement (assist), relationship issues with key suppliers (leave), process improvement (leave).</p></details></li>
+<li><b>Plot your portfolio</b><p>Choose six candidate agent use cases for a company you know. Score each 1 to 5 on value and feasibility using the questions in this module, plot them on the matrix, and pick the first two to build.</p><details><summary>Hint / model answer</summary><p>Good first picks are top-right and also different in kind: one that saves time at volume and one that improves control. Avoid starting with a big bet that needs integrations you do not have.</p></details></li>
+<li><b>Stress-test the ROI</b><p>Using the spreadsheet or <code>roi_model.py</code>, find the break-even realisation rate at which the three-year ROI is zero, keeping leakage at the base case. Then double the integration cost and repeat. What does this tell you about where to focus during the pilot?</p><details><summary>Hint / model answer</summary><p>With base-case leakage, three-year ROI hits zero at roughly 14% realisation; doubling integration cost (₹6 lakh more) moves that to about 18% and pushes payback from month 13 to month 15. So the case survives quite a lot of disappointment on time savings, because the leakage benefit carries it. The pilot should therefore measure two things hard: how much above-policy discounting actually stops, and whether saved time is redeployed.</p></details></li>
+<li><b>Write the agent card</b><p>Write a one-page agent card for the Deal Desk for an audience of internal audit: purpose, users, tools and permissions, data, models, limits, human checkpoints, eval evidence, owner and review date.</p><details><summary>Hint / model answer</summary><p>Use the registry fields as headings. The parts auditors look for first: what the agent can do without a human, how that is enforced (code, not prompt), what evidence shows it works, and who is accountable.</p></details></li>
+<li><b>Draft the staff message</b><p>Write the 200-word note the Head of Sales sends to the sales team and deal-desk analysts announcing the Deal Desk pilot. Cover what changes, what does not, what happens to the analysts' work, and how to give feedback.</p><details><summary>Hint / model answer</summary><p>Lead with the problem people already feel (slow discount answers). Be specific: the agent handles in-policy requests, managers still decide exceptions, analysts move to exceptions and pricing analysis, no roles are being cut (if true). Name the feedback channel and the date of the first review.</p></details></li>
+</ol>
+</section>
+
+<section id="m13-quiz">
+<h2>Quiz</h2>
+<div class="quiz">
+  <div class="q" data-answer="b">
+    <p class="q-text">Which reasons did Gartner give for predicting that over 40% of agentic AI projects will be cancelled by the end of 2027?</p>
+    <ol class="q-opts"><li data-k="a">Model shortages and chip export rules</li><li data-k="b">Escalating costs, unclear business value or inadequate risk controls</li><li data-k="c">Employee resistance and union action</li><li data-k="d">New regulation banning autonomous agents</li></ol>
+    <p class="q-why">Gartner's June 2025 release named cost, value and risk controls, the three things this module is about.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Which task is in the agent "sweet spot"?</p>
+    <ol class="q-opts"><li data-k="a">A one-off board strategy memo</li><li data-k="b">A pure arithmetic rule with structured inputs and no exceptions</li><li data-k="c">Negotiating a key account renewal</li><li data-k="d">High-volume discount requests that need data lookup, a written policy and a drafted reply, with exceptions escalated</li></ol>
+    <p class="q-why">Boring, high-volume, rules-plus-judgement. Pure rules (b) suit ordinary automation; one-offs (a) and relationship work (c) do not.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">In the Deal Desk model, why is time saved counted at 50% realisation?</p>
+    <ol class="q-opts"><li data-k="a">Saved hours only become value if they are redeployed or remove a cost, and not all of them will be</li><li data-k="b">The agent only works half the time</li><li data-k="c">Tax rules require it</li><li data-k="d">To make the ROI look better</li></ol>
+    <p class="q-why">Realisation is an honesty adjustment. It lowers the benefit; it is the opposite of making the ROI look better (d).</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">In the base case, what makes the Deal Desk business case work?</p>
+    <ol class="q-opts"><li data-k="a">Revenue uplift from faster quotes</li><li data-k="b">Headcount reduction</li><li data-k="c">Time savings plus the quality benefit of stopping above-policy discounts</li><li data-k="d">Lower token prices</li></ol>
+    <p class="q-why">Revenue uplift is deliberately excluded, and nobody is let go. Without the leakage benefit, the pessimistic case shows the investment failing.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">Who should own the day-to-day running of a production agent, including keeping its golden set current?</p>
+    <ol class="q-opts"><li data-k="a">The model vendor</li><li data-k="b">A named agent owner in the business, with time set aside</li><li data-k="c">The approval board</li><li data-k="d">Nobody; agents run themselves</li></ol>
+    <p class="q-why">The CoE sets standards and the board approves high-risk launches, but each agent needs a named owner close to the process.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">A department wants to launch an internal Q&amp;A agent over its public product brochures. What level of governance fits?</p>
+    <ol class="q-opts"><li data-k="a">Full approval board and impact assessment</li><li data-k="b">None; it is internal</li><li data-k="c">Tier 1: registry entry, standard checklist and owner sign-off</li><li data-k="d">Ban it until regulation is clearer</li></ol>
+    <p class="q-why">Tiering scales controls to risk. Low-risk agents still go in the registry (b is wrong), but they should not wait for a board (a).</p>
+  </div>
+</div>
+</section>
+
+<section id="m13-learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="business"></div>
+<div class="res-list">
+  <a class="res" href="https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027" target="_blank" rel="noopener"><span class="res-kind">Report</span><span class="res-title">Gartner predicts over 40% of agentic AI projects will be canceled by end of 2027</span><span class="res-by">Gartner · press release, June 2025; also covers agent washing</span></a>
+  <a class="res" href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank" rel="noopener"><span class="res-kind">Report</span><span class="res-title">The state of AI</span><span class="res-by">McKinsey · annual survey of adoption, agents and EBIT impact</span></a>
+  <a class="res" href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">A practical guide to building agents</span><span class="res-by">OpenAI · when an agent is the right tool, and when it is not</span></a>
+  <a class="res" href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Building effective agents</span><span class="res-by">Anthropic · start simple; workflows versus agents</span></a>
+  <a class="res" href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener"><span class="res-kind">Standard</span><span class="res-title">AI Risk Management Framework</span><span class="res-by">NIST · a shared vocabulary for agent governance</span></a>
+  <a class="res" href="https://www.iso.org/standard/42001" target="_blank" rel="noopener"><span class="res-kind">Standard</span><span class="res-title">ISO/IEC 42001:2023</span><span class="res-by">ISO · AI management systems; increasingly asked for in procurement</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul>
+<li>Agent projects usually fail on value, cost or risk, not technology. Plan for all three before you build.</li>
+<li>Decompose jobs into tasks and aim for the sweet spot: boring, high-volume, rules-plus-judgement work.</li>
+<li>Build an ROI model with labelled assumptions, a realisation rate, all run and change costs, and three scenarios.</li>
+<li>Track adoption, efficiency, quality and money against a measured baseline.</li>
+<li>Give every agent a sponsor and an owner, register it, tier its risk, and scale controls to the tier.</li>
+<li>Redesign jobs, train reviewers, and tell staff early; the human in the loop is a real role.</li>
+</ul></div>
+</section>

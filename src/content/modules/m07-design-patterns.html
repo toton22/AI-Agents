@@ -1,0 +1,402 @@
+<!--META {"title":"M07 Agent design patterns","h1":"Pick the <em>simplest</em> pattern that works","eyebrow":"Module 07 · Level 2 · Building","lede":"After this page you will be able to recognise the main workflow and agent patterns, match them to management problems, and implement routing plus an evaluator-optimizer loop for the Deal Desk reply email.","minutes":45} -->
+
+<section id="m07-idea">
+<h2>The big idea</h2>
+<p>Most "AI agent" projects that fail do not fail because the model was weak. They fail because the team picked the wrong shape. They built a fully autonomous agent for a job that was really a three-step checklist, then spent months chasing the agent's creative detours.</p>
+<p>A design pattern is a reusable shape for wiring model calls, tools and people together. You already know these shapes from organisations. An assembly line. A triage desk that sends each case to the right specialist. A project manager who breaks work up and hands it out. A maker-checker arrangement, the "four eyes" principle every Indian bank runs on, where one person prepares and another verifies before anything goes out. AI systems use the same shapes, with model calls in some of the seats.</p>
+<p>The most useful distinction comes from Anthropic's December 2024 essay "Building effective agents". It separates two families:</p>
+<ul>
+<li><b>Workflows</b>: "systems where LLMs and tools are orchestrated through predefined code paths." You decide the steps; the model does the work inside each step.</li>
+<li><b>Agents</b>: systems where the model dynamically directs its own process and tool use. The model decides the steps.</li>
+</ul>
+<p>Workflows are predictable, cheaper and easier to test. Agents are flexible and handle the unexpected, at the cost of predictability. The same essay gives the advice this page is built on: find the simplest solution possible, and add complexity only when it clearly pays for itself.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>When a vendor or your own team proposes "an autonomous agent", ask them to draw it. If the drawing has fixed boxes and arrows, it is a workflow, and that is good news: workflows are easier to audit, cost less per run and fail in predictable ways. Pay for autonomy only where the path genuinely cannot be known in advance, such as open-ended research or a messy customer case. Autonomy is a cost line, not a badge.</p></div>
+</section>
+
+<section id="m07-how">
+<h2>How it works</h2>
+<p>There are five workflow patterns and a handful of agent patterns. Learn their shapes once and you will spot them inside every framework and vendor product.</p>
+
+<h3>Workflow patterns</h3>
+<p><b>Prompt chaining.</b> Break the task into fixed steps, where each model call works on the previous one's output. Put a check (a "gate") between steps, so a bad intermediate result stops the line instead of polluting everything downstream. For the Deal Desk: extract the request details, check they are complete, draft the reply, then format it. Use it when the task splits cleanly into stages and accuracy matters more than speed.</p>
+<p><b>Routing.</b> Classify the input first, then send it to a specialised handler. Each handler can have its own prompt, tools and even its own (cheaper or stronger) model. Customer service runs on this: billing questions go one way, delivery complaints another. Use it when inputs fall into distinct types that need different treatment.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 326" role="img" aria-label="Prompt chaining: extract facts, gate, draft email, tone and format. Routing: input to router, which sends to approve, escalate or decline templates">
+  <text class="fx-tb" x="12" y="28">Prompt chaining</text>
+  <rect class="fx-box k1" x="12" y="45" width="150" height="50" rx="6"/>
+  <text class="fx-t" x="87" y="75" text-anchor="middle">Extract facts</text>
+  <rect class="fx-box k5" x="200" y="45" width="110" height="50" rx="6"/>
+  <text class="fx-t" x="255" y="75" text-anchor="middle">Gate: valid?</text>
+  <rect class="fx-box k1" x="348" y="45" width="160" height="50" rx="6"/>
+  <text class="fx-t" x="428" y="75" text-anchor="middle">Draft email</text>
+  <rect class="fx-box k1" x="546" y="45" width="162" height="50" rx="6"/>
+  <text class="fx-t" x="627" y="75" text-anchor="middle">Tone and format</text>
+  <path class="fx-ar" d="M162 70 H197"/>
+  <path class="fx-ar" d="M310 70 H345"/>
+  <path class="fx-ar" d="M508 70 H543"/>
+  <text class="fx-ts" x="255" y="115" text-anchor="middle">fail: stop and ask</text>
+  <text class="fx-tb" x="12" y="160">Routing</text>
+  <rect class="fx-box" x="12" y="205" width="150" height="50" rx="6"/>
+  <text class="fx-t" x="87" y="235" text-anchor="middle">Decision</text>
+  <rect class="fx-box fx-hi" x="200" y="200" width="150" height="60" rx="6"/>
+  <text class="fx-tb" x="275" y="227" text-anchor="middle">Router</text>
+  <text class="fx-ts" x="275" y="246" text-anchor="middle">small, cheap model</text>
+  <rect class="fx-box k2" x="420" y="170" width="288" height="40" rx="6"/>
+  <text class="fx-t" x="564" y="195" text-anchor="middle">Approve: confirm exact %</text>
+  <rect class="fx-box k3" x="420" y="220" width="288" height="40" rx="6"/>
+  <text class="fx-t" x="564" y="245" text-anchor="middle">Escalate: promise nothing</text>
+  <rect class="fx-box k4" x="420" y="270" width="288" height="40" rx="6"/>
+  <text class="fx-t" x="564" y="295" text-anchor="middle">Decline: reason + alternative</text>
+  <path class="fx-ar" d="M162 230 H197"/>
+  <path class="fx-ar" d="M350 220 L417 192"/>
+  <path class="fx-ar" d="M350 235 H417"/>
+  <path class="fx-ar" d="M350 250 L417 285"/>
+</svg>
+<figcaption>Top: a chain with a gate, so a bad extraction stops the line. Bottom: routing, where a cheap classifier decides which specialised prompt handles the case. Both are fixed paths you can test step by step.</figcaption>
+</figure>
+
+<p><b>Parallelisation.</b> Run independent pieces at the same time, then combine the results in code. Two flavours. Sectioning splits a task into independent parts: check the tier cap, the margin rule and the credit position simultaneously. Voting runs the same task several times and compares answers: three independent reviews of a contract clause, flag it if any one says "risky". Use it for speed, or when several perspectives raise confidence.</p>
+<p><b>Orchestrator-workers.</b> A lead model looks at the task, decides what subtasks it needs (the number and kind are not known in advance), hands them to worker calls, and synthesises the results. A competitive review that needs "however many competitors are relevant" fits this. The difference from parallelisation is that the subtasks are decided at run time, not by you.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 290" role="img" aria-label="Parallelisation: request split into tier cap, margin and credit checks, combined in code. Orchestrator-workers: orchestrator creates worker 1, 2 to n at run time, then synthesises">
+  <text class="fx-tb" x="180" y="26" text-anchor="middle">Parallelisation</text>
+  <rect class="fx-box" x="110" y="40" width="140" height="40" rx="6"/>
+  <text class="fx-t" x="180" y="65" text-anchor="middle">Request</text>
+  <rect class="fx-box k1" x="12" y="115" width="104" height="44" rx="6"/>
+  <text class="fx-t" x="64" y="142" text-anchor="middle">Tier cap</text>
+  <rect class="fx-box k1" x="128" y="115" width="104" height="44" rx="6"/>
+  <text class="fx-t" x="180" y="142" text-anchor="middle">Margin</text>
+  <rect class="fx-box k1" x="244" y="115" width="104" height="44" rx="6"/>
+  <text class="fx-t" x="296" y="142" text-anchor="middle">Credit</text>
+  <rect class="fx-box k2" x="90" y="195" width="180" height="44" rx="6"/>
+  <text class="fx-t" x="180" y="222" text-anchor="middle">Combine in code</text>
+  <path class="fx-ar" d="M150 80 L72 112"/>
+  <path class="fx-ar" d="M180 80 V112"/>
+  <path class="fx-ar" d="M210 80 L288 112"/>
+  <path class="fx-ar" d="M64 159 L140 192"/>
+  <path class="fx-ar" d="M180 159 V192"/>
+  <path class="fx-ar" d="M296 159 L220 192"/>
+  <text class="fx-ts" x="180" y="272" text-anchor="middle">subtasks fixed by you, run at once</text>
+  <text class="fx-tb" x="540" y="26" text-anchor="middle">Orchestrator-workers</text>
+  <rect class="fx-box fx-hi" x="455" y="40" width="170" height="40" rx="6"/>
+  <text class="fx-t" x="540" y="65" text-anchor="middle">Orchestrator</text>
+  <rect class="fx-box k3" x="372" y="115" width="104" height="44" rx="6"/>
+  <text class="fx-t" x="424" y="142" text-anchor="middle">Worker 1</text>
+  <rect class="fx-box k3" x="488" y="115" width="104" height="44" rx="6"/>
+  <text class="fx-t" x="540" y="142" text-anchor="middle">Worker 2</text>
+  <rect class="fx-box k3" x="604" y="115" width="104" height="44" rx="6"/>
+  <text class="fx-t" x="656" y="142" text-anchor="middle">Worker n</text>
+  <rect class="fx-box k2" x="450" y="195" width="180" height="44" rx="6"/>
+  <text class="fx-t" x="540" y="222" text-anchor="middle">Synthesise</text>
+  <path class="fx-ar" d="M510 80 L432 112"/>
+  <path class="fx-ar" d="M540 80 V112"/>
+  <path class="fx-ar" d="M570 80 L648 112"/>
+  <path class="fx-ar" d="M424 159 L500 192"/>
+  <path class="fx-ar" d="M540 159 V192"/>
+  <path class="fx-ar" d="M656 159 L580 192"/>
+  <text class="fx-ts" x="540" y="272" text-anchor="middle">subtasks decided by the model at run time</text>
+</svg>
+<figcaption>Same silhouette, different control. In parallelisation you fixed the three checks. In orchestrator-workers the model decides how many workers to create and what each one does, which is more flexible and harder to predict.</figcaption>
+</figure>
+
+<p><b>Evaluator-optimizer.</b> One call generates, another evaluates against clear criteria and returns feedback, and the generator revises. Loop until it passes or you hit a limit. This is maker-checker for machines. It works when you can write down what "good" looks like (a rubric, a policy, a style guide) and when a revision based on feedback usually helps. Customer emails, contract summaries and translations are natural fits.</p>
+
+<h3>Agent patterns</h3>
+<p><b>ReAct (reason and act).</b> The model alternates between thinking ("I need the customer's tier"), acting (calling a tool), and observing the result, until it can answer. Yao and colleagues introduced the idea in 2022, and nearly every tool-using agent you will meet today runs some version of this loop. It is the default agent shape in this course.</p>
+<p><b>Plan-and-execute.</b> The model writes a plan first, then works through it step by step, revising the plan when results surprise it. Better than pure ReAct for long tasks where losing the thread is the main risk, and the written plan is something a human can review before anything runs.</p>
+<p><b>Reflection or self-critique.</b> The model reviews its own output before finishing: "Did I check the margin rule? Does my email promise more than was approved?" Reflexion (Shinn and colleagues, 2023) and Self-Refine (Madaan and colleagues, 2023) showed that this kind of feedback loop can improve results on many tasks. It is the evaluator-optimizer pattern with one model in both seats, which is cheaper but shares the same blind spots.</p>
+<p><b>Tool use.</b> The model decides which function to call and with what arguments, as in <a href="{{root}}modules/m04-tools-and-function-calling.html">Module 04</a>. Every other agent pattern sits on top of it.</p>
+<p><b>Human-in-the-loop.</b> At defined points the agent stops and asks a person: approve this discount, confirm this payment, choose between these options. Not a weakness. In regulated work it is the design. The Deal Desk's rule "never promise a discount above policy without approval" is this pattern.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 300" role="img" aria-label="Evaluator-optimizer: generator drafts, evaluator checks, feedback loops back, pass goes to output. ReAct: think, act by calling a tool, observe, loop back to think, then answer when done">
+  <text class="fx-tb" x="180" y="22" text-anchor="middle">Evaluator-optimizer</text>
+  <rect class="fx-box k1" x="12" y="60" width="150" height="50" rx="6"/>
+  <text class="fx-tb" x="87" y="90" text-anchor="middle">Generator</text>
+  <rect class="fx-box k5" x="200" y="60" width="150" height="50" rx="6"/>
+  <text class="fx-tb" x="275" y="90" text-anchor="middle">Evaluator</text>
+  <rect class="fx-box k2" x="200" y="200" width="150" height="46" rx="6"/>
+  <text class="fx-tb" x="275" y="228" text-anchor="middle">Send to user</text>
+  <path class="fx-ar" d="M162 85 H197"/>
+  <text class="fx-ts" x="180" y="78" text-anchor="middle">draft</text>
+  <path class="fx-ar fx-dash" d="M275 60 V40 H87 V57"/>
+  <text class="fx-ts" x="181" y="52" text-anchor="middle">fix these problems</text>
+  <path class="fx-ar" d="M275 110 V197"/>
+  <text class="fx-ts" x="285" y="158">pass</text>
+  <text class="fx-ts" x="87" y="150" text-anchor="middle">max 3 rounds,</text>
+  <text class="fx-ts" x="87" y="168" text-anchor="middle">then a human</text>
+  <text class="fx-tb" x="545" y="22" text-anchor="middle">ReAct loop</text>
+  <rect class="fx-box fx-hi" x="380" y="50" width="130" height="50" rx="6"/>
+  <text class="fx-tb" x="445" y="80" text-anchor="middle">Think</text>
+  <rect class="fx-box k3" x="578" y="50" width="130" height="50" rx="6"/>
+  <text class="fx-tb" x="643" y="80" text-anchor="middle">Act: tool</text>
+  <rect class="fx-box k3" x="578" y="160" width="130" height="50" rx="6"/>
+  <text class="fx-tb" x="643" y="190" text-anchor="middle">Observe</text>
+  <rect class="fx-box k2" x="372" y="240" width="130" height="46" rx="6"/>
+  <text class="fx-tb" x="437" y="268" text-anchor="middle">Answer</text>
+  <path class="fx-ar" d="M510 75 H575"/>
+  <path class="fx-ar" d="M643 100 V157"/>
+  <path class="fx-ar" d="M578 185 H480 V103"/>
+  <path class="fx-ar" d="M410 100 V237"/>
+  <text class="fx-ts" x="376" y="170">done</text>
+</svg>
+<figcaption>Left: the maker-checker loop, with a hard limit on rounds. Right: ReAct, the think-act-observe cycle that runs inside most tool-using agents. The model decides when it is done, which is why you also cap the number of turns.</figcaption>
+</figure>
+
+<p>Here is ReAct on the trickiest of the three reference cases, where the tier cap allows the discount but the margin rule does not.</p>
+<div class="trace">
+  <div class="t-user">Kite Fintech wants 5% off. Can we do it?</div>
+  <div class="t-think">I need Kite's tier, payment record and margin.</div>
+  <div class="t-act">find_customer(name="Kite Fintech")</div>
+  <div class="t-obs">{"id":"C-104","tier":"Bronze","late_payments":0,"margin_pct":16}</div>
+  <div class="t-think">Bronze cap is 5%, so the tier rule allows it. No late payments. Now the margin floor: it must stay at or above 12%.</div>
+  <div class="t-act">margin_after_discount(current_margin_pct=16, discount_pct=5)</div>
+  <div class="t-obs">11.0</div>
+  <div class="t-think">11% is below the 12% floor. The tier rule passes but the margin rule fails, so I cannot approve this myself. The largest discount that keeps margin at 12% is 4%.</div>
+  <div class="t-act">request_approval(customer_id="C-104", discount_pct=5, approver="Sales Manager", reason="Within Bronze cap but margin would be 11%, below 12% floor")</div>
+  <div class="t-obs">"Approval request APR-2291 sent to Sales Manager"</div>
+  <div class="t-final">I can't approve 5% for Kite: it is within the Bronze cap, but margin would fall to 11%, below our 12% floor. I've sent it to the Sales Manager (APR-2291). If you need an answer today, 4% keeps margin at 12% and is within policy.</div>
+</div>
+
+<h3>Andrew Ng's four agentic patterns</h3>
+<p>In a March 2024 letter in The Batch, Andrew Ng named four agentic design patterns that many courses still use as a starting map. They line up neatly with the above.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Ng's pattern</th><th>What it means</th><th>Where it appears on this page</th></tr></thead>
+<tbody>
+<tr><td>Reflection</td><td>The model examines its own work and improves it</td><td>Reflection, evaluator-optimizer</td></tr>
+<tr><td>Tool use</td><td>The model calls search, code, APIs and other functions</td><td>Tool use, ReAct</td></tr>
+<tr><td>Planning</td><td>The model makes and follows a multi-step plan</td><td>Plan-and-execute, orchestrator-workers</td></tr>
+<tr><td>Multi-agent collaboration</td><td>Several agents split up the work and combine it</td><td>Orchestrator-workers; <a href="{{root}}modules/m08-multi-agent-systems.html">Module 08</a></td></tr>
+</tbody></table></div>
+
+<h3>Choosing the simplest pattern that works</h3>
+<p>Think of the patterns as a ladder. Start at the bottom and climb only when a real test shows the current rung is not enough.</p>
+<ol class="steps">
+<li><b>One good model call</b><p>A clear prompt with the right context. Many "agent" ideas end here, and that is a win.</p></li>
+<li><b>Add retrieval or a tool</b><p>Ground it in your documents (<a href="{{root}}modules/m05-knowledge-and-rag.html">Module 05</a>) or let it fetch one live fact.</p></li>
+<li><b>Chain, route or parallelise</b><p>Fixed workflow shapes. Predictable, testable, cheap.</p></li>
+<li><b>Add an evaluator</b><p>When you can write the rubric and errors are costly.</p></li>
+<li><b>Orchestrator or ReAct agent</b><p>When the steps truly cannot be known in advance.</p></li>
+<li><b>Multiple agents</b><p>When one agent's context, tools or permissions are overloaded. Expensive; see Module 08.</p></li>
+</ol>
+<p>Four questions decide the rung. Can I write the steps down in advance? If yes, use a workflow. Do inputs fall into clear types? Route. Can I write down what "good" looks like? Add an evaluator. What does a mistake cost, and who must sign off? That tells you where the human checkpoint goes, whatever the pattern.</p>
+
+<h3>A pattern-selection table for management problems</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Function</th><th>Problem</th><th>Pattern</th><th>Why</th><th>Human checkpoint</th></tr></thead>
+<tbody>
+<tr><td>Customer service</td><td>Mixed inbox: refunds, delivery, product questions</td><td>Routing</td><td>Distinct types need different tools and tone</td><td>Refunds above a threshold</td></tr>
+<tr><td>Finance (AP)</td><td>Vendor invoices to ERP entries</td><td>Prompt chaining with gates</td><td>Fixed stages: extract, match to PO, validate GST, post</td><td>Mismatches and new vendors</td></tr>
+<tr><td>Procurement</td><td>Compare five supplier quotes</td><td>Parallelisation (sectioning)</td><td>Each quote can be analysed independently</td><td>Final supplier choice</td></tr>
+<tr><td>Legal / compliance</td><td>Flag risky clauses in contracts</td><td>Parallelisation (voting)</td><td>Several independent reads catch more</td><td>Every flagged clause</td></tr>
+<tr><td>Marketing</td><td>Campaign copy within brand and ASCI rules</td><td>Evaluator-optimizer</td><td>The rubric can be written down</td><td>Before publishing</td></tr>
+<tr><td>Strategy</td><td>Competitor landscape for a new city</td><td>Orchestrator-workers</td><td>Number of competitors not known in advance</td><td>Review of the final memo</td></tr>
+<tr><td>Sales ops</td><td>Discount requests</td><td>ReAct agent + human-in-the-loop</td><td>Lookups depend on the case; approvals are mandatory</td><td>Anything above the cap</td></tr>
+<tr><td>HR</td><td>New-joiner onboarding over 30 days</td><td>Plan-and-execute</td><td>A long plan that must be tracked and adjusted</td><td>Day-30 review with the manager</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="m07-build">
+<h2>Hands-on: route and check</h2>
+<p>The Deal Desk has made its decision. Now it must write the email to the customer, and this is where things go wrong in real life: a friendly draft that "softens" an escalation into a promise. We will route the decision to the right email template, then run a maker-checker loop that blocks any draft promising more than was approved.</p>
+<div class="tabs">
+<div class="tab" data-label="No-code">
+<p>This works in n8n, Make or Power Automate. Node names below are n8n's; the others have equivalents (Router in Make, Switch or Condition in Power Automate).</p>
+<ol class="steps">
+<li><b>Start from the decision</b><p>The previous step (your Deal Desk agent) outputs structured fields: customer, asked_pct, approved_pct, status (approve, escalate or decline) and reason. If your agent outputs prose, add a structured-output step first. Routing on prose is guessing.</p></li>
+<li><b>Route</b><p>Add a Switch node on <code>status</code> with three outputs. Because the decision is already structured, you do not even need a model to route here. That is the simplest pattern working. Use an LLM classifier only when the input is free text, such as an inbound customer email.</p></li>
+<li><b>Draft on each branch</b><p>On each branch, add an LLM node with the branch's instruction. Approve: "Confirm the exact % and that it applies to the next order only." Escalate: "Do NOT promise any discount. Say it is with a manager; reply within 1 working day." Decline: "Say no politely, give the policy reason in one line, offer one alternative."</p></li>
+<li><b>Check</b><p>Merge the branches into one LLM "Reviewer" node. Give it the facts and the rubric: never state a discount above approved_pct; promise nothing if status is escalate; under 120 words; no internal margin figures. Ask for JSON: <code>{"pass": true/false, "problems": [...]}</code>.</p></li>
+<li><b>Loop with a limit</b><p>An IF node on <code>pass</code>. True: send to the salesperson for a final glance. False: pass the problems back to the drafting node and increment a counter. After three failed rounds, stop and route to a human with the draft and the problems listed.</p></li>
+</ol>
+</div>
+<div class="tab" data-label="Python">
+<pre class="code"><code class="language-bash">pip install "anthropic==1.13.0"
+export ANTHROPIC_API_KEY="your-key-here"</code></pre>
+<pre class="code"><code class="language-python"># deal_email.py  -  routing + evaluator-optimizer for the Deal Desk reply
+import os, json
+import anthropic
+
+client = anthropic.Anthropic()                       # reads ANTHROPIC_API_KEY
+MODEL = os.getenv("MODEL", "claude-sonnet-5-5")
+CHEAP_MODEL = os.getenv("CHEAP_MODEL", MODEL)        # a smaller model is fine for routing
+
+def ask(prompt: str, model: str = MODEL, max_tokens: int = 600) -&gt; str:
+    msg = client.messages.create(model=model, max_tokens=max_tokens,
+                                 messages=[{"role": "user", "content": prompt}])
+    return msg.content[0].text
+
+# ---------- 1. ROUTING: what kind of email is this? ----------
+ROUTES = {
+    "approve": "Confirm the discount warmly. State the exact % and that it applies to the next order only.",
+    "escalate": "Do NOT promise any discount. Say the request is with a manager and give a reply time of 1 working day.",
+    "decline": "Say no politely, give the policy reason in one line, and offer one alternative (e.g. volume bundle).",
+}
+
+def route(decision: dict) -&gt; str:
+    prompt = ("Classify this Deal Desk decision into exactly one label: approve, escalate or decline.\n"
+              f"Decision: {json.dumps(decision)}\nReply with the label only.")
+    label = ask(prompt, model=CHEAP_MODEL, max_tokens=5).strip().lower()
+    return label if label in ROUTES else "escalate"   # unknown label -&gt; safest route
+
+# ---------- 2. GENERATE ----------
+def draft(decision: dict, label: str, feedback: str = "") -&gt; str:
+    prompt = (f"Write a short email (under 120 words) from a Meridian Supplies salesperson to the customer.\n"
+              f"Facts: {json.dumps(decision)}\nInstructions: {ROUTES[label]}\n"
+              + (f"Fix these problems from the reviewer: {feedback}\n" if feedback else "")
+              + "Return only the email body.")
+    return ask(prompt)
+
+# ---------- 3. EVALUATE ----------
+RUBRIC = """Check the email against these rules. Return JSON only:
+{"pass": true/false, "problems": ["..."]}
+1. It never states a discount higher than approved_pct.
+2. If status is escalate, it promises no discount at all.
+3. Under 120 words, polite, no internal margin figures.
+4. Names the customer correctly."""
+
+def evaluate(email: str, decision: dict) -&gt; dict:
+    out = ask(f"{RUBRIC}\n\nFacts: {json.dumps(decision)}\n\nEmail:\n{email}", max_tokens=300)
+    try:
+        return json.loads(out[out.find("{"): out.rfind("}") + 1])
+    except ValueError:
+        return {"pass": False, "problems": ["Reviewer output was not valid JSON"]}
+
+# ---------- 4. LOOP: draft -&gt; check -&gt; fix, at most 3 rounds ----------
+def write_reply(decision: dict, max_rounds: int = 3) -&gt; dict:
+    label = route(decision)
+    feedback = ""
+    for attempt in range(1, max_rounds + 1):
+        email = draft(decision, label, feedback)
+        verdict = evaluate(email, decision)
+        if verdict.get("pass"):
+            return {"route": label, "email": email, "rounds": attempt}
+        feedback = "; ".join(verdict.get("problems", []))
+    return {"route": label, "email": email, "rounds": max_rounds,
+            "needs_human": True, "open_problems": feedback}
+
+if __name__ == "__main__":
+    decision = {"customer": "Bluewave Logistics", "asked_pct": 6, "approved_pct": 0,
+                "status": "escalate", "reason": "2 late payments: cap is 3%"}
+    print(json.dumps(write_reply(decision), indent=2))</code></pre>
+<p><b>What this does, part by part:</b></p>
+<ul>
+<li><b><code>ask</code></b> is a one-line helper around the Messages API so the rest of the code reads like a process, not plumbing.</li>
+<li><b>Routing.</b> <code>route</code> asks a (possibly cheaper) model for one of three labels. If the answer is anything else, it falls back to "escalate", the safest route, because a wrongly routed escalation costs a day while a wrongly routed approval costs margin. Each route has its own instruction in <code>ROUTES</code>.</li>
+<li><b>Generator.</b> <code>draft</code> writes the email from the facts plus the route's instruction, and on later rounds includes the reviewer's complaints.</li>
+<li><b>Evaluator.</b> <code>evaluate</code> checks the draft against a written rubric and returns JSON. If the reviewer's reply is not valid JSON, the draft fails rather than slipping through.</li>
+<li><b>Loop.</b> <code>write_reply</code> runs draft, check, fix up to three times. If it still fails, it returns the last draft flagged <code>needs_human</code> with the open problems, instead of sending something that broke the rules.</li>
+</ul>
+<div class="callout tip"><b>Make the checker stricter than the maker</b><p>Some rules do not need a model at all. "Never state a discount higher than approved_pct" can also be checked in code: pull every number followed by % from the draft and compare. Use code for what code can check, and the model evaluator for tone and judgement. Even better, give the evaluator a different model or a different provider, so the two seats do not share the same blind spots.</p></div>
+</div>
+</div>
+<p>Here is the loop catching a classic mistake. The mocked run we used to test the code followed exactly this path.</p>
+<div class="trace">
+  <div class="t-user">{"customer":"Bluewave Logistics","asked_pct":6,"approved_pct":0,"status":"escalate"}</div>
+  <div class="t-act">route(decision)</div>
+  <div class="t-obs">"escalate"</div>
+  <div class="t-act">draft(decision, "escalate")</div>
+  <div class="t-obs">"Dear Bluewave team, great news: we can offer 6% off your next order..."</div>
+  <div class="t-act">evaluate(email, decision)</div>
+  <div class="t-obs">{"pass": false, "problems": ["Promises 6% while status is escalate"]}</div>
+  <div class="t-think">Round 1 failed. Feed the problem back to the generator.</div>
+  <div class="t-act">draft(decision, "escalate", feedback="Promises 6% while status is escalate")</div>
+  <div class="t-obs">"Dear Bluewave team, thank you for your request. It is with our Sales Manager and we will reply within 1 working day."</div>
+  <div class="t-act">evaluate(email, decision)</div>
+  <div class="t-obs">{"pass": true, "problems": []}</div>
+  <div class="t-final">{"route": "escalate", "rounds": 2, "email": "Dear Bluewave team, thank you for your request..."}</div>
+</div>
+</section>
+
+<section id="m07-business">
+<h2>In the business</h2>
+<div class="case"><span class="case-tag">Case · Customer service</span><h4>Routing an e-commerce inbox</h4><p>An Indian online retailer's support inbox mixed refund requests, delivery complaints, product questions and abuse. A single "do everything" agent kept applying refund logic to delivery complaints. The team replaced it with a router (a small, fast model) and four handlers, each with its own tools and tone. Misroutes still happen, so every handler can bounce a case back to the router once, and anything bounced twice goes to a person. The handlers are now tested separately, which made weekly prompt changes much less risky.</p></div>
+<div class="case"><span class="case-tag">Case · Finance</span><h4>An invoice chain with gates</h4><p>A distribution company's accounts payable team built a prompt chain: extract fields from the PDF invoice, match against the purchase order and goods receipt, validate the GSTIN and tax split, then propose the ERP posting. Each step has a gate in code. A missing PO number stops the chain at step one with a clear message, instead of producing a plausible posting with a guessed PO. No agent autonomy anywhere; that was the point. Auditors liked it because each step leaves a record.</p></div>
+<div class="case"><span class="case-tag">Case · Marketing</span><h4>Maker-checker for campaign copy</h4><p>A consumer brand's marketing team uses an evaluator-optimizer loop for social and search ad copy. The evaluator's rubric covers brand voice, banned claims ("best", "guaranteed" without substantiation), and the ASCI code points the legal team flagged. The generator revises up to three times. Copy that still fails goes to the brand manager with the reviewer's notes attached, which turned out to be a useful training tool for junior copywriters too.</p></div>
+<div class="case"><span class="case-tag">Case · Supply chain</span><h4>Parallel quote comparison</h4><p>A manufacturer's procurement team receives five to eight supplier quotes per tender, each in a different format. A parallel workflow extracts each quote into the same template at once (price, lead time, payment terms, warranty, exceptions), then code builds the comparison table. A second, voting-style step has three independent passes flag unusual terms. The buyer gets the table and the flags; the award decision stays with the buyer and the approval matrix.</p></div>
+</section>
+
+<section id="m07-pitfalls">
+<h2>Pitfalls</h2>
+<ul class="checklist">
+<li><b>An agent where a workflow would do.</b> If you can draw the steps, draw them in code. Autonomy adds cost, latency and new failure modes.</li>
+<li><b>The rubber-stamp evaluator.</b> The same model, same prompt style, checking its own work, tends to approve it. Use a different model, a stricter rubric, and code checks for hard rules.</li>
+<li><b>Loops without limits.</b> Evaluator loops and ReAct loops must have a maximum round count and a defined hand-off to a person.</li>
+<li><b>Routing with no fallback.</b> Every router needs a safe default for "none of the above" and a way for a handler to bounce a misrouted case.</li>
+<li><b>Pattern stacking.</b> Routing into orchestrators into evaluators into sub-agents: each layer multiplies cost and makes failures harder to trace. Add one layer at a time and measure.</li>
+<li><b>Hidden human checkpoints.</b> "A human reviews it" on the slide, but the review screen has an Approve-all button and a 40-item queue. Design the checkpoint so a person can actually judge.</li>
+<li><b>Vague rubrics.</b> "Make it professional" is not checkable. "Under 120 words, no margin figures, names the customer" is.</li>
+</ul>
+<div class="callout note"><b>Measure before you climb</b><p>Before adding a pattern, run the simpler version against 30 to 50 real cases and note where it fails. If the failures are about missing facts, add retrieval, not an evaluator. If they are about tone, add an evaluator, not an orchestrator. Patterns fix specific failure types; <a href="{{root}}modules/m10-evaluation.html">Module 10</a> shows how to measure them.</p></div>
+</section>
+
+<section id="m07-practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Name the pattern</b><p>Which pattern fits each? (a) Summarise 40 call transcripts, one summary each. (b) Turn a vendor contract into a risk memo: extract, assess, write. (c) Reply to inbound emails that could be orders, complaints or job applications. (d) Write a press release that legal must approve against a checklist.</p><details><summary>Hint / model answer</summary><p>(a) Parallelisation (sectioning). (b) Prompt chaining, with a gate after extraction. (c) Routing. (d) Evaluator-optimizer for the checklist, plus a human-in-the-loop sign-off from legal.</p></details></li>
+<li><b>Climb down the ladder</b><p>A colleague proposes a multi-agent system to answer HR leave questions from a 10-page policy. Argue for the lowest rung that works, and say what evidence would make you climb.</p><details><summary>Hint / model answer</summary><p>One model call with the policy in context (or a no-code assistant with the file attached). Climb only if testing on real questions shows specific failures, for example missing location-specific rules (add retrieval with metadata) or the need to check leave balances (add one tool).</p></details></li>
+<li><b>Write the rubric</b><p>Write a five-point rubric for an evaluator that checks Meridian's "approve" emails. Each point must be checkable as yes or no.</p><details><summary>Hint / model answer</summary><p>1. States exactly approved_pct, no other percentage. 2. Says it applies to the next order only. 3. Names the customer correctly. 4. Contains no internal margin or cost figures. 5. Under 120 words and ends with a clear next step.</p></details></li>
+<li><b>Break the router</b><p>In the Python version, what happens if the routing model replies "Escalate." with a capital E and a full stop? Trace it and suggest a fix.</p><details><summary>Hint / model answer</summary><p><code>.strip().lower()</code> gives "escalate." which is not in ROUTES, so it falls back to "escalate". The result happens to be right, but by luck. Strip punctuation too, or better, skip the model: route on the structured <code>status</code> field, as in the no-code version.</p></details></li>
+<li><b>Design with a checkpoint</b><p>Pick a process from your own organisation (or a past internship). Draw it as a pattern from this page, mark where a person must decide, and estimate what a mistake at each step would cost.</p><details><summary>Hint / model answer</summary><p>A good answer names the pattern, shows the fixed steps or the agent loop, places the checkpoint where an error becomes expensive or irreversible (money leaves, a customer is told something, a record is changed), and states the round or step limits.</p></details></li>
+</ol>
+</section>
+
+<section id="m07-quiz">
+<h2>Quiz</h2>
+<div class="quiz">
+  <div class="q" data-answer="a">
+    <p class="q-text">What separates a workflow from an agent, in Anthropic's framing?</p>
+    <ol class="q-opts"><li data-k="a">In a workflow, code fixes the path; in an agent, the model directs its own steps and tool use</li><li data-k="b">Workflows cannot call tools</li><li data-k="c">Agents always involve several models</li><li data-k="d">Workflows do not use language models</li></ol>
+    <p class="q-why">Workflows orchestrate models and tools through predefined code paths. Agents decide their own process. Both can use tools and models.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">You must check every supplier quote for the same five things, and quotes are independent. Which pattern fits best?</p>
+    <ol class="q-opts"><li data-k="a">Orchestrator-workers</li><li data-k="b">Routing</li><li data-k="c">Parallelisation (sectioning)</li><li data-k="d">ReAct</li></ol>
+    <p class="q-why">The subtasks are known in advance and independent, so run them at once and combine in code. Orchestrator-workers is for when the subtasks are only known at run time.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">The evaluator in a maker-checker loop keeps approving drafts that break the rules. What is the best first fix?</p>
+    <ol class="q-opts"><li data-k="a">Raise the number of rounds to ten</li><li data-k="b">Remove the evaluator</li><li data-k="c">Ask the generator to be more careful</li><li data-k="d">Make the rubric concrete, check hard rules in code, and consider a different model as reviewer</li></ol>
+    <p class="q-why">Rubber-stamping comes from vague rubrics and shared blind spots. Checkable rules, code checks and a different reviewer model address the cause; more rounds do not.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">Which of these is NOT one of Andrew Ng's four agentic design patterns?</p>
+    <ol class="q-opts"><li data-k="a">Reflection</li><li data-k="b">Routing</li><li data-k="c">Planning</li><li data-k="d">Multi-agent collaboration</li></ol>
+    <p class="q-why">Ng's four are reflection, tool use, planning and multi-agent collaboration. Routing is one of the workflow patterns from Anthropic's essay.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">In the Kite Fintech trace, why does the agent escalate even though 5% is within the Bronze cap?</p>
+    <ol class="q-opts"><li data-k="a">Kite has late payments</li><li data-k="b">Bronze customers always need approval</li><li data-k="c">Margin after discount would be 11%, below the 12% floor</li><li data-k="d">5% is above 15%</li></ol>
+    <p class="q-why">16 minus 5 is 11, which breaks the margin rule. Both rules must pass. Kite has no late payments.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">The routing model returns a label that is not on the list. What does a well-designed router do?</p>
+    <ol class="q-opts"><li data-k="a">Falls back to the safest route and logs it</li><li data-k="b">Picks a route at random</li><li data-k="c">Sends the case to the approve handler</li><li data-k="d">Retries forever until it gets a valid label</li></ol>
+    <p class="q-why">A safe default (here, escalate) limits damage, and the log tells you the router needs work. Defaulting to approve is the most expensive mistake.</p>
+  </div>
+</div>
+</section>
+
+<section id="m07-learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="agentic-patterns"></div>
+<div class="res-list">
+  <a class="res" href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener"><span class="res-kind">Article</span><span class="res-title">Building effective agents</span><span class="res-by">Anthropic, Dec 2024 · the five workflow patterns and the case for simplicity</span></a>
+  <a class="res" href="https://www.deeplearning.ai/the-batch/how-agents-can-improve-llm-performance/" target="_blank" rel="noopener"><span class="res-kind">Article</span><span class="res-title">How agents can improve LLM performance</span><span class="res-by">Andrew Ng, The Batch, Mar 2024 · the four agentic design patterns</span></a>
+  <a class="res" href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">ReAct (the original paper)</span><span class="res-by">Yao et al., 2022 · where the think-act-observe loop comes from</span></a>
+  <a class="res" href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Reflexion: Language Agents with Verbal Reinforcement Learning</span><span class="res-by">Shinn et al., 2023 · learning from self-critique</span></a>
+  <a class="res" href="https://arxiv.org/abs/2303.17651" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Self-Refine: Iterative Refinement with Self-Feedback</span><span class="res-by">Madaan et al., 2023 · generate, critique, revise</span></a>
+  <a class="res" href="https://arxiv.org/abs/2305.04091" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Plan-and-Solve Prompting</span><span class="res-by">Wang et al., 2023 · plan first, then execute</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul>
+<li>Workflows fix the path in code; agents let the model choose. Prefer workflows wherever you can draw the steps.</li>
+<li>The five workflow patterns: prompt chaining, routing, parallelisation, orchestrator-workers, evaluator-optimizer.</li>
+<li>The core agent patterns: ReAct, plan-and-execute, reflection, tool use and human-in-the-loop.</li>
+<li>Ng's four (reflection, tool use, planning, multi-agent collaboration) map onto the same ideas.</li>
+<li>Climb the ladder one rung at a time, and only when tests show the current rung failing.</li>
+<li>Every loop needs a round limit and a hand-off to a person; every router needs a safe default.</li>
+<li>Check hard rules in code, and give the checker a different model or a stricter rubric than the maker.</li>
+</ul></div>
+</section>

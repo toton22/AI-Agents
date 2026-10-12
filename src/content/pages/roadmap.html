@@ -1,0 +1,87 @@
+<!--META {"title":"Learning roadmap","h1":"From curious to <em>confident</em>: three tracks and a semester plan","eyebrow":"Orientation · Roadmap","lede":"Pick the track that matches what you'll actually do at work, follow the module order, and use the fourteen-week plan if you're teaching or studying this as a course.","minutes":12} -->
+<section id="tracks">
+<h2>Pick a track</h2>
+<p>Everyone does the thirteen modules. The tracks differ in which build methods you practise on and how deep you go into code. You can switch later. Plenty of managers start on the first track and drift into the third once they've seen how short an agent loop really is.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Track</th><th>You are</th><th>Build with</th><th>You'll be able to</th></tr></thead>
+<tbody>
+<tr><td><b>A · Manager</b><br><span class="muted small">no code</span></td><td>MBA/BBA student, functional manager, consultant, product owner</td><td><a href="{{root}}methods/no-code-assistants.html">Configured assistants</a>, <a href="{{root}}methods/copilot-studio.html">Copilot Studio</a>, <a href="{{root}}methods/enterprise-platforms.html">enterprise platforms</a> (as a buyer)</td><td>Spot good use cases, specify an agent on one page, prototype it, write the business case, run the vendor evaluation, set governance</td></tr>
+<tr><td><b>B · Analyst</b><br><span class="muted small">low-code</span></td><td>Business analyst, operations or process-excellence lead, "citizen developer"</td><td><a href="{{root}}methods/workflow-automation.html">n8n / Zapier / Power Automate</a>, <a href="{{root}}methods/copilot-studio.html">Copilot Studio</a>, <a href="{{root}}methods/voice-agents.html">voice platforms</a></td><td>Build and run departmental agents with real tools and approvals, measure them, hand them to IT for scale</td></tr>
+<tr><td><b>C · Builder</b><br><span class="muted small">Python</span></td><td>Analytics or tech-minded student, IT/data team member, founder</td><td><a href="{{root}}methods/api-tool-use.html">Raw API</a> first, then one framework (<a href="{{root}}methods/langgraph.html">LangGraph</a>, <a href="{{root}}methods/openai-agents-sdk.html">OpenAI SDK</a>, <a href="{{root}}methods/claude-agent-sdk.html">Claude SDK</a> or <a href="{{root}}methods/google-adk.html">ADK</a>), plus <a href="{{root}}methods/mcp.html">MCP</a></td><td>Ship a production-grade agent with evals, guardrails, tracing and a deployment pipeline</td></tr>
+</tbody></table></div>
+<div class="callout mgr"><b>Manager's lens</b><p>Even on Track A, do the raw-API page once, slowly, reading the plain-English notes. Seeing that an "agent" is a loop of model call, tool call and check removes most of the mystique, and makes you much harder to oversell in a vendor meeting.</p></div>
+</section>
+
+<section id="levels">
+<h2>Skills by level</h2>
+<h3>Level 1 · Foundations (modules 01–04)</h3>
+<ul class="checklist">
+<li>Explain the difference between a chatbot, a copilot, a workflow and an agent, with a business example of each</li>
+<li>Estimate the monthly token cost of an agent from volume and prompt size</li>
+<li>Write a system prompt with role, rules, escalation and output format</li>
+<li>Describe a tool in a schema and say which tools need human approval</li>
+</ul>
+<h3>Level 2 · Building (modules 05–09)</h3>
+<ul class="checklist">
+<li>Ground an agent in company documents and make it cite sources</li>
+<li>Decide what an agent should remember, for how long, and how a customer can make it forget</li>
+<li>Choose the simplest pattern that solves a problem, and say when multi-agent is worth the cost</li>
+<li>Connect an agent to company tools through MCP</li>
+</ul>
+<h3>Level 3 · Corporate (modules 10–13)</h3>
+<ul class="checklist">
+<li>Build a golden test set and report pass rates before and after a change</li>
+<li>Threat-model an agent and design layered guardrails</li>
+<li>Draw the production architecture and plan a 30-60-90 day pilot</li>
+<li>Write the business case, the KPI sheet and the governance entry for an agent</li>
+</ul>
+</section>
+
+<section id="semester">
+<h2>Fourteen-week semester plan</h2>
+<p>Designed for a three-credit elective: one 90-minute concept session and one 90-minute lab per week. Capstone teams form in week 5 and present in week 14.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Week</th><th>Concept session</th><th>Lab</th><th>Capstone milestone</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><a href="{{root}}modules/m01-what-is-an-agent.html">M01</a> What an agent is</td><td><a href="{{root}}lab.html">Agent Lab</a>: step through all five Meridian cases</td><td>—</td></tr>
+<tr><td>2</td><td><a href="{{root}}modules/m02-llms-for-managers.html">M02</a> LLMs for managers</td><td>Cost estimate exercise; compare two models on the same prompt</td><td>—</td></tr>
+<tr><td>3</td><td><a href="{{root}}modules/m03-instructions-and-prompts.html">M03</a> Instructions and prompting</td><td><a href="{{root}}methods/no-code-assistants.html">Build Deal Desk as a configured assistant</a></td><td>—</td></tr>
+<tr><td>4</td><td><a href="{{root}}modules/m04-tools-and-function-calling.html">M04</a> Tools and function calling</td><td><a href="{{root}}methods/api-tool-use.html">Raw API loop</a> (Track C) or <a href="{{root}}methods/workflow-automation.html">n8n tools</a> (A/B)</td><td>—</td></tr>
+<tr><td>5</td><td><a href="{{root}}modules/m05-knowledge-and-rag.html">M05</a> Knowledge and RAG</td><td><a href="{{root}}chatbots.html">Chatbot demo</a> with your own FAQ</td><td>Teams formed; pick a <a href="{{root}}capstones.html">capstone</a></td></tr>
+<tr><td>6</td><td><a href="{{root}}modules/m06-memory-and-state.html">M06</a> Memory and state</td><td>Add deal memory to your Deal Desk build</td><td>Agent Design Canvas v1</td></tr>
+<tr><td>7</td><td><a href="{{root}}modules/m07-design-patterns.html">M07</a> Design patterns</td><td>Routing + evaluator-optimizer exercise</td><td>Business case draft</td></tr>
+<tr><td>8</td><td>Mid-term review and quiz</td><td>Capstone clinic</td><td>Prototype v0 demo (2 minutes)</td></tr>
+<tr><td>9</td><td><a href="{{root}}modules/m08-multi-agent-systems.html">M08</a> Multi-agent systems</td><td><a href="{{root}}methods/crewai.html">CrewAI</a> research crew</td><td>—</td></tr>
+<tr><td>10</td><td><a href="{{root}}modules/m09-protocols-mcp-a2a.html">M09</a> MCP and A2A</td><td><a href="{{root}}methods/mcp.html">Build an MCP server</a> or connect one</td><td>Tools working end to end</td></tr>
+<tr><td>11</td><td><a href="{{root}}modules/m10-evaluation.html">M10</a> Evaluation</td><td>Golden test set for your capstone</td><td>Eval report v1</td></tr>
+<tr><td>12</td><td><a href="{{root}}modules/m11-guardrails-and-responsible-ai.html">M11</a> Guardrails and responsible AI</td><td>Red-team another team's agent</td><td>Risk and governance note</td></tr>
+<tr><td>13</td><td><a href="{{root}}modules/m12-deployment-and-llmops.html">M12</a> Deployment + <a href="{{root}}modules/m13-business-case-and-governance.html">M13</a> Business case</td><td>Publish to a channel (Teams, web, WhatsApp sandbox)</td><td>Final build freeze</td></tr>
+<tr><td>14</td><td>Demo day</td><td>—</td><td>5-minute demo, CXO-panel questions, reflection</td></tr>
+</tbody></table></div>
+<div class="callout tip"><b>Suggested assessment split</b><p>Quizzes 15%, lab submissions 20%, mid-term 15%, capstone 50% (use the <a href="{{root}}capstones.html#cp-rubric">rubric</a>). Adjust to your programme's rules.</p></div>
+</section>
+
+<section id="sprint">
+<h2>Four-week sprint for working managers</h2>
+<p>For executive education or a team learning together at work. About four hours a week.</p>
+<ol class="steps">
+<li><b>Week 1 · Understand</b><p>M01, M02 and the <a href="{{root}}mindmap.html">concept map</a>. Run the <a href="{{root}}lab.html">Agent Lab</a>. List ten repetitive decisions in your own team.</p></li>
+<li><b>Week 2 · Prototype</b><p>M03 and M05. Build one of your ten as a <a href="{{root}}methods/no-code-assistants.html">configured assistant</a> or in <a href="{{root}}methods/copilot-studio.html">Copilot Studio</a>. Test it on twenty real past cases.</p></li>
+<li><b>Week 3 · De-risk</b><p>M10 and M11. Write a golden test set, red-team the prototype, decide where a human must approve.</p></li>
+<li><b>Week 4 · Decide</b><p>M12 and M13. Fill in the business-case template, pick a build method for production, and take a pilot proposal to your leadership.</p></li>
+</ol>
+</section>
+
+<section id="certs">
+<h2>Credentials worth knowing about</h2>
+<p>None of these is required, and the catalogue changes every few months, so check the vendor's site for what's current before you enrol. They're useful mainly as structured study paths and as signals on a CV.</p>
+<div class="res-list">
+  <a class="res" href="https://learn.microsoft.com/en-us/training/" target="_blank" rel="noopener"><span class="res-kind">Course</span><span class="res-title">Microsoft Learn: Copilot Studio and AI agent learning paths</span><span class="res-by">Microsoft · free modules; relevant certifications are listed alongside</span></a>
+  <a class="res" href="https://trailhead.salesforce.com/" target="_blank" rel="noopener"><span class="res-kind">Course</span><span class="res-title">Salesforce Trailhead: Agentforce trails</span><span class="res-by">Salesforce · free hands-on trails; Agentforce credentials listed on Trailhead</span></a>
+  <a class="res" href="https://aws.amazon.com/certification/" target="_blank" rel="noopener"><span class="res-kind">Course</span><span class="res-title">AWS Certification</span><span class="res-by">AWS · includes foundational AI credentials; Skill Builder has Bedrock agent labs</span></a>
+  <a class="res" href="https://cloud.google.com/learn/certification" target="_blank" rel="noopener"><span class="res-kind">Course</span><span class="res-title">Google Cloud certifications</span><span class="res-by">Google Cloud · includes a generative-AI leadership credential aimed at non-engineers</span></a>
+  <a class="res" href="https://huggingface.co/learn/agents-course" target="_blank" rel="noopener"><span class="res-kind">Course</span><span class="res-title">Hugging Face Agents Course</span><span class="res-by">Hugging Face · free, code-first, with a certificate of completion</span></a>
+  <a class="res" href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">AI Agents for Beginners</span><span class="res-by">Microsoft · free lesson-by-lesson course on GitHub</span></a>
+</div>
+<p>More courses, papers and books are on the <a href="{{root}}resources.html">resources page</a>.</p>
+</section>

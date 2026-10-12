@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LangChain + LangGraph · AI Agents for Management</title>
+<meta name="description" content="Build the Meridian Deal Desk twice with LangChain v1 and LangGraph v1: a 30-line agent with create_agent, then an explicit graph where code makes the policy decision, a person approves through interrupt(), and a checkpointer lets the run pause and resume. Then trace it in LangSmith and see how it de">
+<meta property="og:title" content="LangChain + LangGraph · AI Agents for Management">
+<meta property="og:description" content="Build the Meridian Deal Desk twice with LangChain v1 and LangGraph v1: a 30-line agent with create_agent, then an explicit graph where code makes the policy decision, a person approves through interrupt(), and a checkpointer lets the run pause and resume. Then trace it in LangSmith and see how it de">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23151826'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6'%3E%3Ccircle cx='12' cy='6' r='2.2'/%3E%3Ccircle cx='6' cy='17' r='2.2'/%3E%3Ccircle cx='18' cy='17' r='2.2'/%3E%3Cpath d='M11 8 7 15M13 8l4 7M8.2 17h7.6'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('aiam.theme');if(t)document.documentElement.setAttribute('data-theme',JSON.parse(t));}catch(e){}</script>
+</head>
+<body data-root="../" data-page="x-langgraph" data-track="m01,m02,m03,m04,m05,m06,m07,m08,m09,m10,m11,m12,m13,x-nocode,x-copilot,x-workflow,x-enterprise,x-voice,x-computer,x-api,x-langgraph,x-crewai,x-maf,x-openai,x-claude,x-adk,x-llamaindex,x-mcp,chatbots,lab">
+<a class="skip-link" href="#content">Skip to content</a>
+<svg id="fx-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="fx-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fx-head" d="M0,0 L10,5 L0,10 z"/></marker></defs></svg>
+<div class="shell">
+  <aside class="rail" aria-label="Course contents">
+    <div class="rail-head">
+      <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M11 7.2 6.2 15.8M13 7.2l4.8 8.6M7.4 18h9.2"/></svg></span><span><span class="brand-name">AI Agents for Management</span><span class="brand-sub">Concept to corporate deployment</span></span></a>
+      <div class="rail-tools">
+        <button class="searchbtn" type="button" data-search-open><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg><span>Search</span><kbd>/</kbd></button>
+        <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+    </div>
+    <div class="rail-progress"><div class="rail-progress-top"><span>Pages completed</span><b id="pcount">0 / 30</b></div><div class="meter"><i id="pbar"></i></div></div>
+    <nav class="nav" aria-label="Course pages">
+<div class="nav-group"><p>Orientation</p>
+<a href="../index.html"><span class="num"></span><span>Start here</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../mindmap.html"><span class="num"></span><span>Concept map: ways to build agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../roadmap.html"><span class="num"></span><span>Learning roadmap</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 1 · Foundations</p>
+<a href="../modules/m01-what-is-an-agent.html" data-id="m01"><span class="num">01</span><span>M01 What an AI agent is</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m02-llms-for-managers.html" data-id="m02"><span class="num">02</span><span>M02 How LLMs work</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m03-instructions-and-prompts.html" data-id="m03"><span class="num">03</span><span>M03 Instructions and prompts</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m04-tools-and-function-calling.html" data-id="m04"><span class="num">04</span><span>M04 Tools and function calling</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 2 · Building</p>
+<a href="../modules/m05-knowledge-and-rag.html" data-id="m05"><span class="num">05</span><span>M05 Knowledge and RAG</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m06-memory-and-state.html" data-id="m06"><span class="num">06</span><span>M06 Memory and state</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m07-design-patterns.html" data-id="m07"><span class="num">07</span><span>M07 Agent design patterns</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m08-multi-agent-systems.html" data-id="m08"><span class="num">08</span><span>M08 Multi-agent systems</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m09-protocols-mcp-a2a.html" data-id="m09"><span class="num">09</span><span>M09 Protocols: MCP and A2A</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 3 · Corporate</p>
+<a href="../modules/m10-evaluation.html" data-id="m10"><span class="num">10</span><span>M10 Evaluation and testing</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m11-guardrails-and-responsible-ai.html" data-id="m11"><span class="num">11</span><span>M11 Guardrails and security</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m12-deployment-and-llmops.html" data-id="m12"><span class="num">12</span><span>M12 Deployment and LLMOps</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m13-business-case-and-governance.html" data-id="m13"><span class="num">13</span><span>M13 Business case and governance</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · No-code &amp; low-code</p>
+<a href="../methods/index.html"><span class="num"></span><span>Choose your method</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/no-code-assistants.html" data-id="x-nocode"><span class="num">A</span><span>No-code assistants</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/copilot-studio.html" data-id="x-copilot"><span class="num">B</span><span>Copilot Studio</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/workflow-automation.html" data-id="x-workflow"><span class="num">C</span><span>Workflow automation</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/enterprise-platforms.html" data-id="x-enterprise"><span class="num">D</span><span>Enterprise platforms</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/voice-agents.html" data-id="x-voice"><span class="num">E</span><span>Voice agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/computer-use.html" data-id="x-computer"><span class="num">F</span><span>Computer use agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · Code</p>
+<a href="../methods/api-tool-use.html" data-id="x-api"><span class="num">G</span><span>Raw API tool use</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/langgraph.html" data-id="x-langgraph" aria-current="page"><span class="num">H</span><span>LangChain + LangGraph</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/crewai.html" data-id="x-crewai"><span class="num">I</span><span>CrewAI</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/microsoft-agent-framework.html" data-id="x-maf"><span class="num">J</span><span>Microsoft Agent Framework</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/openai-agents-sdk.html" data-id="x-openai"><span class="num">K</span><span>OpenAI Agents SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/claude-agent-sdk.html" data-id="x-claude"><span class="num">L</span><span>Claude Agent SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/google-adk.html" data-id="x-adk"><span class="num">M</span><span>Google ADK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/llamaindex.html" data-id="x-llamaindex"><span class="num">N</span><span>LlamaIndex</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/mcp.html" data-id="x-mcp"><span class="num">O</span><span>Build an MCP server</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Practice</p>
+<a href="../chatbots.html" data-id="chatbots"><span class="num"></span><span>Chatbots + live bot</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../lab.html" data-id="lab"><span class="num"></span><span>Agent Lab</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../capstones.html"><span class="num"></span><span>Capstone projects</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Library</p>
+<a href="../media.html"><span class="num"></span><span>Videos &amp; infographics</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../glossary.html"><span class="num"></span><span>Glossary</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../resources.html"><span class="num"></span><span>Books, courses, papers</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="iconbtn" type="button" id="menu-btn" aria-label="Open contents"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+      <span class="brand-name">AI Agents for Management</span>
+      <button class="iconbtn" type="button" data-search-open aria-label="Search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></button>
+      <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+    </div>
+    <div class="page-wrap">
+      <main class="article" id="content">
+<header class="page-head"><p class="eyebrow">Method · Code</p><h1>Build the Deal Desk as a <em>graph</em> with LangGraph</h1><p class="lede">Build the Meridian Deal Desk twice with LangChain v1 and LangGraph v1: a 30-line agent with create_agent, then an explicit graph where code makes the policy decision, a person approves through interrupt(), and a checkpointer lets the run pause and resume. Then trace it in LangSmith and see how it deploys.</p><div class="page-meta"><span>55 min read</span><span>Tracked in your progress</span></div></header>
+
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Intermediate to advanced Python</dd></div><div><dt>Time to first agent</dt><dd>1 hour (quick version); a day for a proper graph</dd></div><div><dt>Typical cost</dt><dd>Libraries free (MIT); model tokens; LangSmith has free and paid tiers</dd></div><div><dt>Best for</dt><dd>Stateful workflows with approvals, pause and resume</dd></div><div><dt>Runs where</dt><dd>Your own servers, or LangSmith Deployment (cloud, hybrid, self-hosted)</dd></div><div><dt>Lock-in risk</dt><dd>Low for the code; medium if you build on the managed platform</dd></div></dl>
+<p>LangChain is the best-known open-source toolkit for building with language models, from the company of the same name. LangGraph is its lower-level sibling for agents that need real control flow: steps, branches, loops, memory, and the ability to stop halfway and wait for a person.</p>
+<p>The two were reorganised with their 1.0 releases in October 2025, and the split is now clean. <b>LangChain v1</b> gives you <code>create_agent</code>, a ready-made tool-calling agent with "middleware" you switch on for things like human approval, summarising long chats or redacting personal data. <b>LangGraph v1</b> is the engine underneath: you draw your agent as a graph of nodes and edges, and it handles state, checkpoints and resumption. You can start with the first and drop down to the second when you need more control.</p>
+<p>Around them sit two commercial products. <b>LangSmith</b> records traces of every run and runs evaluations. <b>LangSmith Deployment</b>, renamed from LangGraph Platform in October 2025, hosts graphs as APIs. <b>Studio</b> (formerly LangGraph Studio) is the visual debugger. The libraries are MIT-licensed and work fine without any of the paid pieces.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>LangGraph's selling point for a business is not cleverness. It is that you can draw the process on a whiteboard, with the approval step as a box, and the code has the same shape. Your process owner, your auditor and your developer can all point at the same diagram. That is rare in AI projects, and it is worth a lot when something goes wrong.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Pick LangGraph when the process has a shape you care about. "Look up, check policy, if it fails get approval, then draft" is a shape. So is "draft, review, revise up to three times, then send". If you can draw the steps and the branches, LangGraph lets you enforce them, rather than hoping a model follows a long prompt.</p>
+<p>It is especially strong when a person has to step in partway through. A Deal Desk approval might take ten minutes or two days. LangGraph saves the state at every step, so the run can stop at the approval, the server can restart overnight, and the run resumes from exactly that point when the Sales Manager clicks approve.</p>
+<p>Skip it for a five-tool assistant with no branching; <code>create_agent</code>, or the <a href="../methods/api-tool-use.html">raw API loop</a>, is enough. Skip it too if your team does not write Python or TypeScript; look at <a href="../methods/copilot-studio.html">Copilot Studio</a> or <a href="../methods/workflow-automation.html">n8n</a> instead. And be ready for a learning curve: state schemas, reducers and checkpointers are new ideas for most teams.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>The process is explicit: nodes, edges and branches you can draw</li><li>Pause and resume built in, with durable checkpoints</li><li>Human-in-the-loop via <code>interrupt()</code> at any node</li><li>Works with almost any model provider</li><li>Strong tracing and debugging with LangSmith and Studio</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Steeper learning curve than a simple agent loop</li><li>Older tutorials use pre-1.0 APIs that no longer match</li><li>Nodes before an interrupt re-run on resume (see the build)</li><li>The managed platform is where cost and lock-in creep in</li><li>Easy to over-engineer a graph for a simple job</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>A LangGraph agent has three ingredients. <b>State</b> is a typed dictionary that travels through the run: the request, the customer record, the verdict, the decision, the reply. <b>Nodes</b> are plain Python functions that read the state and return updates. <b>Edges</b> connect nodes, and conditional edges choose the next node based on the state.</p>
+<figure class="fig" data-dl="langchain-langgraph-figure-1">
+<svg viewBox="0 0 720 300" role="img" aria-label="The Deal Desk graph: lookup, policy check, then either draft directly or escalate, pause for approval, then draft; a checkpointer saves state after every node">
+  <text class="fx-ts" x="67" y="48" text-anchor="middle">START</text>
+  <rect class="fx-box" x="12" y="60" width="110" height="50" rx="6"/>
+  <text class="fx-tb" x="67" y="82" text-anchor="middle">lookup</text>
+  <text class="fx-ts" x="67" y="100" text-anchor="middle">parse + CRM</text>
+  <rect class="fx-box k2" x="150" y="60" width="130" height="50" rx="6"/>
+  <text class="fx-tb" x="215" y="82" text-anchor="middle">policy_check</text>
+  <text class="fx-ts" x="215" y="100" text-anchor="middle">rules in code</text>
+  <rect class="fx-box k1" x="590" y="60" width="118" height="50" rx="6"/>
+  <text class="fx-tb" x="649" y="82" text-anchor="middle">draft</text>
+  <text class="fx-ts" x="649" y="100" text-anchor="middle">LLM writes reply</text>
+  <text class="fx-ts" x="649" y="48" text-anchor="middle">END after this</text>
+  <rect class="fx-box k4" x="310" y="170" width="120" height="50" rx="6"/>
+  <text class="fx-tb" x="370" y="192" text-anchor="middle">escalate</text>
+  <text class="fx-ts" x="370" y="210" text-anchor="middle">raise ticket</text>
+  <rect class="fx-box fx-hi" x="460" y="170" width="130" height="50" rx="6"/>
+  <text class="fx-tb" x="525" y="192" text-anchor="middle">approval</text>
+  <text class="fx-ts" x="525" y="210" text-anchor="middle">interrupt()</text>
+  <text class="fx-ts" x="525" y="242" text-anchor="middle">pauses for the Sales Manager</text>
+  <rect class="fx-box k3" x="12" y="230" width="250" height="50" rx="6"/>
+  <text class="fx-tb" x="137" y="252" text-anchor="middle">Checkpointer (thread_id)</text>
+  <text class="fx-ts" x="137" y="270" text-anchor="middle">saves state after every node</text>
+  <path class="fx-ar" d="M122 85 L150 85"/>
+  <path class="fx-ar" d="M280 85 L590 85"/>
+  <text class="fx-ts" x="435" y="77" text-anchor="middle">within policy</text>
+  <path class="fx-ar" d="M250 110 L330 170"/>
+  <text class="fx-ts" x="300" y="132">breaks a rule</text>
+  <path class="fx-ar" d="M430 195 L460 195"/>
+  <path class="fx-ar" d="M580 170 L640 110"/>
+</svg>
+<figcaption>The model appears in only two boxes: reading the request and writing the reply. The decision in the middle is ordinary code, and the approval is a pause the graph cannot skip.</figcaption>
+</figure>
+<p>Look at where the model sits. In the quick <code>create_agent</code> version, the model decides everything: which tool to call, when to escalate, what to write. In the explicit graph, the model reads the salesperson's message and writes the reply. The policy decision in the middle is ordinary Python. This is the most useful design idea on this page: <b>let the model do language, let code do rules</b>.</p>
+<h3>Interrupts and checkpoints</h3>
+<p>When a node calls <code>interrupt(payload)</code>, the graph stops and hands the payload to whoever is running it. Your app shows it to the approver. When the approver answers, you call the graph again with <code>Command(resume=answer)</code> and the same <code>thread_id</code>. The answer becomes the return value of <code>interrupt()</code>, and the run carries on.</p>
+<p>That only works because of the <b>checkpointer</b>, which saves the state after every node under the thread id. In the demo it is <code>InMemorySaver</code>, which forgets everything when the script ends. In production you swap in a database-backed saver (Postgres is the usual choice) and the pause can last days.</p>
+<p>One quirk catches everybody. When a run resumes, the node that called <code>interrupt()</code> restarts <b>from its first line</b>. Anything before the interrupt runs again. If that "anything" is raising an approval ticket, you get two tickets. The fix, used below, is to raise the ticket in its own node (<code>escalate</code>) and keep the approval node to nothing but the interrupt.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk</h2>
+<ol class="steps">
+<li><b>Install and set keys</b><p>Python 3.10 or newer, a virtual environment, keys in environment variables.</p></li>
+<li><b>Write the tools in plain Python</b><p>The same <code>meridian_tools.py</code> used on every method page.</p></li>
+<li><b>Quick version with create_agent</b><p>A full tool-calling agent with an approval gate in about 30 lines.</p></li>
+<li><b>Explicit graph with StateGraph</b><p>Lookup, policy check, escalate, approval via <code>interrupt()</code>, draft, plus a checkpointer.</p></li>
+<li><b>Run it and read the trace</b><p>Bluewave at 6% exercises every node.</p></li>
+<li><b>Open it in Studio and LangSmith</b><p>See the graph drawn and every step traced.</p></li>
+</ol>
+<h3>Step 1: install</h3>
+<pre class="code"><code class="language-bash">python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install langchain==1.4.4 langgraph==1.2.14 langchain-anthropic==1.7.6   # checked Oct 2026
+export ANTHROPIC_API_KEY="your-key"
+export MODEL="anthropic:claude-sonnet-5-5"     # provider:model; e.g. openai:gpt-5.5 with langchain-openai</code></pre>
+<p>What this does: installs LangChain, LangGraph and the Anthropic connector at the versions this page was checked against. LangChain names models as <code>provider:model-id</code>, so switching to OpenAI or Google is an install and an environment variable, not a rewrite.</p>
+<h3>Step 2: the tools (meridian_tools.py)</h3>
+<pre class="code"><code class="language-python">"""meridian_tools.py - the Deal Desk agent's tools, in plain Python.
+
+In a real company these functions would call the CRM and the ERP.
+Here they read a small in-memory table so the whole agent runs on a laptop.
+"""
+import difflib
+from datetime import datetime
+
+CUSTOMERS = {
+    "C-101": {"id": "C-101", "name": "Sahyadri Hospitals", "tier": "Gold",
+              "annual_revenue_lakh": 48, "late_payments_fy": 0, "gross_margin_pct": 22},
+    "C-102": {"id": "C-102", "name": "Bluewave Logistics", "tier": "Silver",
+              "annual_revenue_lakh": 19, "late_payments_fy": 2, "gross_margin_pct": 18},
+    "C-103": {"id": "C-103", "name": "Orchid Schools Trust", "tier": "Gold",
+              "annual_revenue_lakh": 31, "late_payments_fy": 0, "gross_margin_pct": 25},
+    "C-104": {"id": "C-104", "name": "Kite Fintech", "tier": "Bronze",
+              "annual_revenue_lakh": 6, "late_payments_fy": 0, "gross_margin_pct": 16},
+    "C-105": {"id": "C-105", "name": "Trident Engineering", "tier": "Silver",
+              "annual_revenue_lakh": 22, "late_payments_fy": 1, "gross_margin_pct": 20},
+}
+
+POLICY = """Meridian Supplies discount policy (FY 2026-27)
+1. Maximum discount by tier: Bronze 5%, Silver 8%, Gold 12%.
+2. Customers with 2 or more late payments this financial year are capped at 3%.
+3. Gross margin after discount must stay at or above 12%
+   (margin_after = current_margin - discount).
+4. Anything above the cap needs Sales Manager approval;
+   anything above 15% needs Regional Head approval."""
+
+TIER_CAP = {"Bronze": 5, "Silver": 8, "Gold": 12}
+MARGIN_FLOOR = 12
+APPROVALS = []  # stands in for your ticketing system
+
+
+def get_customer(customer_id: str) -&gt; dict:
+    """Return the customer record for an id such as C-101."""
+    record = CUSTOMERS.get(customer_id.strip().upper())
+    return record or {"error": f"No customer with id {customer_id}"}
+
+
+def find_customer(name: str) -&gt; dict:
+    """Fuzzy lookup by customer name. Returns the best-matching record."""
+    by_name = {c["name"].lower(): c for c in CUSTOMERS.values()}
+    query = name.strip().lower()
+    for full_name, record in by_name.items():
+        if query and (query in full_name or full_name in query):
+            return record
+    close = difflib.get_close_matches(query, list(by_name), n=1, cutoff=0.5)
+    return by_name[close[0]] if close else {"error": f"No customer matching '{name}'"}
+
+
+def get_discount_policy() -&gt; str:
+    """Return the current discount policy text."""
+    return POLICY
+
+
+def margin_after_discount(current_margin_pct: float, discount_pct: float) -&gt; float:
+    """Gross margin % left after the discount (simplified: margin minus discount)."""
+    return round(current_margin_pct - discount_pct, 2)
+
+
+def request_approval(customer_id: str, discount_pct: float, approver: str, reason: str) -&gt; str:
+    """Log an approval request for a discount above policy. A named person must decide."""
+    ticket = f"APR-{len(APPROVALS) + 1:04d}"
+    APPROVALS.append({"ticket": ticket, "customer_id": customer_id, "discount_pct": discount_pct,
+                      "approver": approver, "reason": reason,
+                      "raised_at": datetime.now().isoformat(timespec="seconds")})
+    return f"{ticket} logged with {approver} for {discount_pct}% on {customer_id}."
+
+
+def evaluate_request(customer: dict, discount_pct: float) -&gt; dict:
+    """The policy written as code: the same rules, checked the same way every time."""
+    cap = 3 if customer["late_payments_fy"] &gt;= 2 else TIER_CAP[customer["tier"]]
+    margin_after = margin_after_discount(customer["gross_margin_pct"], discount_pct)
+    problems = []
+    if discount_pct &gt; cap:
+        problems.append(f"{discount_pct}% is above the {cap}% cap")
+    if margin_after &lt; MARGIN_FLOOR:
+        problems.append(f"margin after discount would be {margin_after}%, below the {MARGIN_FLOOR}% floor")
+    approver = None
+    if problems:
+        approver = "Regional Head" if discount_pct &gt; 15 else "Sales Manager"
+    return {"within_policy": not problems, "cap_pct": cap, "margin_after_pct": margin_after,
+            "problems": problems, "approver": approver}</code></pre>
+<p>What this does: holds the customer table and the policy from the course case, plus five tool functions and <code>evaluate_request</code>, the whole discount policy written as code. LangChain reads each function's name, type hints and docstring to describe it to the model, so plain functions work as tools with no decorators. The explicit graph below calls <code>evaluate_request</code> directly; the model never gets a vote on the rules.</p>
+<h3>Step 3: the quick version (lg_quick.py)</h3>
+<pre class="code"><code class="language-python">"""lg_quick.py - Deal Desk in about 30 lines with LangChain v1 create_agent."""
+import os
+
+from langchain.agents import create_agent
+from langchain.agents.middleware import HumanInTheLoopMiddleware
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.types import Command
+
+import meridian_tools as mt
+
+MODEL = os.getenv("MODEL", "anthropic:claude-sonnet-5-5")   # provider:model-id
+
+agent = create_agent(
+    model=MODEL,
+    tools=[mt.find_customer, mt.get_customer, mt.get_discount_policy,
+           mt.margin_after_discount, mt.request_approval],
+    system_prompt=(
+        "You are the Deal Desk assistant at Meridian Supplies, Pune. Look the customer up, "
+        "read the policy, compute the margin with the tool. Approve only within every rule "
+        "and draft a short reply. Otherwise call request_approval and never promise the discount. "
+        "request_approval only runs after the approver says yes; if it is rejected, say so and "
+        "offer the within-policy maximum instead."),
+    middleware=[HumanInTheLoopMiddleware(interrupt_on={"request_approval": True})],
+    checkpointer=InMemorySaver(),          # remembers the paused run
+)
+
+config = {"configurable": {"thread_id": "deal-0001"}}
+result = agent.invoke(
+    {"messages": [{"role": "user", "content": "Bluewave Logistics wants 6% off. Can we do it?"}]},
+    config=config)
+
+if "__interrupt__" in result:              # paused at the approval gate
+    print(result["__interrupt__"][0].value)
+    ok = input("Sales Manager - approve this discount? (y/n): ").strip().lower() == "y"
+    decision = {"type": "approve"} if ok else {"type": "reject", "message": "Manager declined."}
+    result = agent.invoke(Command(resume={"decisions": [decision]}), config=config)
+
+print(result["messages"][-1].content)</code></pre>
+<p>What this does:</p>
+<ul>
+<li><code>create_agent</code> builds the standard model-calls-tools loop for you, the same loop you would write by hand on the <a href="../methods/api-tool-use.html">raw API page</a>.</li>
+<li><code>HumanInTheLoopMiddleware</code> says: whenever the model tries to call <code>request_approval</code>, stop before running it. Other tools run freely.</li>
+<li><code>InMemorySaver</code> is the checkpointer that remembers the paused run. The <code>thread_id</code> names this conversation, so you can resume the right one.</li>
+<li>If the result contains <code>__interrupt__</code>, the run is paused. The payload lists the tool call and what the reviewer may do (approve, edit, reject or respond). Resuming with <code>Command(resume={"decisions": [...]})</code> continues the run.</li>
+</ul>
+<p>This is a good first agent. Its weakness is that the model still decides whether a request needs approval. If it misreads the policy and approves Kite Fintech at 5%, nothing in the code stops it.</p>
+<h3>Step 4: the explicit graph (lg_graph.py)</h3>
+<pre class="code"><code class="language-python">"""lg_graph.py - Deal Desk as an explicit LangGraph StateGraph with a human approval gate."""
+import os
+from typing import TypedDict
+
+from langchain.chat_models import init_chat_model
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph import END, START, StateGraph
+from langgraph.types import Command, interrupt
+from pydantic import BaseModel, Field
+
+import meridian_tools as mt
+
+llm = init_chat_model(os.getenv("MODEL", "anthropic:claude-sonnet-5-5"))
+
+
+class DealRequest(BaseModel):
+    customer_name: str = Field(description="Customer name as written by the salesperson")
+    discount_pct: float = Field(description="Discount asked for, in percent")
+
+
+class DealState(TypedDict, total=False):
+    request: str          # what the salesperson typed
+    customer: dict        # record from find_customer
+    discount_pct: float
+    verdict: dict         # output of the policy check
+    ticket: str           # approval ticket reference
+    decision: str         # what the human approver said
+    reply: str            # the drafted reply
+
+
+def lookup(state: DealState) -&gt; dict:
+    parsed = llm.with_structured_output(DealRequest).invoke(
+        f"Extract the customer and the discount asked for: {state['request']}")
+    return {"customer": mt.find_customer(parsed.customer_name),
+            "discount_pct": parsed.discount_pct}
+
+
+def policy_check(state: DealState) -&gt; dict:
+    if "error" in state["customer"]:
+        return {"verdict": {"within_policy": False, "problems": [state["customer"]["error"]],
+                            "approver": "Sales Manager"}}
+    return {"verdict": mt.evaluate_request(state["customer"], state["discount_pct"])}
+
+
+def decide(state: DealState) -&gt; str:
+    return "draft" if state["verdict"]["within_policy"] else "escalate"
+
+
+def escalate(state: DealState) -&gt; dict:
+    v, c = state["verdict"], state["customer"]
+    ticket = mt.request_approval(c.get("id", "unknown"), state["discount_pct"],
+                                 v["approver"], "; ".join(v["problems"]))
+    return {"ticket": ticket}
+
+
+def approval(state: DealState) -&gt; dict:
+    answer = interrupt({"ticket": state["ticket"], "approver": state["verdict"]["approver"],
+                        "question": f"Allow {state['discount_pct']}% for {state['customer'].get('name')}?",
+                        "problems": state["verdict"]["problems"]})     # the graph pauses here
+    return {"decision": answer}
+
+
+def draft(state: DealState) -&gt; dict:
+    facts = {"customer": state["customer"], "asked_pct": state["discount_pct"],
+             "verdict": state["verdict"], "approver_decision": state.get("decision", "not needed")}
+    msg = llm.invoke(
+        "You write for Meridian Supplies' sales team. Draft a short, polite reply to the customer "
+        "that matches these facts exactly. Never offer more than the policy or the approver allows.\n"
+        f"{facts}")
+    return {"reply": msg.content}
+
+
+builder = StateGraph(DealState)
+builder.add_node("lookup", lookup)
+builder.add_node("policy_check", policy_check)
+builder.add_node("escalate", escalate)
+builder.add_node("approval", approval)
+builder.add_node("draft", draft)
+builder.add_edge(START, "lookup")
+builder.add_edge("lookup", "policy_check")
+builder.add_conditional_edges("policy_check", decide, ["draft", "escalate"])
+builder.add_edge("escalate", "approval")
+builder.add_edge("approval", "draft")
+builder.add_edge("draft", END)
+graph = builder.compile(checkpointer=InMemorySaver())
+
+
+if __name__ == "__main__":
+    config = {"configurable": {"thread_id": "deal-0002"}}
+    result = graph.invoke({"request": input("Salesperson: ")}, config=config)
+    if "__interrupt__" in result:
+        print("\nAPPROVAL NEEDED:", result["__interrupt__"][0].value)
+        answer = input("Approver decision (e.g. 'approve 4%' or 'reject'): ")
+        result = graph.invoke(Command(resume=answer), config=config)
+    print("\n" + result["reply"])</code></pre>
+<p>What this does, node by node:</p>
+<ul>
+<li><code>DealState</code> lists everything the run carries. Each node returns only the fields it changes.</li>
+<li><code>lookup</code> asks the model for one small, checkable thing: the customer name and the percentage, returned as a typed <code>DealRequest</code>. Then it calls <code>find_customer</code>.</li>
+<li><code>policy_check</code> runs <code>evaluate_request</code>. No model involved. Same input, same answer, every time.</li>
+<li><code>decide</code> is the routing function for the conditional edge: within policy goes straight to <code>draft</code>, anything else to <code>escalate</code>.</li>
+<li><code>escalate</code> raises the ticket. It sits in its own node so it runs once, even though the next node will be resumed.</li>
+<li><code>approval</code> contains only the <code>interrupt()</code>. The approver's answer, for example "approve 4%", lands in <code>decision</code>.</li>
+<li><code>draft</code> gives the model the facts and the decision and asks for a reply that offers nothing beyond them.</li>
+<li>The <code>builder</code> lines wire the graph exactly as in the figure, and <code>compile(checkpointer=...)</code> makes it pausable.</li>
+</ul>
+<div class="callout tip"><b>Tip</b><p>Because <code>policy_check</code> is pure Python, you can unit-test it without any API key: assert that Sahyadri at 10% passes, Bluewave at 6% fails on the cap and Kite at 5% fails on margin. Put those three tests in your build pipeline and the policy can never quietly drift.</p></div>
+<h3>Step 5: a run, step by step</h3>
+<div class="trace">
+  <div class="t-user">Bluewave Logistics wants 6% off their next order. Can we do it?</div>
+  <div class="t-act">lookup: model extracts {"customer_name":"Bluewave Logistics","discount_pct":6.0} → find_customer("Bluewave Logistics")</div>
+  <div class="t-obs">{"id":"C-102","tier":"Silver","late_payments_fy":2,"gross_margin_pct":18}</div>
+  <div class="t-act">policy_check: evaluate_request(customer, 6.0)</div>
+  <div class="t-obs">{"within_policy":false,"cap_pct":3,"margin_after_pct":12.0,"problems":["6.0% is above the 3% cap"],"approver":"Sales Manager"}</div>
+  <div class="t-think">decide → "escalate" (rule broken, so the graph cannot reach draft without passing approval)</div>
+  <div class="t-act">escalate: request_approval("C-102", 6.0, "Sales Manager", "6.0% is above the 3% cap")</div>
+  <div class="t-obs">APR-0001 logged with Sales Manager for 6.0% on C-102.</div>
+  <div class="t-act">approval: interrupt({...}) · graph paused, state checkpointed under thread "deal-0002"</div>
+  <div class="t-human">Sales Manager replies "approve 4%". App calls graph.invoke(Command(resume="approve 4%"), config)</div>
+  <div class="t-act">draft: model receives facts + decision "approve 4%"</div>
+  <div class="t-final">"Thank you for the request. We're able to offer 4% on your next order, approved by our Sales Manager. We'd be glad to process it as soon as you confirm..."</div>
+</div>
+<p>Try Sahyadri at 10%: the graph goes lookup, policy_check, draft and never pauses. Try Kite at 5%: policy_check catches the 11% margin and the graph escalates, whatever the model might have thought.</p>
+<h3>Step 6: see it in Studio and LangSmith</h3>
+<p>Tracing needs only environment variables. Add a <code>langgraph.json</code> next to your code and the local Agent Server can serve the graph to Studio.</p>
+<pre class="code"><code class="language-json">{
+  "dependencies": ["."],
+  "graphs": {"deal_desk": "./lg_graph.py:graph"},
+  "env": ".env"
+}</code></pre>
+<pre class="code"><code class="language-bash"># .env - read by `langgraph dev`; never commit this file
+ANTHROPIC_API_KEY=your-key
+MODEL=anthropic:claude-sonnet-5-5
+LANGSMITH_TRACING=true
+LANGSMITH_API_KEY=your-langsmith-key
+LANGSMITH_PROJECT=meridian-deal-desk
+
+# then, in the project folder (pin the CLI version you test with):
+pip install "langgraph-cli[inmem]"
+langgraph dev        # starts a local Agent Server and prints a Studio link</code></pre>
+<p>What this does: <code>langgraph.json</code> tells the server which graph to load (<code>deal_desk</code>, from <code>lg_graph.py</code>) and where the environment file is. The <code>LANGSMITH_*</code> variables switch on tracing, so every run appears in LangSmith with each node, model call, token count and the interrupt. <code>langgraph dev</code> runs the graph locally and gives you a link to Studio, where you see the graph drawn, can submit a request, watch it stop at <code>approval</code>, and type the resume value. The server keeps its own state, so the in-memory checkpointer in the file only matters when you run the script directly.</p>
+<div class="callout note"><b>Note</b><p>Tracing sends prompts, tool inputs and outputs to LangSmith. For customer data, check where your LangSmith workspace is hosted and whether a self-hosted option is required by your data protection review.</p></div>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<h3>Hosting</h3>
+<p>You have two routes. Run the graph inside your own service (a FastAPI app on your cloud) with a Postgres checkpointer from the <code>langgraph-checkpoint-postgres</code> package. Or use LangSmith Deployment, which as of 2026 offers a fully managed cloud, a hybrid model (LangChain runs the control plane, your servers run the agents and hold the data), self-hosting on your own Kubernetes, and a standalone server you run with Docker. For Indian firms with data residency questions, the hybrid and self-hosted options are usually the ones that pass review. Check current terms in the <a href="https://docs.langchain.com/langsmith/deployments" target="_blank" rel="noopener">deployment docs</a>.</p>
+<h3>Identity and SSO</h3>
+<p>Put the agent API behind your company login and pass the user's identity into the graph's config, so it reaches every trace. Approvals must come from an authenticated approver, not from whoever holds the thread id. A common mistake: the resume endpoint has no authorisation check, so anyone with a thread id can "approve".</p>
+<h3>Data access</h3>
+<p>Nodes call your systems through tool functions using a least-privilege service account. Pass the model only the fields it needs. Under the DPDP Act 2023, the customer data in state and in traces is still data you are responsible for, so set retention for both the checkpointer tables and LangSmith traces.</p>
+<h3>Cost control</h3>
+<p>The explicit graph is cheaper than the quick agent: two small model calls per request (extract, draft) instead of a loop of four to six. That is a general lesson. Every decision you move from the model into code saves tokens and removes a failure mode. Add <code>recursion_limit</code> in the run config as a step cap for graphs with loops.</p>
+<h3>Monitoring and approvals</h3>
+<p>LangSmith dashboards show latency, errors, tokens and cost per run; build an escalation-rate view from the traces. For approvals, connect the interrupt to the tool your managers already use: a Teams or Slack card, a CRM task, or an email with approve and reject links. Add expiry: a pending approval older than two working days is closed and the salesperson told.</p>
+<ul class="checklist"><li>Postgres (or equivalent) checkpointer, not in-memory</li><li>Resume endpoint checks the approver's identity and role</li><li>Unit tests on the policy node for all five customers</li><li>Trace and checkpoint retention set</li><li>Step cap and per-request token budget</li><li>Approval expiry and notification</li></ul>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<p>LangGraph earns its keep where the process has branches, loops or waits.</p>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales</td><td>Deal Desk (this page)</td><td>Extracts request, checks policy in code, escalates, drafts reply</td><td>Sales Manager resumes the paused run</td></tr>
+<tr><td>Finance</td><td>Vendor invoice exceptions</td><td>Matches invoice to PO and receipt, routes mismatches above tolerance</td><td>AP lead approves before payment release</td></tr>
+<tr><td>HR</td><td>Offer letter preparation</td><td>Pulls band and approved CTC, drafts letter, checks against grade rules</td><td>HRBP approves any out-of-band offer</td></tr>
+<tr><td>Marketing</td><td>Campaign copy review</td><td>Drafts, checks brand and ASCI-style claims rules, revises up to three times</td><td>Brand manager signs off the final version</td></tr>
+<tr><td>Customer service</td><td>Complaint resolution</td><td>Classifies, pulls order history, proposes remedy by policy</td><td>Supervisor approves goodwill credits</td></tr>
+</tbody></table></div>
+<div class="callout mgr"><b>Manager's lens</b><p>When a team proposes a LangGraph build, ask them to show you the graph before any code. If you can't follow it, neither will your auditors. If it has fifteen nodes for a job a clerk does in four steps, it's over-built.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Add a Regional Head path</b><p>Orchid Schools Trust asks for 18%. Trace the graph by hand. Which approver does it reach, and what would you change so that the Regional Head's approval also requires the Sales Manager's first?</p><details><summary>Hint / model answer</summary><p><code>evaluate_request</code> returns approver "Regional Head" because 18% is above 15% (and the margin would be 7%). For a two-level approval, add a second approval node: escalate → approval_sm → (if approved and above 15%) approval_rh → draft. Each approval node holds only its own <code>interrupt()</code>.</p></details></li>
+<li><b>Spot the double ticket</b><p>A colleague moves the <code>request_approval</code> call into the <code>approval</code> node, just above <code>interrupt()</code>. What happens when the Sales Manager approves?</p><details><summary>Hint / model answer</summary><p>On resume, the approval node restarts from its first line, so <code>request_approval</code> runs again and creates a second ticket (APR-0002) for the same request. Keep side effects in a separate node, or make them idempotent (check whether a ticket already exists for this thread).</p></details></li>
+<li><b>Decide what stays with the model</b><p>List each step of the Deal Desk and say whether it should be done by the model or by code, with one reason each.</p><details><summary>Hint / model answer</summary><p>Model: reading free-text requests (names and numbers in messy language), writing the reply (tone, clarity). Code: customer lookup, policy rules, margin arithmetic, choosing the approver, enforcing the approval. Rule of thumb: if two analysts would always reach the same answer, it belongs in code.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="b">
+    <p class="q-text">What does the checkpointer make possible in the Deal Desk graph?</p>
+    <ol class="q-opts"><li data-k="a">Faster model responses</li><li data-k="b">Pausing at the approval and resuming later from the same point</li><li data-k="c">Calling several tools in parallel</li><li data-k="d">Encrypting customer data</li></ol>
+    <p class="q-why">The checkpointer saves state after each node under a thread id, which is what lets interrupt() pause a run and Command(resume=...) continue it, even after a restart with a database-backed saver.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">A node calls request_approval() and then interrupt(). The approver approves. What happens?</p>
+    <ol class="q-opts"><li data-k="a">The run continues after interrupt() and the ticket is created once</li><li data-k="b">The graph restarts from START</li><li data-k="c">The run fails with an error</li><li data-k="d">The node re-runs from its first line, so request_approval() runs a second time</li></ol>
+    <p class="q-why">On resume, LangGraph restarts the interrupted node from the beginning. Side effects before interrupt() repeat, which is why the ticket belongs in its own node.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">In the explicit graph, why does policy_check call evaluate_request instead of asking the model?</p>
+    <ol class="q-opts"><li data-k="a">Rules applied in code give the same answer every time and can be unit-tested</li><li data-k="b">LangGraph does not allow model calls in nodes</li><li data-k="c">The model cannot read numbers</li><li data-k="d">It is required for tracing to work</li></ol>
+    <p class="q-why">Models usually apply rules correctly, but "usually" is not good enough for discounts. Code is deterministic and testable; nodes can call models, they just should not decide policy here.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">In the quick create_agent version, what does HumanInTheLoopMiddleware(interrupt_on={"request_approval": True}) do?</p>
+    <ol class="q-opts"><li data-k="a">Makes a person approve every tool call</li><li data-k="b">Sends every reply to a manager for review</li><li data-k="c">Pauses before request_approval runs and waits for a decision; other tools run freely</li><li data-k="d">Stops the model from calling request_approval at all</li></ol>
+    <p class="q-why">Only the listed tool is gated. Tools not in interrupt_on are auto-approved.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">LangGraph Platform was renamed in October 2025. What is the managed hosting product called now?</p>
+    <ol class="q-opts"><li data-k="a">LangChain Cloud</li><li data-k="b">LangSmith Deployment</li><li data-k="c">LangGraph Studio</li><li data-k="d">LangServe</li></ol>
+    <p class="q-why">Hosting is LangSmith Deployment. Studio (c) is the visual debugger, and LangServe (d) is an older, separate project.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="langgraph"><div class="vid"><button class="vid-thumb" type="button" data-yt="29XE10U6ooc" aria-label="Play: LangChain Academy New Course: Introduction to LangGraph"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/29XE10U6ooc/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>LangChain Academy New Course: Introduction to LangGraph</b><span class="ch">LangChain</span><span class="nt">Official overview of the free LangChain Academy LangGraph course.</span><a href="https://www.youtube.com/watch?v=29XE10U6ooc" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="jGg_1h0qzaM" aria-label="Play: LangGraph Complete Course for Beginners – Complex AI Agents with Python"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/jGg_1h0qzaM/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>LangGraph Complete Course for Beginners – Complex AI Agents with Python</b><span class="ch">freeCodeCamp.org</span><span class="nt">Full beginner course: state, nodes, edges, tools and a RAG agent.</span><a href="https://www.youtube.com/watch?v=jGg_1h0qzaM" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="4GiqzUHD5AA" aria-label="Play: Context Engineering for Agents"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/4GiqzUHD5AA/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Context Engineering for Agents</b><span class="ch">LangChain</span><span class="nt">LangChain&#x27;s guide to managing context in LangGraph agents.</span><a href="https://www.youtube.com/watch?v=4GiqzUHD5AA" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div></div>
+<div class="res-list">
+  <a class="res" href="https://docs.langchain.com/oss/python/langgraph/overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">LangGraph overview</span><span class="res-by">LangChain · start here for graphs, state and persistence</span></a>
+  <a class="res" href="https://docs.langchain.com/oss/python/langgraph/interrupts" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Interrupts</span><span class="res-by">LangChain · human-in-the-loop, including the re-run rule</span></a>
+  <a class="res" href="https://docs.langchain.com/oss/python/langchain/overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">LangChain overview</span><span class="res-by">LangChain · create_agent and middleware</span></a>
+  <a class="res" href="https://docs.langchain.com/langsmith/studio" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Studio</span><span class="res-by">LangChain · the visual debugger for graphs</span></a>
+  <a class="res" href="https://docs.langchain.com/langsmith/deployments" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">LangSmith Deployment</span><span class="res-by">LangChain · cloud, hybrid and self-hosted options</span></a>
+  <a class="res" href="https://github.com/langchain-ai/langgraph" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">langchain-ai/langgraph</span><span class="res-by">GitHub · source, examples and release notes</span></a>
+</div>
+<div class="cards">
+  <a class="card" href="../modules/m06-memory-and-state.html"><span class="card-kicker">Module 06</span><b>Memory and state</b><span>Why checkpoints and threads matter.</span></a>
+  <a class="card" href="../modules/m07-design-patterns.html"><span class="card-kicker">Module 07</span><b>Agent design patterns</b><span>Workflows versus agents, and when to use each.</span></a>
+  <a class="card" href="../methods/crewai.html"><span class="card-kicker">Method · Code</span><b>CrewAI</b><span>The same Deal Desk as a team of role-playing agents.</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>LangChain v1's <code>create_agent</code> gets you a working agent fast; LangGraph v1 gives you explicit control.</li><li>Draw the process as nodes and edges; let the model do language and code do rules.</li><li><code>interrupt()</code> plus a checkpointer gives you real pause-and-resume approvals.</li><li>Nodes restart on resume, so keep side effects out of the interrupting node.</li><li>LangSmith traces every step; LangSmith Deployment (formerly LangGraph Platform) hosts graphs.</li></ul></div>
+</section>
+
+<div class="endcap"><button class="donebtn" type="button">Mark this page complete</button><nav class="pager" aria-label="Previous and next"><a class="prev" href="../methods/api-tool-use.html"><small>Previous</small>Raw API tool use</a><a class="next" href="../methods/crewai.html"><small>Next</small>CrewAI</a></nav></div>
+      </main>
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+    <footer class="site-foot"><span>AI Agents for Management · an open course for business students and managers</span><span>Product names, features and prices change fast: check vendor docs before you rely on a detail. Last reviewed October 2026.</span></footer>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="../assets/app.js" defer></script>
+
+</body>
+</html>

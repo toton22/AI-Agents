@@ -1,0 +1,497 @@
+<!--META {"title":"Raw API tool use","h1":"Build the agent <em>loop</em> yourself","eyebrow":"Method · Code","lede":"Write the Meridian Deal Desk agent with nothing but the Anthropic or OpenAI API and plain Python, so you can see exactly what every agent framework does on your behalf: the loop, the stop reasons, parallel tool calls, the step limit, the approval gate and the audit log.","minutes":50} -->
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Intermediate (comfortable reading Python)</dd></div><div><dt>Time to first agent</dt><dd>1 to 2 hours</dd></div><div><dt>Typical cost</dt><dd>API tokens only, no licence fee</dd></div><div><dt>Best for</dt><dd>Learning the mechanics; small, auditable agents</dd></div><div><dt>Runs where</dt><dd>Anywhere Python runs: laptop, VM, container, serverless</dd></div><div><dt>Lock-in risk</dt><dd>Low: about 40 lines change if you switch vendor</dd></div></dl>
+<p>Every agent framework on this site, from LangGraph to CrewAI to the OpenAI Agents SDK, sits on top of one feature that the model vendors sell directly: <b>tool use</b>, also called function calling. You describe your functions to the model. The model replies either with an answer or with a request to call one of them. Your code runs the function and sends the result back. Repeat until the model says it is done.</p>
+<p>That is the whole trick. A loop, a list of tool descriptions, and some discipline about what happens when things go wrong.</p>
+<p>This page builds the Meridian Deal Desk agent with no framework at all. The main version uses Anthropic's Messages API. A tab shows the same loop on OpenAI's Responses API. Both use the same plain Python tools, the same approval gate and the same audit log, so you can see that the vendor is the least interesting part of the design.</p>
+<p>Why bother, when frameworks exist? Because once you have seen the loop, you ask better questions in every vendor demo. What happens when a tool fails? Who sees the request before a discount goes out? What stops it looping forever? Here you write those answers yourself, in about 150 lines.</p>
+<h3>What changed recently (as of 2026)</h3>
+<p>Three things matter for this method. First, both big vendors now let the model ask for <b>several tools in one turn</b> (parallel tool use), and your loop has to handle that properly. Second, both support a <b>strict mode</b> where the model's tool arguments are checked against your JSON schema, which cuts down on malformed calls. Third, vendors now also run some tools on their own servers (web search, code execution). Those "server tools" add new stop reasons, such as Anthropic's <code>pause_turn</code>, that a home-made loop must not mistake for a final answer. Check the current details in the <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview" target="_blank" rel="noopener">Claude tool use docs</a> and OpenAI's <a href="https://developers.openai.com/api/docs/guides/function-calling" target="_blank" rel="noopener">function calling guide</a>.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>Think of this page as the "show me the engine" visit before you buy the car. You may never ship a hand-written loop to production. But once you have read one, vendor claims about "autonomous agents" become concrete: it is a loop with a step limit, a list of permitted actions, and a log. If a vendor cannot tell you their step limit or show you their log, that is your answer.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Pick the raw API when the job is small, the rules are clear, and you want every line to be readable by an auditor. The Deal Desk is a good example: five tools, one approval rule, one user type. A framework would add dependencies and abstractions without adding much.</p>
+<p>It also suits learning, security teams wary of large dependency trees, and agents that must live inside an existing Python service.</p>
+<p>Skip it when the work runs across hours or days and must survive restarts, when several agents need to coordinate, or when you need a visual debugger and hosted deployment. You can build all of that yourself. Frankly, you will end up rebuilding a worse version of LangGraph, and someone in your team will have to maintain it.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>Nothing hidden: you can read every step the agent takes</li><li>Tiny dependency footprint (one vendor SDK)</li><li>Full control over approvals, logging and error handling</li><li>Easy to port: tools are plain Python functions</li><li>Cheapest way to learn what frameworks do</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>You own pause-and-resume, retries and persistence</li><li>No built-in tracing UI; you build dashboards from logs</li><li>Message formats differ between vendors</li><li>Easy to forget edge cases (refusals, truncation, server tools)</li><li>Multi-agent coordination gets messy fast</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>Here is the shape of every tool-using agent, drawn for the Deal Desk.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 330" role="img" aria-label="The agent loop: the salesperson's request goes to your Python loop, which calls the model API, runs tools, pauses at an approval gate and writes an audit log">
+  <rect class="fx-box" x="12" y="42" width="130" height="56" rx="6"/>
+  <text class="fx-tb" x="77" y="66" text-anchor="middle">Salesperson</text>
+  <text class="fx-ts" x="77" y="86" text-anchor="middle">types a request</text>
+  <rect class="fx-box fx-hi" x="230" y="30" width="200" height="80" rx="6"/>
+  <text class="fx-tb" x="330" y="62" text-anchor="middle">Your loop (Python)</text>
+  <text class="fx-ts" x="330" y="84" text-anchor="middle">max 8 steps · logs all</text>
+  <rect class="fx-box k1" x="590" y="42" width="118" height="56" rx="6"/>
+  <text class="fx-tb" x="649" y="66" text-anchor="middle">Model API</text>
+  <text class="fx-ts" x="649" y="86" text-anchor="middle">Claude or GPT</text>
+  <rect class="fx-box k2" x="230" y="170" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="330" y="196" text-anchor="middle">Tool functions</text>
+  <text class="fx-ts" x="330" y="216" text-anchor="middle">CRM · policy · margin</text>
+  <rect class="fx-box k4" x="12" y="170" width="150" height="60" rx="6"/>
+  <text class="fx-tb" x="87" y="196" text-anchor="middle">Approval gate</text>
+  <text class="fx-ts" x="87" y="216" text-anchor="middle">Sales Manager</text>
+  <rect class="fx-box k3" x="548" y="170" width="160" height="60" rx="6"/>
+  <text class="fx-tb" x="628" y="196" text-anchor="middle">Audit log</text>
+  <text class="fx-ts" x="628" y="216" text-anchor="middle">every call logged</text>
+  <path class="fx-ar" d="M142 70 L230 70"/>
+  <path class="fx-ar" d="M430 58 L590 58"/>
+  <text class="fx-ts" x="510" y="50" text-anchor="middle">messages + tools</text>
+  <path class="fx-ar" d="M590 88 L430 88"/>
+  <text class="fx-ts" x="510" y="106" text-anchor="middle">stop_reason + calls</text>
+  <path class="fx-ar" d="M310 110 L310 170"/>
+  <text class="fx-ts" x="302" y="145" text-anchor="end">run</text>
+  <path class="fx-ar" d="M350 170 L350 110"/>
+  <text class="fx-ts" x="358" y="145">results</text>
+  <path class="fx-ar" d="M230 200 L162 200"/>
+  <text class="fx-ts" x="87" y="250" text-anchor="middle">pauses for a person</text>
+  <path class="fx-ar fx-dash" d="M430 100 L600 170"/>
+  <text class="fx-ts" x="360" y="290" text-anchor="middle">tool_use: run the tools, send results, go round again · end_turn: final answer</text>
+  <text class="fx-ts" x="360" y="310" text-anchor="middle">anything else (max_tokens, refusal, step limit): stop and hand to a person</text>
+</svg>
+<figcaption>The model never touches your systems. It asks; your loop decides whether to run the tool, and the approval gate decides whether a person must see it first.</figcaption>
+</figure>
+<p>Read the figure from left to right. The salesperson's message goes into your loop. The loop sends the conversation so far, plus the list of tools, to the model. The model replies with a <b>stop reason</b> that tells the loop what to do next.</p>
+<h3>Stop reasons are the steering wheel</h3>
+<p>Most bugs in home-made agents come from treating every reply as a final answer. Anthropic's API returns one of these in <code>stop_reason</code>:</p>
+<div class="table-wrap"><table><thead><tr><th>stop_reason</th><th>What it means</th><th>What your loop should do</th></tr></thead><tbody>
+<tr><td><code>tool_use</code></td><td>The model wants one or more tools run</td><td>Run every requested tool, return all results in one message, call the model again</td></tr>
+<tr><td><code>end_turn</code></td><td>The model has finished</td><td>Return the text to the user and log it</td></tr>
+<tr><td><code>max_tokens</code></td><td>The reply hit your token limit</td><td>Treat as incomplete; stop or retry with a higher limit</td></tr>
+<tr><td><code>refusal</code></td><td>The model declined</td><td>Stop and route to a person; do not retry blindly</td></tr>
+<tr><td><code>pause_turn</code></td><td>A server-side tool loop needs to continue</td><td>Send the assistant content back to let it finish (only if you use server tools)</td></tr>
+<tr><td><code>stop_sequence</code>, <code>model_context_window_exceeded</code></td><td>Your stop string appeared, or the context filled up</td><td>Treat as finished-but-check, or truncated</td></tr>
+</tbody></table></div>
+<p>OpenAI's Responses API takes a slightly different route. Instead of a stop reason, the <code>output</code> list contains items, and if any of them are <code>function_call</code> items you run them and send back <code>function_call_output</code> items. No function calls means a final answer. Same loop, different labels.</p>
+<h3>Parallel tool calls</h3>
+<p>When a salesperson asks about Bluewave Logistics, the model can see straight away that it needs two things: the customer record and the policy. Modern models will ask for both in a single turn. Your loop must run both, then send <b>both results back in one message</b>, each tagged with the id of the call it answers. Anthropic's docs are explicit: one <code>tool_result</code> per <code>tool_use</code>, all together in the next user message, results before any text. Send them in separate messages and the conversation breaks.</p>
+<h3>The step limit</h3>
+<p>A model can get stuck: calling the same lookup again, or bouncing between two tools. The fix is boring and essential. Count the turns and stop at a limit (eight is plenty for the Deal Desk). When the limit hits, hand the request to a person with a clear message. Frameworks have the same guard under names like <code>max_turns</code> or <code>max_iter</code>.</p>
+<h3>The approval gate</h3>
+<p>The rule "never promise a discount above policy without approval" cannot live only in the prompt. Prompts are requests, not controls. So the loop itself checks the tool name: any call to <code>request_approval</code> is paused until a named person decides. The model gets the person's decision back as the tool result and has to draft a reply that matches it.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk</h2>
+<p>You will write four small files. The tools are plain Python with no AI in them. The shared file holds the prompt, the tool descriptions, the approval gate and the logger. Then one loop file per vendor.</p>
+<ol class="steps">
+<li><b>Set up Python and keys</b><p>Python 3.10 or newer. Create a folder, a virtual environment, and set your API key as an environment variable. Never paste keys into code or notebooks you share.</p></li>
+<li><b>Write the tools in plain Python</b><p>These functions stand in for your CRM and ERP. They are the only things that touch company data.</p></li>
+<li><b>Describe the tools, add the gate and the log</b><p>One shared file both loops import.</p></li>
+<li><b>Write the loop</b><p>Claude version first, OpenAI version in the second tab.</p></li>
+<li><b>Run the three test cases</b><p>Sahyadri at 10% (approve), Bluewave at 6% (escalate), Kite at 5% (escalate on margin).</p></li>
+</ol>
+<h3>Step 1: install and set keys</h3>
+<pre class="code"><code class="language-bash">python -m venv .venv &amp;&amp; source .venv/bin/activate     # Windows: .venv\Scripts\activate
+pip install anthropic==1.13.0 openai==3.29.0           # versions this page was checked against, Oct 2026
+export ANTHROPIC_API_KEY="your-key"                    # Windows PowerShell: $env:ANTHROPIC_API_KEY="your-key"
+export OPENAI_API_KEY="your-key"                       # only needed for the OpenAI tab
+export MODEL="claude-sonnet-5-5"                       # any current model id your account can use</code></pre>
+<p>What this does: creates an isolated Python environment, installs the two vendor SDKs at the versions this page was checked against, and puts your keys where the SDKs look for them. The SDKs read <code>ANTHROPIC_API_KEY</code> and <code>OPENAI_API_KEY</code> automatically. Model names change often, so the code reads the model id from an environment variable too.</p>
+<h3>Step 2: the tools (meridian_tools.py)</h3>
+<pre class="code"><code class="language-python">"""meridian_tools.py - the Deal Desk agent's tools, in plain Python.
+
+In a real company these functions would call the CRM and the ERP.
+Here they read a small in-memory table so the whole agent runs on a laptop.
+"""
+import difflib
+from datetime import datetime
+
+CUSTOMERS = {
+    "C-101": {"id": "C-101", "name": "Sahyadri Hospitals", "tier": "Gold",
+              "annual_revenue_lakh": 48, "late_payments_fy": 0, "gross_margin_pct": 22},
+    "C-102": {"id": "C-102", "name": "Bluewave Logistics", "tier": "Silver",
+              "annual_revenue_lakh": 19, "late_payments_fy": 2, "gross_margin_pct": 18},
+    "C-103": {"id": "C-103", "name": "Orchid Schools Trust", "tier": "Gold",
+              "annual_revenue_lakh": 31, "late_payments_fy": 0, "gross_margin_pct": 25},
+    "C-104": {"id": "C-104", "name": "Kite Fintech", "tier": "Bronze",
+              "annual_revenue_lakh": 6, "late_payments_fy": 0, "gross_margin_pct": 16},
+    "C-105": {"id": "C-105", "name": "Trident Engineering", "tier": "Silver",
+              "annual_revenue_lakh": 22, "late_payments_fy": 1, "gross_margin_pct": 20},
+}
+
+POLICY = """Meridian Supplies discount policy (FY 2026-27)
+1. Maximum discount by tier: Bronze 5%, Silver 8%, Gold 12%.
+2. Customers with 2 or more late payments this financial year are capped at 3%.
+3. Gross margin after discount must stay at or above 12%
+   (margin_after = current_margin - discount).
+4. Anything above the cap needs Sales Manager approval;
+   anything above 15% needs Regional Head approval."""
+
+TIER_CAP = {"Bronze": 5, "Silver": 8, "Gold": 12}
+MARGIN_FLOOR = 12
+APPROVALS = []  # stands in for your ticketing system
+
+
+def get_customer(customer_id: str) -&gt; dict:
+    """Return the customer record for an id such as C-101."""
+    record = CUSTOMERS.get(customer_id.strip().upper())
+    return record or {"error": f"No customer with id {customer_id}"}
+
+
+def find_customer(name: str) -&gt; dict:
+    """Fuzzy lookup by customer name. Returns the best-matching record."""
+    by_name = {c["name"].lower(): c for c in CUSTOMERS.values()}
+    query = name.strip().lower()
+    for full_name, record in by_name.items():
+        if query and (query in full_name or full_name in query):
+            return record
+    close = difflib.get_close_matches(query, list(by_name), n=1, cutoff=0.5)
+    return by_name[close[0]] if close else {"error": f"No customer matching '{name}'"}
+
+
+def get_discount_policy() -&gt; str:
+    """Return the current discount policy text."""
+    return POLICY
+
+
+def margin_after_discount(current_margin_pct: float, discount_pct: float) -&gt; float:
+    """Gross margin % left after the discount (simplified: margin minus discount)."""
+    return round(current_margin_pct - discount_pct, 2)
+
+
+def request_approval(customer_id: str, discount_pct: float, approver: str, reason: str) -&gt; str:
+    """Log an approval request for a discount above policy. A named person must decide."""
+    ticket = f"APR-{len(APPROVALS) + 1:04d}"
+    APPROVALS.append({"ticket": ticket, "customer_id": customer_id, "discount_pct": discount_pct,
+                      "approver": approver, "reason": reason,
+                      "raised_at": datetime.now().isoformat(timespec="seconds")})
+    return f"{ticket} logged with {approver} for {discount_pct}% on {customer_id}."
+
+
+def evaluate_request(customer: dict, discount_pct: float) -&gt; dict:
+    """The policy written as code: the same rules, checked the same way every time."""
+    cap = 3 if customer["late_payments_fy"] &gt;= 2 else TIER_CAP[customer["tier"]]
+    margin_after = margin_after_discount(customer["gross_margin_pct"], discount_pct)
+    problems = []
+    if discount_pct &gt; cap:
+        problems.append(f"{discount_pct}% is above the {cap}% cap")
+    if margin_after &lt; MARGIN_FLOOR:
+        problems.append(f"margin after discount would be {margin_after}%, below the {MARGIN_FLOOR}% floor")
+    approver = None
+    if problems:
+        approver = "Regional Head" if discount_pct &gt; 15 else "Sales Manager"
+    return {"within_policy": not problems, "cap_pct": cap, "margin_after_pct": margin_after,
+            "problems": problems, "approver": approver}</code></pre>
+<p>What this does, in plain English:</p>
+<ul>
+<li><code>CUSTOMERS</code> and <code>POLICY</code> are the exact customer table and discount policy from the course case. In real life these come from your CRM and your policy document.</li>
+<li><code>margin_after_discount</code> does the arithmetic. Models are decent at sums but not reliable enough for money, so the model is told to call this instead of calculating.</li>
+<li><code>request_approval</code> only logs a ticket. It cannot grant anything. The decision comes from a person.</li>
+<li><code>evaluate_request</code> is the whole policy as code. The raw loop does not use it (the model reasons over the policy text), but the LangGraph and CrewAI pages do. Keep it: it is also your test oracle.</li>
+</ul>
+<h3>Step 3: descriptions, gate and log (deal_desk_common.py)</h3>
+<pre class="code"><code class="language-python">"""deal_desk_common.py - prompt, tool schemas, approval gate and audit log, shared by both loops."""
+import json
+import time
+
+import meridian_tools as mt
+
+SYSTEM = """You are the Deal Desk assistant at Meridian Supplies Pvt Ltd, Pune.
+A salesperson asks whether a customer can have a discount.
+1. Look the customer up. 2. Read the discount policy. 3. Compute the margin with the tool.
+If the request is within every rule, approve it and draft a short reply to the customer.
+If it breaks any rule, do NOT promise it. Call request_approval with the right approver
+and a one-line reason, then draft the reply that matches the approver's decision.
+Never invent customer data. Quote the numbers you used."""
+
+TOOLS = [
+    {"name": "find_customer",
+     "description": "Find a customer by name (spelling can be loose). Returns id, tier, "
+                    "annual revenue in lakh, late payments this FY and gross margin %.",
+     "input_schema": {"type": "object",
+                      "properties": {"name": {"type": "string"}},
+                      "required": ["name"], "additionalProperties": False}},
+    {"name": "get_customer",
+     "description": "Get a customer record by id, for example C-101.",
+     "input_schema": {"type": "object",
+                      "properties": {"customer_id": {"type": "string"}},
+                      "required": ["customer_id"], "additionalProperties": False}},
+    {"name": "get_discount_policy",
+     "description": "Return Meridian's current discount policy. Read it before deciding.",
+     "input_schema": {"type": "object", "properties": {}, "required": [],
+                      "additionalProperties": False}},
+    {"name": "margin_after_discount",
+     "description": "Gross margin % left after a discount. Use this; do not do the sum yourself.",
+     "input_schema": {"type": "object",
+                      "properties": {"current_margin_pct": {"type": "number"},
+                                     "discount_pct": {"type": "number"}},
+                      "required": ["current_margin_pct", "discount_pct"],
+                      "additionalProperties": False}},
+    {"name": "request_approval",
+     "description": "Escalate a discount that breaks policy. A person decides; "
+                    "the result tells you their decision.",
+     "input_schema": {"type": "object",
+                      "properties": {"customer_id": {"type": "string"},
+                                     "discount_pct": {"type": "number"},
+                                     "approver": {"type": "string",
+                                                  "enum": ["Sales Manager", "Regional Head"]},
+                                     "reason": {"type": "string"}},
+                      "required": ["customer_id", "discount_pct", "approver", "reason"],
+                      "additionalProperties": False}},
+]
+
+FUNCTIONS = {
+    "find_customer": mt.find_customer,
+    "get_customer": mt.get_customer,
+    "get_discount_policy": mt.get_discount_policy,
+    "margin_after_discount": mt.margin_after_discount,
+    "request_approval": mt.request_approval,
+}
+NEEDS_HUMAN = {"request_approval"}
+
+
+def log(event, **data):
+    """Append one line per event to an audit file you can open in Excel or ship to a SIEM."""
+    with open("deal_desk_audit.jsonl", "a", encoding="utf-8") as f:
+        f.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "event": event, **data}) + "\n")
+
+
+def human_gate(args):
+    """Pause and let the approver decide. In production: a Teams/Slack card or a ticket."""
+    print(f"\n[APPROVAL NEEDED] {args['approver']}: {args['discount_pct']}% for "
+          f"{args['customer_id']}. Reason: {args['reason']}")
+    answer = input("Decision - y to approve, n to reject, or a number to counter-offer: ").strip().lower()
+    if answer == "y":
+        return f"APPROVED by {args['approver']} at {args['discount_pct']}%"
+    try:
+        return f"COUNTER-OFFER from {args['approver']}: {float(answer):g}% maximum"
+    except ValueError:
+        return f"REJECTED by {args['approver']}. Do not offer any discount above policy."
+
+
+def run_tool(name, args):
+    """Run one tool safely. Returns (text for the model, is_error)."""
+    if name not in FUNCTIONS:
+        return f"Unknown tool: {name}", True
+    try:
+        result = FUNCTIONS[name](**args)
+        if name in NEEDS_HUMAN:
+            result = f"{result} Decision: {human_gate(args)}"
+        return (result if isinstance(result, str) else json.dumps(result)), False
+    except Exception as exc:                     # a broken tool must not crash the agent
+        return f"Tool error: {exc}", True</code></pre>
+<p>What this does:</p>
+<ul>
+<li><code>SYSTEM</code> is the agent's job description. Note the order of work and the hard rule: do not promise, escalate.</li>
+<li><code>TOOLS</code> is the menu the model sees. Each entry has a name, a description in plain English, and a JSON schema for the inputs. The descriptions matter more than people expect; "use this, do not do the sum yourself" changes behaviour. The <code>enum</code> on <code>approver</code> means the model can only pick one of two real roles.</li>
+<li><code>FUNCTIONS</code> maps names to real Python functions. If the model asks for a tool that is not on this list, <code>run_tool</code> refuses.</li>
+<li><code>human_gate</code> is the approval step. In the demo the approver types y, n or a counter-offer in the terminal. In a company it would be an approval card in Teams or Slack, or a ticket.</li>
+<li><code>run_tool</code> turns a broken CRM call into an error message the model can read, not a crash. <code>log</code> writes one JSON line per event: your audit trail.</li>
+</ul>
+<h3>Step 4: the loop</h3>
+<div class="tabs"><div class="tab" data-label="Anthropic (Claude)">
+<pre class="code"><code class="language-python">"""deal_desk_claude.py - the Meridian Deal Desk agent on the raw Anthropic Messages API."""
+import os
+
+import anthropic
+from deal_desk_common import SYSTEM, TOOLS, run_tool, log
+
+MODEL = os.getenv("MODEL", "claude-sonnet-5-5")   # use a model id your account has
+MAX_STEPS = 8                                    # hard stop against runaway loops
+client = anthropic.Anthropic()                   # reads ANTHROPIC_API_KEY from the environment
+
+
+def run_agent(request):
+    messages = [{"role": "user", "content": request}]
+    log("request", text=request)
+    for step in range(1, MAX_STEPS + 1):
+        response = client.messages.create(
+            model=MODEL, max_tokens=1024, system=SYSTEM, tools=TOOLS, messages=messages)
+        log("model_turn", step=step, stop_reason=response.stop_reason,
+            input_tokens=response.usage.input_tokens, output_tokens=response.usage.output_tokens)
+        messages.append({"role": "assistant", "content": response.content})
+
+        if response.stop_reason == "tool_use":
+            results = []
+            for block in response.content:          # may hold several calls at once
+                if block.type == "tool_use":
+                    output, is_error = run_tool(block.name, block.input)
+                    log("tool_call", step=step, tool=block.name, args=block.input,
+                        output=output, is_error=is_error)
+                    results.append({"type": "tool_result", "tool_use_id": block.id,
+                                    "content": output, "is_error": is_error})
+            messages.append({"role": "user", "content": results})   # all results, one message
+            continue
+
+        if response.stop_reason == "end_turn":
+            answer = "".join(b.text for b in response.content if b.type == "text")
+            log("final", text=answer)
+            return answer
+
+        log("stopped", reason=response.stop_reason)  # max_tokens, refusal, anything else
+        return f"Stopped ({response.stop_reason}). Routing this request to the Deal Desk team."
+
+    log("stopped", reason="max_steps")
+    return "Stopped after too many steps. Routing this request to the Deal Desk team."
+
+
+if __name__ == "__main__":
+    print(run_agent(input("Salesperson: ")))</code></pre>
+<p>What this does, line by line in spirit:</p>
+<ul>
+<li>The conversation starts as a single user message: the salesperson's request.</li>
+<li>Each turn sends the whole conversation, the system prompt and the tool list to <code>messages.create</code>.</li>
+<li>The model's reply is appended to the history <i>as it came back</i>, including any tool requests. Skipping this breaks the next turn, because every tool result must point at a tool request the model made.</li>
+<li>On <code>tool_use</code>, the inner loop runs every tool block in the reply (there may be several), and all the results go back together in one user message.</li>
+<li>On <code>end_turn</code>, the text is the answer.</li>
+<li>Anything else, and anything that runs past eight steps, stops and hands the request to a person. Failing safe is a design choice, not an afterthought.</li>
+</ul>
+</div><div class="tab" data-label="OpenAI (Responses API)">
+<pre class="code"><code class="language-python">"""deal_desk_openai.py - the same loop on the OpenAI Responses API."""
+import json
+import os
+
+from openai import OpenAI
+from deal_desk_common import SYSTEM, TOOLS, run_tool, log
+
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5.5")     # use a model id your account has
+MAX_STEPS = 8
+client = OpenAI()                                # reads OPENAI_API_KEY from the environment
+
+# Same tools, OpenAI's wrapping: "parameters" instead of "input_schema".
+OPENAI_TOOLS = [{"type": "function", "name": t["name"], "description": t["description"],
+                 "parameters": t["input_schema"], "strict": True} for t in TOOLS]
+
+
+def run_agent(request):
+    items = [{"role": "user", "content": request}]
+    log("request", text=request)
+    for step in range(1, MAX_STEPS + 1):
+        response = client.responses.create(
+            model=MODEL, instructions=SYSTEM, tools=OPENAI_TOOLS, input=items)
+        if response.status == "incomplete":           # hit a token limit or was cut short
+            log("stopped", reason="incomplete")
+            return "Stopped (incomplete reply). Routing this request to the Deal Desk team."
+        items += response.output                       # keep the model's own items in history
+        calls = [item for item in response.output if item.type == "function_call"]
+        if not calls:                                  # no tool calls means a final answer
+            log("final", text=response.output_text)
+            return response.output_text
+        for call in calls:                             # parallel calls arrive together
+            args = json.loads(call.arguments)
+            output, is_error = run_tool(call.name, args)
+            log("tool_call", step=step, tool=call.name, args=args, output=output, is_error=is_error)
+            items.append({"type": "function_call_output", "call_id": call.call_id, "output": output})
+    log("stopped", reason="max_steps")
+    return "Stopped after too many steps. Routing this request to the Deal Desk team."
+
+
+if __name__ == "__main__":
+    print(run_agent(input("Salesperson: ")))</code></pre>
+<p>What this does: the same loop with OpenAI's vocabulary. Tools are wrapped as <code>{"type": "function", ...}</code> with <code>parameters</code> instead of <code>input_schema</code>, and <code>"strict": True</code> asks the API to hold arguments to the schema (which is why every schema in the shared file sets <code>additionalProperties: false</code>). The reply's <code>output</code> list is added to the history as-is, which also carries any reasoning items the model produced. Each <code>function_call</code> item gets a matching <code>function_call_output</code> with the same <code>call_id</code>. When a reply has no function calls, <code>output_text</code> is the answer.</p>
+</div></div>
+<div class="callout tip"><b>Tip</b><p>Run <code>python deal_desk_claude.py</code>, type a request, then open <code>deal_desk_audit.jsonl</code> in a text editor. Seeing the token counts and tool calls for one request teaches you more about cost than any pricing page.</p></div>
+<h3>Step 5: a run, step by step</h3>
+<p>Here is what a Bluewave request looks like with the Claude loop. The wording of the model's reasoning and reply will vary from run to run; the tool calls and numbers should not.</p>
+<div class="trace">
+  <div class="t-user">Bluewave Logistics wants 6% off their next order. Can we do it?</div>
+  <div class="t-think">I need the customer record and the policy. I can ask for both at once.</div>
+  <div class="t-act">find_customer(name="Bluewave Logistics") + get_discount_policy()   [step 1, two calls in parallel]</div>
+  <div class="t-obs">{"id":"C-102","tier":"Silver","annual_revenue_lakh":19,"late_payments_fy":2,"gross_margin_pct":18} · policy text</div>
+  <div class="t-think">Silver cap is 8%, but 2 late payments cap them at 3%. 6% breaks the cap. Check the margin anyway.</div>
+  <div class="t-act">margin_after_discount(current_margin_pct=18, discount_pct=6)   [step 2]</div>
+  <div class="t-obs">12</div>
+  <div class="t-think">Margin is exactly at the 12% floor, but the late-payment cap fails. This needs the Sales Manager.</div>
+  <div class="t-act">request_approval(customer_id="C-102", discount_pct=6, approver="Sales Manager", reason="2 late payments this FY; cap is 3%")   [step 3]</div>
+  <div class="t-human">Loop pauses. Sales Manager types 4: counter-offer at 4% maximum. Result returned: "APR-0001 logged ... Decision: COUNTER-OFFER from Sales Manager: 4% maximum"</div>
+  <div class="t-final">Not within policy as asked: Bluewave has 2 late payments this FY, which caps them at 3%. The Sales Manager has approved a counter-offer of 4% (margin after discount 14%). Draft reply: "Thank you for your continued business. We can offer 4% on your next order..." [step 4, end_turn]</div>
+</div>
+<p>Run the other two cases yourself. Sahyadri at 10% should end in one or two steps with an approval and a draft: Gold cap 12%, margin 22 − 10 = 12%, exactly at the floor. Kite at 5% is the tricky one. The discount is inside the Bronze cap, so a careless agent approves it. But 16 − 5 = 11%, below the 12% floor, so it must escalate.</p>
+<div class="callout warn"><b>Watch out</b><p>Kite is your best test case. If your agent approves Kite at 5%, it read the tier cap and stopped thinking. Fix the prompt or, better, move the decision into code (as the <a href="{{root}}methods/langgraph.html">LangGraph page</a> does with <code>evaluate_request</code>).</p></div>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<p>The demo runs in a terminal. A company version needs the same loop with grown-up plumbing around it. Here is what changes, and the bit that usually goes wrong in each.</p>
+<h3>Identity and SSO</h3>
+<p>Put the loop behind your existing login (Microsoft Entra ID, Google Workspace, Okta) as a small web service, for example FastAPI. Pass the salesperson's identity into every log line. The approver's identity must come from SSO too, not from a name typed into a box. What usually goes wrong: the approval card is sent to a shared mailbox, so you cannot prove who approved.</p>
+<h3>Data access</h3>
+<p>The model never gets database credentials. Only your tool functions do, through a service account with read-only access to exactly the fields the Deal Desk needs. Customer revenue and payment history are personal or commercially sensitive data, so check your obligations under India's DPDP Act 2023 and your customer contracts before sending them to any external API. Send the minimum: the model does not need the customer's contact person or bank details to apply a discount rule.</p>
+<h3>Hosting</h3>
+<p>A VM, a container or a serverless function all work. If data must stay in a region, check which cloud regions offer your model (Claude is also sold through AWS Bedrock and Google Cloud Vertex AI; OpenAI models through Azure). The approval step changes shape: a web service cannot wait on <code>input()</code>. Save the conversation when the gate fires, send the approval card, and resume when the decision arrives.</p>
+<h3>Cost control</h3>
+<p>Every loop turn resends the whole conversation, so cost grows with steps. Your levers: the step limit, <code>max_tokens</code>, short tool outputs (return the five fields needed, not the whole CRM record), and a smaller model for simple requests. Log input and output tokens per request, as the code does, and set a monthly budget alert in the vendor console.</p>
+<h3>Monitoring</h3>
+<p>The JSONL log feeds a simple dashboard: requests, escalation rate, steps per request, tool errors, step-limit hits. A jump in escalations usually means the policy changed and nobody updated the tool.</p>
+<h3>Approvals and governance</h3>
+<p>Add timeouts (an approval not answered in 24 hours expires), segregation of duties (the requester cannot approve their own discount), and a weekly sample review by the commercial team. Keep the policy text in one place that the tool reads, so legal or finance can change it without a code release.</p>
+<ul class="checklist"><li>Loop behind SSO, user id in every log line</li><li>Tools use a least-privilege service account</li><li>Approval decisions tied to a verified approver identity</li><li>Step limit, token limit and budget alert set</li><li>Paused conversations stored, not held in memory</li><li>Audit log retained per your records policy</li><li>Regression tests for Sahyadri, Bluewave and Kite before every change</li></ul>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<p>The same 150-line pattern fits many small, rule-bound jobs. Swap the tools and the policy; keep the loop, the gate and the log.</p>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales</td><td>Discount desk (this page)</td><td>Looks up customer, applies policy, computes margin, drafts reply</td><td>Sales Manager approves anything above cap or below margin floor</td></tr>
+<tr><td>Finance</td><td>Expense claim pre-check</td><td>Reads the claim, checks per-diem and category limits, flags missing bills</td><td>Finance controller approves exceptions</td></tr>
+<tr><td>HR</td><td>Leave policy assistant</td><td>Checks balance and policy, drafts approval note</td><td>Line manager approves special leave</td></tr>
+<tr><td>Procurement</td><td>Vendor onboarding check</td><td>Verifies GSTIN format, PAN, required documents against a checklist</td><td>Procurement lead signs off new vendors</td></tr>
+<tr><td>Customer service</td><td>Refund eligibility</td><td>Pulls order, checks return window and refund rules, drafts response</td><td>Supervisor approves refunds above a threshold</td></tr>
+</tbody></table></div>
+<div class="callout mgr"><b>Manager's lens</b><p>Notice the pattern in the last column. The agent does the lookups and the arithmetic, which is where people lose time. A person keeps the judgement calls that carry money or reputation. That split is also how you will justify the project: hours saved on lookups, with no loss of control.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Add a new rule</b><p>Finance adds a rule: any customer with annual revenue under ₹10 lakh cannot get more than 3% without approval. Where do you change the code, and which test case changes its outcome?</p><details><summary>Hint / model answer</summary><p>Update <code>POLICY</code> text so the model sees it, and update <code>evaluate_request</code> so your test oracle agrees. Kite Fintech (₹6 lakh) is affected: a 4% request that was inside the Bronze cap now escalates. Add Kite at 4% to your regression tests.</p></details></li>
+<li><b>Break the loop on purpose</b><p>Set <code>MAX_STEPS = 2</code> and run the Bluewave request. What does the salesperson see, and what does the log show?</p><details><summary>Hint / model answer</summary><p>The agent stops after two model calls, before it can escalate, and returns "Stopped after too many steps. Routing this request to the Deal Desk team." The log shows two <code>model_turn</code> events and a <code>stopped</code> event with reason <code>max_steps</code>. That is a safe failure: no discount was promised.</p></details></li>
+<li><b>Make the gate asynchronous</b><p>Sketch, in plain English or pseudo-code, how you would change <code>human_gate</code> so the approver answers from Teams an hour later instead of the terminal.</p><details><summary>Hint / model answer</summary><p>When <code>request_approval</code> is called: save <code>messages</code> and the pending <code>tool_use_id</code> to a database, post an approval card with the ticket id, and end the request with "awaiting approval". When the card is answered, load the saved messages, append the <code>tool_result</code> containing the decision, and call the loop again from that point. Frameworks such as LangGraph do exactly this with a checkpointer.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="c">
+    <p class="q-text">The model's reply has stop_reason "tool_use" with two tool_use blocks. What should your loop send back?</p>
+    <ol class="q-opts"><li data-k="a">Two separate user messages, one per result</li><li data-k="b">Only the first result; the model will ask for the second again</li><li data-k="c">One user message containing both tool_result blocks, each with its tool_use_id</li><li data-k="d">A text message summarising both results</li></ol>
+    <p class="q-why">All results go back together in the next user message, matched by id. Separate messages (a) break the required pairing between the assistant's tool requests and their results.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">Kite Fintech (Bronze, 16% margin) asks for 5%. What should the Deal Desk do?</p>
+    <ol class="q-opts"><li data-k="a">Approve: 5% is within the Bronze cap</li><li data-k="b">Escalate: margin after discount would be 11%, below the 12% floor</li><li data-k="c">Escalate to the Regional Head</li><li data-k="d">Reject outright without escalation</li></ol>
+    <p class="q-why">The tier cap passes but the margin rule fails, so it needs approval. The Regional Head (c) is only needed above 15%. (a) is the classic shortcut error.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Why is the approval rule enforced in the loop's code rather than only in the system prompt?</p>
+    <ol class="q-opts"><li data-k="a">Prompts cost more tokens</li><li data-k="b">The API does not accept long prompts</li><li data-k="c">Code runs faster than prompts</li><li data-k="d">A prompt is a request the model usually follows; code is a control it cannot skip</li></ol>
+    <p class="q-why">Models follow instructions most of the time, which is not good enough for money. The loop checks the tool name and pauses regardless of what the model intends.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">What is the main purpose of MAX_STEPS?</p>
+    <ol class="q-opts"><li data-k="a">Stop runaway loops and cap cost, failing safe to a person</li><li data-k="b">Make the model answer faster</li><li data-k="c">Limit how many customers can be looked up per day</li><li data-k="d">Satisfy the vendor's rate limits</li></ol>
+    <p class="q-why">A stuck model can keep calling tools. The step limit bounds cost and hands the request to a human with a clear message.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">In the OpenAI Responses API version, how does the loop know the model has finished?</p>
+    <ol class="q-opts"><li data-k="a">stop_reason equals "end_turn"</li><li data-k="b">The response contains a "done" flag set by your tools</li><li data-k="c">The output list contains no function_call items</li><li data-k="d">The model returns an empty string</li></ol>
+    <p class="q-why">The Responses API signals tool requests as function_call items in output. None means the text in output_text is the answer. (a) is Anthropic's vocabulary.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="tool-calling"></div>
+<div class="res-list">
+  <a class="res" href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Tool use with Claude</span><span class="res-by">Anthropic · the reference for tool definitions and results</span></a>
+  <a class="res" href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Parallel tool use</span><span class="res-by">Anthropic · how to return several results correctly</span></a>
+  <a class="res" href="https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Handling stop reasons</span><span class="res-by">Anthropic · every stop_reason and what to do with it</span></a>
+  <a class="res" href="https://developers.openai.com/api/docs/guides/function-calling" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Function calling</span><span class="res-by">OpenAI · the Responses API version of the same loop</span></a>
+  <a class="res" href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener"><span class="res-kind">Article</span><span class="res-title">Building effective agents</span><span class="res-by">Anthropic · why simple loops beat complex frameworks more often than you think</span></a>
+  <a class="res" href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">ReAct: Synergizing Reasoning and Acting in Language Models</span><span class="res-by">Yao et al. · the research idea behind the think-act-observe loop</span></a>
+</div>
+<div class="cards">
+  <a class="card" href="{{root}}modules/m04-tools-and-function-calling.html"><span class="card-kicker">Module 04</span><b>Tools and function calling</b><span>The concepts behind this page, without code.</span></a>
+  <a class="card" href="{{root}}methods/langgraph.html"><span class="card-kicker">Method · Code</span><b>LangGraph</b><span>The same agent with pause, resume and a visual graph.</span></a>
+  <a class="card" href="{{root}}methods/openai-agents-sdk.html"><span class="card-kicker">Method · Code</span><b>OpenAI Agents SDK</b><span>This loop, packaged, with handoffs and guardrails.</span></a>
+  <a class="card" href="{{root}}lab.html"><span class="card-kicker">Practice</span><b>Agent Lab</b><span>Step through a Deal Desk run in your browser.</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>An agent is a loop: the model asks for tools, your code runs them, results go back, repeat.</li><li>Handle every stop reason explicitly; only <code>end_turn</code> (or no function calls) is a final answer.</li><li>Return all parallel tool results together, each matched to its call id.</li><li>Put the step limit, the approval gate and the audit log in code, not in the prompt.</li><li>Once you have written this loop, every framework becomes easier to evaluate.</li></ul></div>
+</section>

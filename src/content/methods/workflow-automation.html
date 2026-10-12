@@ -1,0 +1,209 @@
+<!--META {"title":"Workflow automation","h1":"Agents inside <em>workflow</em> tools","eyebrow":"Method · Low-code","lede":"Build the Meridian Deal Desk agent in n8n, node by node, with a Google Sheets lookup, a Code tool for margin and a Slack approval gate, and compare n8n with Zapier, Make and Power Automate for your own team.","minutes":45} -->
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Intermediate (comfortable with spreadsheets and logic)</dd></div><div><dt>Time to first agent</dt><dd>1–3 hours</dd></div><div><dt>Typical cost</dt><dd>Platform plan or self-hosting, plus model API usage</dd></div><div><dt>Best for</dt><dd>Agents that sit inside a business process with triggers, systems and approvals</dd></div><div><dt>Runs where</dt><dd>Vendor cloud, or your own servers (n8n)</dd></div><div><dt>Lock-in risk</dt><dd>Medium: workflows are vendor-specific, but logic is visible and exportable</dd></div></dl>
+<p>Workflow automation tools started life connecting apps: "when a form is submitted, add a row to a sheet and post in Slack". Around 2024–25 they all added an AI agent step. Now a workflow can hand a messy request to a model, let it pick tools, and carry on with the rest of the process afterwards. You still see every step on a canvas. That visibility is the main reason managers like this method.</p>
+<p>Four tools come up in most Indian and global companies:</p>
+<ul>
+<li><b>n8n</b>: open, self-hostable, with an <b>AI Agent</b> node that connects to chat models, memory and tools as sub-nodes. Popular with technical teams who want their data on their own servers.</li>
+<li><b>Zapier</b>: the largest app catalogue, with <b>Zapier Agents</b> (built with Zapier Copilot) and AI steps inside Zaps.</li>
+<li><b>Make</b>: a visual scenario builder with <b>Make AI Agents</b>, which run on the same canvas and show each decision in a Reasoning panel.</li>
+<li><b>Power Automate</b>: Microsoft's workflow tool, with <b>AI Builder</b> prompts and document processing, the long-standing <b>Approvals</b> connector, desktop flows for RPA, and close ties to <a href="{{root}}methods/copilot-studio.html">Copilot Studio</a>.</li>
+</ul>
+<h3>What changed recently (as of October 2026)</h3>
+<p>n8n has moved to its 2.x line. Every AI Agent node now works as a <em>Tools Agent</em> (the old agent-type setting is deprecated), and n8n added <b>human review</b> for tool calls: you can gate any tool so the workflow pauses and asks a person in Chat, Slack, Teams, Gmail, Outlook, Telegram, Discord, WhatsApp or Google Chat before it runs. n8n also has a separate <b>Agents</b> feature in preview, with a builder, skills, knowledge, schedules and channels; self-hosted support starts at version 2.32.3. Make announced its "next generation" of AI Agents in February 2026, available on all plans. Zapier continues to push Agents alongside Zaps.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>Workflow tools are where agents meet operations. The agent is one box on a canvas; the boxes around it decide what triggers it, what it may touch and who signs off. If your process owner can read that canvas and point at the approval step, you've built something an auditor can follow. That's worth more than a clever prompt.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Pick a workflow tool when the agent is part of a <em>process</em>: something triggers it (a chat, an email, a new row, a schedule), it needs data from several systems, and the result must flow somewhere (a CRM update, a Slack message, an approval). The Deal Desk is a good fit. So is invoice triage, lead routing, or summarising daily tickets for a team lead.</p>
+<p>Among the four, the choice usually comes down to where your systems are and who maintains the thing. Microsoft shop: Power Automate. A non-technical team that needs a niche SaaS app connected tomorrow: Zapier. Complex branching on a budget: Make. Data must stay on your servers, or you want to inspect and version everything: n8n.</p>
+<p>Don't pick it when you need fine-grained control over the reasoning loop (multiple cooperating agents, custom memory, evaluation suites in code); move to <a href="{{root}}methods/langgraph.html">LangGraph</a> or the <a href="{{root}}methods/openai-agents-sdk.html">OpenAI Agents SDK</a>. And don't pick it for a pure document Q&amp;A bot. A <a href="{{root}}methods/no-code-assistants.html">no-code assistant</a> does that with far less effort.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>Agents run on real triggers, not only when someone chats.</li><li>Deterministic steps (lookups, maths, routing) sit next to the LLM step.</li><li>Built-in human approval steps in every tool.</li><li>Every run is logged with inputs and outputs, step by step.</li><li>n8n can be self-hosted, which helps with data residency and DPDP comfort.</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Canvases grow messy fast; you need naming and documentation discipline.</li><li>Model costs sit on top of platform costs and are easy to forget.</li><li>Credentials for many systems live in one tool, so it becomes a security target.</li><li>Self-hosting n8n means you own patching, backups and uptime.</li><li>Agent features change monthly; tutorials from 2025 are often out of date.</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>In n8n, an agent workflow has a <b>trigger</b> node (for chat: the Chat Trigger, "When chat message received") feeding an <b>AI Agent</b> node. The agent node has sockets underneath for sub-nodes: one <b>Chat Model</b> (OpenAI, Anthropic, Gemini, a local model and so on), an optional <b>Memory</b> (so it remembers earlier turns in the conversation), and one or more <b>Tools</b>. A tool can be almost any n8n app node used in tool mode (Google Sheets, HTTP Request, Postgres), a Code tool, or a whole sub-workflow. n8n's documentation says you must connect at least one tool.</p>
+<p>When a message arrives, the agent node sends the model your system message, the conversation so far and the list of tools with their descriptions. The model replies either with an answer or with a tool call; n8n runs the tool and sends the result back; the loop repeats until the model answers. This is the same loop as in <a href="{{root}}modules/m04-tools-and-function-calling.html">M04</a>, drawn as boxes.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 340" role="img" aria-label="n8n Deal Desk workflow: Chat Trigger feeds AI Agent; sub-nodes for chat model, memory, Google Sheets tool, Code tool and a human-review-gated approval tool that sends to Slack">
+  <rect class="fx-box" x="12" y="50" width="140" height="60" rx="6"/>
+  <text class="fx-tb" x="82" y="76" text-anchor="middle">Chat Trigger</text>
+  <text class="fx-ts" x="82" y="95" text-anchor="middle">message received</text>
+  <rect class="fx-box fx-hi" x="210" y="40" width="220" height="80" rx="6"/>
+  <text class="fx-th" x="320" y="72" text-anchor="middle">AI Agent</text>
+  <text class="fx-ts" x="320" y="96" text-anchor="middle">system message + loop</text>
+  <rect class="fx-box" x="488" y="50" width="220" height="60" rx="6"/>
+  <text class="fx-tb" x="598" y="76" text-anchor="middle">Reply in chat</text>
+  <text class="fx-ts" x="598" y="95" text-anchor="middle">decision + draft</text>
+  <path class="fx-ar" d="M152 80 L208 80"/>
+  <path class="fx-ar" d="M430 80 L486 80"/>
+  <rect class="fx-box k2" x="12" y="190" width="120" height="54" rx="6"/>
+  <text class="fx-tb" x="72" y="213" text-anchor="middle">Chat Model</text>
+  <text class="fx-ts" x="72" y="231" text-anchor="middle">LLM</text>
+  <rect class="fx-box k2" x="146" y="190" width="120" height="54" rx="6"/>
+  <text class="fx-tb" x="206" y="213" text-anchor="middle">Memory</text>
+  <text class="fx-ts" x="206" y="231" text-anchor="middle">recent turns</text>
+  <rect class="fx-box k3" x="280" y="190" width="132" height="54" rx="6"/>
+  <text class="fx-tb" x="346" y="213" text-anchor="middle">Sheets tool</text>
+  <text class="fx-ts" x="346" y="231" text-anchor="middle">find_customer</text>
+  <rect class="fx-box k3" x="426" y="190" width="132" height="54" rx="6"/>
+  <text class="fx-tb" x="492" y="213" text-anchor="middle">Code tool</text>
+  <text class="fx-ts" x="492" y="231" text-anchor="middle">margin_after</text>
+  <rect class="fx-box k5" x="572" y="190" width="136" height="54" rx="6"/>
+  <text class="fx-tb" x="640" y="213" text-anchor="middle">Human review</text>
+  <text class="fx-ts" x="640" y="231" text-anchor="middle">Slack approval</text>
+  <rect class="fx-box k3" x="572" y="272" width="136" height="54" rx="6"/>
+  <text class="fx-tb" x="640" y="295" text-anchor="middle">Approval tool</text>
+  <text class="fx-ts" x="640" y="313" text-anchor="middle">request_approval</text>
+  <path class="fx-ln fx-dash" d="M72 188 L250 122"/>
+  <path class="fx-ln fx-dash" d="M206 188 L280 122"/>
+  <path class="fx-ln fx-dash" d="M346 188 L330 122"/>
+  <path class="fx-ln fx-dash" d="M492 188 L380 122"/>
+  <path class="fx-ln fx-dash" d="M640 188 L420 122"/>
+  <path class="fx-ar" d="M640 244 L640 270"/>
+</svg>
+<figcaption>Sub-nodes hang under the agent. The approval tool is reachable only through the human review step, so the model can ask for an approval but cannot skip the human.</figcaption>
+</figure>
+<p>Two n8n features matter for business use. First, <code>$fromAI()</code>: inside a tool node's parameters you can mark a field as "let the model fill this", with a name and description, so the Google Sheets lookup gets the customer name the model extracted. Second, human review: configured from the agent's Tools panel, it sits between the agent and the tools you choose. On approve, n8n's docs say "the tool executes with the input specified by the AI"; on deny, the action is cancelled and the model is told it was rejected.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk agent</h2>
+<p>You need n8n (n8n Cloud trial, or self-hosted with Docker), a Google account for Sheets, a Slack workspace for approvals, and an API key for a chat model. Store every key in n8n's Credentials, never in a node's text field.</p>
+<ol class="steps">
+<li><b>Create the customer sheet</b><p>In Google Sheets, make a sheet <code>Customers</code> with headers <code>id, name, tier, revenue_lakh, late_payments, margin_pct</code> and the five Meridian rows. Add a second tab <code>Decisions</code> with headers <code>timestamp, customer_id, discount_pct, decision, approver, outcome</code>. That second tab is your audit log.</p></li>
+<li><b>Add the Chat Trigger</b><p>New workflow → add <b>Chat Trigger</b> ("When chat message received"). For testing, the built-in chat panel is enough. Later you can make the chat public behind authentication, or swap the trigger for Slack or Teams.</p></li>
+<li><b>Add the AI Agent node and its system message</b><p>Connect an <b>AI Agent</b> node to the trigger. In its options, set the system message:</p>
+<pre class="code"><code class="language-plaintext">You are the Meridian Deal Desk agent. For every discount request:
+1. Use find_customer to get the customer's row. Ask if the name is unclear.
+2. Cap = 3% if late_payments &gt;= 2, else Bronze 5%, Silver 8%, Gold 12%.
+3. Use margin_after_discount to compute margin after the discount.
+4. APPROVE only if discount &lt;= cap AND margin after &gt;= 12.
+   Otherwise call request_approval with approver "Sales Manager",
+   or "Regional Head" if the discount is above 15%.
+5. If request_approval is denied, say so and suggest the highest
+   discount that is within policy. Never promise an unapproved discount.
+Reply with: Decision, Checks (cap, margin after), Next step.</code></pre>
+<p>What this does: same policy as every other page on this site, written as an ordered checklist the model follows. Point 5 follows n8n's own advice to tell the agent which tools need approval and what to do on a denial.</p></li>
+<li><b>Connect a chat model and memory</b><p>Under the agent, add a <b>Chat Model</b> sub-node (for example OpenAI Chat Model or Anthropic Chat Model) with your credential. Add <b>Simple Memory</b> so a follow-up like "and if they take 8% instead?" still knows which customer you mean.</p></li>
+<li><b>Tool 1: find_customer (Google Sheets)</b><p>Add a <b>Google Sheets</b> tool. Name it <code>find_customer</code>, description: "Look up a Meridian customer by name. Returns id, tier, late_payments and margin_pct." Operation: get rows, sheet <code>Customers</code>, filter column <code>name</code>, and set the filter value with the "let the model define this" option (it inserts a <code>$fromAI()</code> expression) described as "The customer's name as written in the sheet".</p></li>
+<li><b>Tool 2: margin_after_discount (Code tool)</b><p>Add a <b>Code</b> tool named <code>margin_after_discount</code>, description: "Computes gross margin after a discount. Input: JSON with current_margin_pct and discount_pct." Language JavaScript:</p>
+<pre class="code"><code class="language-javascript">// 'query' holds what the agent sent to this tool
+const input = typeof query === 'string' ? JSON.parse(query) : query;
+const current = Number(input.current_margin_pct);
+const discount = Number(input.discount_pct);
+if (Number.isNaN(current) || Number.isNaN(discount)) {
+  return 'Error: send numbers for current_margin_pct and discount_pct';
+}
+const after = current - discount;           // simplified policy formula
+return JSON.stringify({ margin_after_pct: after, meets_floor: after &gt;= 12 });</code></pre>
+<p>What this does, line by line: it reads the agent's input (handling it whether it arrives as text or as an object), turns both values into numbers, returns a clear error if they aren't numbers, subtracts the discount from current margin, and sends back the result plus a yes/no on the 12% floor. The model never does the arithmetic itself; it only reads the answer.</p></li>
+<li><b>Tool 3: request_approval, behind human review</b><p>Open the agent's Tools panel, find <b>Human review</b>, and choose <b>Slack</b> as the approval channel (Gmail or Microsoft Teams work the same way). Connect a tool to the review step: a <b>Google Sheets</b> append-row tool named <code>request_approval</code> that writes customer_id, discount_pct, approver and reason into <code>Decisions</code>, each filled by <code>$fromAI()</code>. In the review message, show the tool name and its parameters so the approver sees exactly what the agent wants to do, for example the text <code>{{ $tool.name }}</code> followed by <code>{{ JSON.stringify($tool.parameters) }}</code>.</p>
+<p>What this does: when the agent decides to escalate, the workflow pauses and posts the request to the Sales Manager in Slack with approve and deny buttons. Approve: the row is written and the agent tells the salesperson. Deny: nothing is written, and the agent is told it was rejected.</p></li>
+<li><b>Test the three cases, then activate</b><p>Run Sahyadri 10%, Bluewave 6% and Kite 5% in the chat panel. Open each execution and check the agent's tool calls. When all three behave, activate the workflow.</p></li>
+</ol>
+<div class="callout note"><b>About exporting the workflow as JSON</b><p>n8n workflows export as JSON and can be imported elsewhere, which is how teams version them in Git. We haven't printed one here because node type names and parameter shapes change between n8n versions; export your own working version from the menu and commit that file.</p></div>
+<div class="trace">
+  <div class="t-user">Sahyadri Hospitals wants 10% off their next order. Can we do it?</div>
+  <div class="t-act">find_customer(name="Sahyadri Hospitals")</div>
+  <div class="t-obs">{"id":"C-101","name":"Sahyadri Hospitals","tier":"Gold","late_payments":0,"margin_pct":22}</div>
+  <div class="t-think">Gold, no late payments, so cap is 12%. 10% is within the cap. Check the margin.</div>
+  <div class="t-act">margin_after_discount({"current_margin_pct":22,"discount_pct":10})</div>
+  <div class="t-obs">{"margin_after_pct":12,"meets_floor":true}</div>
+  <div class="t-think">Exactly at the 12% floor, which is allowed. Approve; no approval tool needed.</div>
+  <div class="t-final">Decision: APPROVE. Checks: Gold cap 12%, margin after 12% (floor 12%). Next step: draft reply to Sahyadri confirming 10% on the next order. Note this uses all the margin headroom; there's no room for extra freight concessions.</div>
+</div>
+<div class="callout tip"><b>Tip</b><p>Write each decision to the Decisions tab, approved or not, with a normal (non-AI) Google Sheets node after the agent. Then a pivot table tells the sales head every Monday how many discounts went through, at what average, and how many needed approval.</p></div>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<h3>Hosting choice</h3>
+<p>n8n Cloud is managed by n8n. Self-hosted n8n (Docker on your own server or a cloud VM in an Indian region) keeps workflow data and credentials inside your perimeter, which helps when legal asks where customer data goes under the DPDP Act. The trade-off is that you now run a production service: updates, backups of the database that stores workflows and credentials, monitoring, and uptime. n8n is released under its Sustainable Use License, and some features (for example, certain enterprise controls) need paid editions, so check the edition comparison before committing. Zapier and Make are cloud-only. Power Automate runs in Microsoft's cloud, with desktop flows on your machines.</p>
+<h3>Identity and access</h3>
+<p>Turn on SSO for the tool's editor accounts, and separate who can <em>edit</em> workflows from who can <em>use</em> them. Use service accounts for Google Sheets and Slack credentials, not someone's personal login; when that person leaves, the workflow should keep running. Give the Sheets credential access to the two tabs it needs and nothing else.</p>
+<h3>Cost control</h3>
+<p>You pay twice: the platform (executions, tasks or credits, depending on the vendor) and the model provider (tokens). An agent that loops through five tool calls costs five times what a single call does. Set a sensible maximum number of iterations on the agent, choose a smaller model for lookups, and put a spending limit on the model API key.</p>
+<h3>Monitoring and approvals</h3>
+<p>Every execution is logged, which is excellent for debugging and a privacy question at the same time: logs contain customer names and margins. Set a retention period. Add an error workflow that alerts someone when the agent fails. For approvals, the Slack message is the request, but the Decisions tab is the record. Review approval patterns monthly with the sales head.</p>
+<ul class="checklist"><li>Hosting decided (cloud or self-hosted) with a named owner for updates and backups</li><li>Credentials held in the tool's credential store, under service accounts</li><li>Editor SSO on; production workflows editable by two people only</li><li>Max iterations set on the agent; API spending limit set</li><li>Execution log retention set; error workflow alerts a person</li><li>Decisions logged to a sheet or database for audit</li></ul>
+<div class="callout warn"><b>Watch out</b><p>A workflow tool with credentials to Gmail, Sheets, Slack and your CRM is a prize for attackers. If a prompt injection in an incoming email convinces the agent to call the wrong tool, the damage is limited only by what those credentials can do. Gate every write action with human review until you have months of clean logs. <a href="{{root}}modules/m11-guardrails-and-responsible-ai.html">M11</a> covers this in depth.</p></div>
+<h3>How the four tools compare</h3>
+<div class="table-wrap"><table><thead><tr><th></th><th>n8n</th><th>Zapier</th><th>Make</th><th>Power Automate</th></tr></thead><tbody>
+<tr><td>Agent feature</td><td>AI Agent node; Agents (preview)</td><td>Zapier Agents; AI steps in Zaps</td><td>Make AI Agents on the scenario canvas</td><td>AI Builder in flows; agents via Copilot Studio</td></tr>
+<tr><td>Hosting</td><td>Cloud or self-hosted</td><td>Cloud only</td><td>Cloud only</td><td>Microsoft cloud; desktop flows on your PCs</td></tr>
+<tr><td>Choice of model</td><td>Wide: hosted APIs and local models</td><td>Built in, with model options</td><td>Several providers via AI apps</td><td>Microsoft-provided models</td></tr>
+<tr><td>Human approval</td><td>Human review on tool calls (Slack, Teams, Gmail and more)</td><td>Human-in-the-loop steps</td><td>Manual approvals and stop points</td><td>Approvals connector, a mature feature</td></tr>
+<tr><td>Integrations</td><td>Hundreds of nodes plus HTTP and MCP</td><td>The largest catalogue (8,000+ apps per Zapier)</td><td>3,000+ integrations per Make</td><td>Microsoft and third-party connectors</td></tr>
+<tr><td>Visibility</td><td>Full execution data per node</td><td>Agent activity view</td><td>Reasoning panel on the canvas</td><td>Run history per flow</td></tr>
+<tr><td>Best fit</td><td>Technical teams, data residency needs</td><td>Non-technical teams, long-tail SaaS apps</td><td>Complex branching on a budget</td><td>Microsoft 365 companies</td></tr>
+</tbody></table></div>
+<p>Integration counts are the vendors' own figures as of 2026. Pricing models differ (executions, tasks, credits, per-user or per-flow licences) and change often, so compare them on your expected monthly volume, not on list prices.</p>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales</td><td>Deal Desk</td><td>Looks up customer, computes margin, decides or escalates</td><td>Sales Manager approves via Slack before any out-of-policy write</td></tr>
+<tr><td>Finance</td><td>Invoice inbox triage</td><td>Reads vendor emails, extracts invoice data, matches to purchase orders</td><td>AP clerk approves exceptions before posting</td></tr>
+<tr><td>Marketing</td><td>Lead routing</td><td>Enriches inbound leads, scores fit, assigns to the right rep</td><td>Sales ops reviews weekly routing samples</td></tr>
+<tr><td>Customer service</td><td>Ticket summariser</td><td>Every morning, summarises open tickets by customer and urgency</td><td>Team lead decides priorities</td></tr>
+<tr><td>HR</td><td>Candidate scheduling</td><td>Proposes interview slots from calendars and drafts invites</td><td>Recruiter confirms before invites go out</td></tr>
+<tr><td>Supply chain</td><td>Delay alerts</td><td>Watches shipment updates and drafts customer notices for delays</td><td>Account manager edits and sends</td></tr>
+</tbody></table></div>
+<div class="case"><span class="case-tag">Case · Finance</span><h4>Invoice triage at a mid-sized logistics company</h4><p>A typical pattern: an accounts payable team receives a few hundred vendor emails a day. A workflow agent reads each one, extracts invoice number, amount and GSTIN, and matches against open purchase orders in the ERP. Clean matches are queued for posting; mismatches go to a person with the agent's notes. The quiet benefit is the log. For the first time, the team can see which vendors send the messiest invoices, and that becomes a conversation with procurement.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice and quiz</h2>
+<ol class="exercises">
+<li><b>Swap the trigger</b><p>Replace the Chat Trigger with a schedule that reads new rows from a "Requests" tab every hour and runs the agent on each. What else must change?</p><details><summary>Hint / model answer</summary><p>The agent's input now comes from a row, so the prompt source changes from the chat to a field (for example "Customer: {name}, discount: {pct}"). There's no chat to reply to, so the output must be written back to the row or sent to the salesperson. Memory isn't useful across unrelated rows; remove it. Human review still gates request_approval.</p></details></li>
+<li><b>Price a month</b><p>Assume 40 salespeople, 3 discount requests each per working day, 22 working days, and an average of 3 model calls per request. How many model calls a month? What would you check on your platform's pricing page?</p><details><summary>Hint / model answer</summary><p>40 × 3 × 22 = 2,640 requests; × 3 = 7,920 model calls a month. Check how the platform counts usage (per execution, per task, per step), whether AI steps cost extra, and the model's per-token price for your average prompt length. Then add a 30% buffer for retries and follow-ups.</p></details></li>
+<li><b>Pick the tool</b><p>Meridian's IT runs Microsoft 365 but the sales team uses Google Sheets for pricing. Legal wants customer data kept in India. Recommend one of the four tools in five sentences.</p><details><summary>Hint / model answer</summary><p>A defensible answer is self-hosted n8n in an Indian cloud region: data stays in your environment, it has both Google Sheets and Microsoft connectors, and human review gates the approval. Power Automate is also defensible if IT will move the pricing sheet to SharePoint, since governance is already in place. State the trade-off: n8n needs someone to run it.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="c">
+    <p class="q-text">In n8n, what must an AI Agent node have connected at minimum, according to the docs?</p>
+    <ol class="q-opts"><li data-k="a">A memory sub-node</li><li data-k="b">An output parser</li><li data-k="c">At least one tool (plus a chat model)</li><li data-k="d">A Slack credential</li></ol>
+    <p class="q-why">n8n states you must connect at least one tool, and a chat model is what the agent reasons with. Memory and parsers are optional.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">What happens when a human reviewer denies a gated tool call in n8n?</p>
+    <ol class="q-opts"><li data-k="a">The tool doesn't run and the model is told it was rejected</li><li data-k="b">The workflow crashes</li><li data-k="c">The tool runs with default values</li><li data-k="d">The tool runs but the result is hidden</li></ol>
+    <p class="q-why">Deny cancels the action and informs the AI, which is why the system message should say what to do on a denial.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Why compute margin in a Code tool instead of letting the model subtract?</p>
+    <ol class="q-opts"><li data-k="a">Models can't read numbers</li><li data-k="b">The Code tool is free while models cost money</li><li data-k="c">n8n doesn't allow arithmetic in prompts</li><li data-k="d">Code gives the same exact answer every time and can be tested</li></ol>
+    <p class="q-why">Models usually get 22 − 10 right, but "usually" isn't a control. Code is exact, repeatable and testable.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">Which tool is the only one of the four that you can self-host entirely?</p>
+    <ol class="q-opts"><li data-k="a">Zapier</li><li data-k="b">n8n</li><li data-k="c">Make</li><li data-k="d">Power Automate</li></ol>
+    <p class="q-why">n8n can run on your own servers. Power Automate has desktop flows on your machines, but the service itself runs in Microsoft's cloud.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">The biggest security risk specific to workflow-tool agents is:</p>
+    <ol class="q-opts"><li data-k="a">The canvas being visible to colleagues</li><li data-k="b">Using spreadsheets as a data source</li><li data-k="c">Many system credentials in one place, reachable by an agent that reads untrusted input</li><li data-k="d">Running workflows on a schedule</li></ol>
+    <p class="q-why">An injected instruction in an email can steer an agent to misuse whatever credentials the workflow holds. Least-privilege credentials and human review on writes are the defences.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="n8n"></div>
+<div class="res-list">
+  <a class="res" href="https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">n8n AI Agent node</span><span class="res-by">n8n · how the agent node, models and tools connect</span></a>
+  <a class="res" href="https://docs.n8n.io/build/integrate-ai/ai-examples/human-in-the-loop-for-tools.md" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Human-in-the-loop for AI tool calls</span><span class="res-by">n8n · gating tools with Slack, Teams, Gmail approvals</span></a>
+  <a class="res" href="https://docs.n8n.io/deploy/host-n8n.md" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Host n8n</span><span class="res-by">n8n · self-hosting options and configuration</span></a>
+  <a class="res" href="https://zapier.com/agents" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Zapier Agents</span><span class="res-by">Zapier · templates and how agents connect to apps</span></a>
+  <a class="res" href="https://www.make.com/en/ai-agents" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Make AI Agents</span><span class="res-by">Make · agents on the scenario canvas with a Reasoning panel</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/power-automate/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Power Automate documentation</span><span class="res-by">Microsoft Learn · approvals, AI Builder, desktop flows</span></a>
+</div>
+<div class="cards"><a class="card" href="{{root}}methods/copilot-studio.html"><span class="card-kicker">Method · Low-code</span><b>Copilot Studio</b><span>The Microsoft route, with agent flows built in.</span></a><a class="card" href="{{root}}methods/mcp.html"><span class="card-kicker">Method · Code</span><b>Build an MCP server</b><span>Expose Meridian's tools once and use them from n8n and elsewhere.</span></a></div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>Workflow tools put the agent inside a process: triggers before it, systems and approvals after it.</li><li>In n8n, the agent node plus sub-nodes (model, memory, tools) is the whole architecture; human review gates the risky tools.</li><li>Keep arithmetic in code and decisions in a log you can audit.</li><li>Choose among n8n, Zapier, Make and Power Automate by where your systems live and who will maintain the workflow.</li></ul></div>
+</section>

@@ -1,0 +1,126 @@
+<!--META {"title":"Start here","h1":"AI Agents for Management","eyebrow":"Start here","lede":"A complete, free course on AI agents for business students and managers: what agents are, every way to build one, and how to take one safely into a company.","custom_head":true} -->
+<header class="page-head hero">
+  <p class="eyebrow">An open course · Basics to boardroom</p>
+  <h1>Learn to hire, brief and supervise an <em>AI agent</em></h1>
+  <p class="lede">Thirteen modules, fifteen build methods, twelve capstone briefs and a lab where you can watch an agent think. Written for people who will run the business case, own the process and answer for the outcome, whether or not they write the code.</p>
+  <div class="hero-cta">
+    <a class="btn primary" href="{{root}}modules/m01-what-is-an-agent.html">Start Module 01</a>
+    <a class="btn" href="{{root}}mindmap.html">See every way to build an agent</a>
+    <a class="btn ghost" href="{{root}}lab.html">Open the Agent Lab</a>
+  </div>
+  <div class="hero-trace">
+    <div class="trace">
+      <div class="t-user">Bluewave Logistics wants 6% off their next order. Can we do it?</div>
+      <div class="t-think">I need their tier, payment record and current margin before I say anything.</div>
+      <div class="t-act">find_customer(name="Bluewave Logistics")</div>
+      <div class="t-obs">{"id":"C-102","tier":"Silver","late_payments":2,"margin_pct":18}</div>
+      <div class="t-act">get_discount_policy()</div>
+      <div class="t-obs">Silver cap 8%. Two or more late payments this FY: cap 3%. Margin floor 12%.</div>
+      <div class="t-think">Two late payments, so the cap drops to 3%. Six is above it. This needs the Sales Manager.</div>
+      <div class="t-act">request_approval(customer_id="C-102", discount_pct=6, approver="Sales Manager", reason="Above 3% late-payment cap")</div>
+      <div class="t-human">Sales Manager: approve 4%, ask for payment on 30-day terms.</div>
+      <div class="t-final">Offer Bluewave 4% with 30-day payment terms. I've drafted the email for your review.</div>
+    </div>
+    <p class="small muted" style="margin-top:8px">That's the Meridian Deal Desk agent, the running example you'll build fifteen different ways. <button class="btn sm ghost" type="button" data-replay>Replay the trace</button></p>
+  </div>
+</header>
+
+<section id="what">
+<h2>What this is</h2>
+<p>Most material on AI agents is written for engineers. Fair enough, they build them. But engineers rarely decide which process gets an agent, how much it's allowed to do alone, who signs off when it gets something wrong, or whether the thing paid for itself. Managers do. So this course is written for them.</p>
+<p>You'll still see real code. Every code path comes with a plain-English reading and a no-code alternative, because a manager who can read a forty-line agent loop asks much better questions in the steering meeting. And honestly, some of you will get hooked and build the whole thing yourselves. That's fine too.</p>
+<div class="stats">
+  <div class="stat"><b>{{count:modules}}</b><span>Tutorial modules</span></div>
+  <div class="stat"><b>{{count:methods}}</b><span>Build methods</span></div>
+  <div class="stat"><b>{{count:capstones}}</b><span>Capstone briefs</span></div>
+  <div class="stat"><b>{{count:videos}}</b><span>Curated videos</span></div>
+  <div class="stat"><b>{{count:figures}}</b><span>Infographics</span></div>
+  <div class="stat"><b>{{count:quiz}}</b><span>Quiz questions</span></div>
+</div>
+</section>
+
+<section id="path">
+<h2>The path, basics to pro</h2>
+<p>Three levels. Do them in order the first time. After that, treat the site as a reference and jump around.</p>
+<div class="level-row">
+  <div class="level"><span class="lv">Level 1 · Foundations</span><h3>Know what you're dealing with</h3>
+    <ol start="1">
+      <li><a href="{{root}}modules/m01-what-is-an-agent.html">What an AI agent is</a></li>
+      <li><a href="{{root}}modules/m02-llms-for-managers.html">How LLMs work, for managers</a></li>
+      <li><a href="{{root}}modules/m03-instructions-and-prompts.html">Instructions and prompting</a></li>
+      <li><a href="{{root}}modules/m04-tools-and-function-calling.html">Tools and function calling</a></li>
+    </ol></div>
+  <div class="level"><span class="lv">Level 2 · Building</span><h3>Put the parts together</h3>
+    <ol start="5">
+      <li><a href="{{root}}modules/m05-knowledge-and-rag.html">Knowledge and RAG</a></li>
+      <li><a href="{{root}}modules/m06-memory-and-state.html">Memory and state</a></li>
+      <li><a href="{{root}}modules/m07-design-patterns.html">Agent design patterns</a></li>
+      <li><a href="{{root}}modules/m08-multi-agent-systems.html">Multi-agent systems</a></li>
+      <li><a href="{{root}}modules/m09-protocols-mcp-a2a.html">Protocols: MCP and A2A</a></li>
+    </ol></div>
+  <div class="level"><span class="lv">Level 3 · Corporate</span><h3>Make it safe, useful and paid for</h3>
+    <ol start="10">
+      <li><a href="{{root}}modules/m10-evaluation.html">Evaluation and testing</a></li>
+      <li><a href="{{root}}modules/m11-guardrails-and-responsible-ai.html">Guardrails and responsible AI</a></li>
+      <li><a href="{{root}}modules/m12-deployment-and-llmops.html">Deployment and LLMOps</a></li>
+      <li><a href="{{root}}modules/m13-business-case-and-governance.html">Business case, ROI, governance</a></li>
+    </ol></div>
+</div>
+<p>Alongside the modules sit the <a href="{{root}}methods/index.html">fifteen build methods</a>. Each one is its own page: what the tool is, when to pick it, the same Deal Desk agent built step by step, and what changes when you take it into a real company. The <a href="{{root}}roadmap.html">learning roadmap</a> suggests which methods to try for your track.</p>
+</section>
+
+<section id="methods">
+<h2>Fifteen ways to build</h2>
+<p>There's no single "right" way to build an agent. A finance team living in Microsoft 365 should probably start in Copilot Studio. A startup with two Python developers might go straight to the raw API. A customer-service head buying a platform needs to understand Agentforce or ServiceNow well enough to negotiate. Pick the page that matches your situation, or let the <a href="{{root}}methods/index.html">method chooser</a> suggest one.</p>
+<div class="cards">
+  <a class="card" href="{{root}}methods/no-code-assistants.html"><span class="card-kicker">No-code</span><b>Custom GPTs, Claude Projects, Gems</b><span>An assistant with your instructions and files, in an afternoon.</span></a>
+  <a class="card" href="{{root}}methods/copilot-studio.html"><span class="card-kicker">Low-code</span><b>Microsoft Copilot Studio</b><span>Agents inside Teams and M365, governed by IT.</span></a>
+  <a class="card" href="{{root}}methods/workflow-automation.html"><span class="card-kicker">Low-code</span><b>n8n, Zapier, Make, Power Automate</b><span>Agents as one smart step in a business workflow.</span></a>
+  <a class="card" href="{{root}}methods/enterprise-platforms.html"><span class="card-kicker">Platforms</span><b>Agentforce, ServiceNow, Bedrock and more</b><span>Agents where your CRM, ITSM or cloud data already lives.</span></a>
+  <a class="card" href="{{root}}methods/voice-agents.html"><span class="card-kicker">Voice</span><b>Voice agents</b><span>Phone and call-centre agents, latency and all.</span></a>
+  <a class="card" href="{{root}}methods/computer-use.html"><span class="card-kicker">Computer use</span><b>Browser and desktop agents</b><span>When the old system has no API.</span></a>
+  <a class="card" href="{{root}}methods/api-tool-use.html"><span class="card-kicker">Code</span><b>Raw API with tool calling</b><span>Build the loop yourself and see what every framework hides.</span></a>
+  <a class="card" href="{{root}}methods/langgraph.html"><span class="card-kicker">Code</span><b>LangGraph</b><span>Explicit, controllable agent workflows with checkpoints.</span></a>
+  <a class="card" href="{{root}}methods/crewai.html"><span class="card-kicker">Code</span><b>CrewAI</b><span>Role-based teams of agents.</span></a>
+  <a class="card" href="{{root}}methods/microsoft-agent-framework.html"><span class="card-kicker">Code</span><b>Microsoft Agent Framework</b><span>The successor to AutoGen and Semantic Kernel.</span></a>
+  <a class="card" href="{{root}}methods/openai-agents-sdk.html"><span class="card-kicker">Code</span><b>OpenAI Agents SDK</b><span>Agents, handoffs, guardrails, tracing.</span></a>
+  <a class="card" href="{{root}}methods/claude-agent-sdk.html"><span class="card-kicker">Code</span><b>Claude Agent SDK</b><span>The engine behind Claude Code, for your own agents.</span></a>
+  <a class="card" href="{{root}}methods/google-adk.html"><span class="card-kicker">Code</span><b>Google ADK</b><span>Agent Development Kit, with a dev UI and A2A.</span></a>
+  <a class="card" href="{{root}}methods/llamaindex.html"><span class="card-kicker">Code</span><b>LlamaIndex</b><span>Agents over messy company documents.</span></a>
+  <a class="card" href="{{root}}methods/mcp.html"><span class="card-kicker">Code</span><b>Build an MCP server</b><span>Give any agent your company's tools, once.</span></a>
+</div>
+</section>
+
+<section id="meridian">
+<h2>The running example</h2>
+<p>Every build in this course uses the same small business problem, so you can compare methods like for like. Meridian Supplies is a fictional Pune distributor of office and facility supplies. Its salespeople constantly ask "can we give this customer X% off?" and the answer depends on the customer's tier, their payment record, the margin left after the discount, and who has authority to approve what.</p>
+<p>It's a perfect first agent. Small enough to build in an afternoon. Real enough to have a policy, a judgement call and a human sign-off. And it fails in instructive ways if you get the design wrong.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>Customer</th><th>Tier</th><th>Annual revenue</th><th>Late payments (FY)</th><th>Gross margin</th></tr></thead>
+<tbody>
+<tr><td>C-101</td><td>Sahyadri Hospitals</td><td>Gold</td><td>₹48 lakh</td><td>0</td><td>22%</td></tr>
+<tr><td>C-102</td><td>Bluewave Logistics</td><td>Silver</td><td>₹19 lakh</td><td>2</td><td>18%</td></tr>
+<tr><td>C-103</td><td>Orchid Schools Trust</td><td>Gold</td><td>₹31 lakh</td><td>0</td><td>25%</td></tr>
+<tr><td>C-104</td><td>Kite Fintech</td><td>Bronze</td><td>₹6 lakh</td><td>0</td><td>16%</td></tr>
+<tr><td>C-105</td><td>Trident Engineering</td><td>Silver</td><td>₹22 lakh</td><td>1</td><td>20%</td></tr>
+</tbody></table></div>
+<div class="callout note"><b>The discount policy</b><p>Maximum discount: Bronze 5%, Silver 8%, Gold 12%. Customers with two or more late payments this financial year are capped at 3%. Gross margin after discount must stay at or above 12%. Anything above the cap needs Sales Manager approval; anything above 15% needs the Regional Head.</p></div>
+<p>Try it yourself in the <a href="{{root}}lab.html">Agent Lab</a>: pick a customer, ask for a discount, and step through what the agent does.</p>
+</section>
+
+<section id="use">
+<h2>Ways to use the site</h2>
+<h3>Self-study</h3>
+<p>Do one module a week, plus one method page that fits your track. Mark pages complete as you go; the bar in the left rail keeps count (it's stored in your own browser, nowhere else). Every module ends with a quiz and exercises with model answers.</p>
+<h3>In a classroom</h3>
+<p>The <a href="{{root}}roadmap.html">roadmap</a> has a fourteen-week semester plan that maps sessions to modules, lab work and capstone milestones. The <a href="{{root}}capstones.html">capstone page</a> has team briefs, an assessment rubric and a demo-day guide. The <a href="{{root}}media.html">media library</a> collects every video and infographic in one place for slides.</p>
+<h3>At work</h3>
+<p>Skip to Level 3. Module 13's business-case template and Module 11's guardrail checklist are written to be lifted straight into a proposal. The <a href="{{root}}methods/enterprise-platforms.html">enterprise platforms</a> page is the one to read before a vendor demo.</p>
+<div class="callout mgr"><b>A note on currency</b><p>This field moves monthly. Product names change, features ship, some tools get retired. Each page says "as of 2026" where it matters and links the official docs. When the site and the vendor disagree, believe the vendor.</p></div>
+</section>
+
+<section id="needs">
+<h2>What you need</h2>
+<p>For the no-code track: a browser and a free or work account on one of the assistant tools. For low-code: access to Copilot Studio, n8n (self-host or cloud trial) or Zapier. For code: Python 3.11 or newer, a terminal, and an API key from at least one model provider. Keep keys in environment variables, never in code, and set a monthly spend limit on the provider's console before you start. Use a small, cheap model for practice runs and save the big one for the final demo; Module 02 shows how to estimate the bill before you spend anything.</p>
+<p>The <a href="{{root}}lab.html">Agent Lab</a> and the <a href="{{root}}chatbots.html">chatbot demo</a> run entirely in your browser. No key needed.</p>
+</section>

@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>M08 Multi-agent systems · AI Agents for Management</title>
+<meta name="description" content="After this page you will be able to decide when a team of agents beats a single agent, design that team the way you would design an org chart, anticipate its costs and failure modes, and build a three-agent market entry research crew.">
+<meta property="og:title" content="M08 Multi-agent systems · AI Agents for Management">
+<meta property="og:description" content="After this page you will be able to decide when a team of agents beats a single agent, design that team the way you would design an org chart, anticipate its costs and failure modes, and build a three-agent market entry research crew.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23151826'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6'%3E%3Ccircle cx='12' cy='6' r='2.2'/%3E%3Ccircle cx='6' cy='17' r='2.2'/%3E%3Ccircle cx='18' cy='17' r='2.2'/%3E%3Cpath d='M11 8 7 15M13 8l4 7M8.2 17h7.6'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('aiam.theme');if(t)document.documentElement.setAttribute('data-theme',JSON.parse(t));}catch(e){}</script>
+</head>
+<body data-root="../" data-page="m08" data-track="m01,m02,m03,m04,m05,m06,m07,m08,m09,m10,m11,m12,m13,x-nocode,x-copilot,x-workflow,x-enterprise,x-voice,x-computer,x-api,x-langgraph,x-crewai,x-maf,x-openai,x-claude,x-adk,x-llamaindex,x-mcp,chatbots,lab">
+<a class="skip-link" href="#content">Skip to content</a>
+<svg id="fx-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="fx-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fx-head" d="M0,0 L10,5 L0,10 z"/></marker></defs></svg>
+<div class="shell">
+  <aside class="rail" aria-label="Course contents">
+    <div class="rail-head">
+      <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M11 7.2 6.2 15.8M13 7.2l4.8 8.6M7.4 18h9.2"/></svg></span><span><span class="brand-name">AI Agents for Management</span><span class="brand-sub">Concept to corporate deployment</span></span></a>
+      <div class="rail-tools">
+        <button class="searchbtn" type="button" data-search-open><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg><span>Search</span><kbd>/</kbd></button>
+        <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+    </div>
+    <div class="rail-progress"><div class="rail-progress-top"><span>Pages completed</span><b id="pcount">0 / 30</b></div><div class="meter"><i id="pbar"></i></div></div>
+    <nav class="nav" aria-label="Course pages">
+<div class="nav-group"><p>Orientation</p>
+<a href="../index.html"><span class="num"></span><span>Start here</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../mindmap.html"><span class="num"></span><span>Concept map: ways to build agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../roadmap.html"><span class="num"></span><span>Learning roadmap</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 1 · Foundations</p>
+<a href="../modules/m01-what-is-an-agent.html" data-id="m01"><span class="num">01</span><span>M01 What an AI agent is</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m02-llms-for-managers.html" data-id="m02"><span class="num">02</span><span>M02 How LLMs work</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m03-instructions-and-prompts.html" data-id="m03"><span class="num">03</span><span>M03 Instructions and prompts</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m04-tools-and-function-calling.html" data-id="m04"><span class="num">04</span><span>M04 Tools and function calling</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 2 · Building</p>
+<a href="../modules/m05-knowledge-and-rag.html" data-id="m05"><span class="num">05</span><span>M05 Knowledge and RAG</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m06-memory-and-state.html" data-id="m06"><span class="num">06</span><span>M06 Memory and state</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m07-design-patterns.html" data-id="m07"><span class="num">07</span><span>M07 Agent design patterns</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m08-multi-agent-systems.html" data-id="m08" aria-current="page"><span class="num">08</span><span>M08 Multi-agent systems</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m09-protocols-mcp-a2a.html" data-id="m09"><span class="num">09</span><span>M09 Protocols: MCP and A2A</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 3 · Corporate</p>
+<a href="../modules/m10-evaluation.html" data-id="m10"><span class="num">10</span><span>M10 Evaluation and testing</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m11-guardrails-and-responsible-ai.html" data-id="m11"><span class="num">11</span><span>M11 Guardrails and security</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m12-deployment-and-llmops.html" data-id="m12"><span class="num">12</span><span>M12 Deployment and LLMOps</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m13-business-case-and-governance.html" data-id="m13"><span class="num">13</span><span>M13 Business case and governance</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · No-code &amp; low-code</p>
+<a href="../methods/index.html"><span class="num"></span><span>Choose your method</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/no-code-assistants.html" data-id="x-nocode"><span class="num">A</span><span>No-code assistants</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/copilot-studio.html" data-id="x-copilot"><span class="num">B</span><span>Copilot Studio</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/workflow-automation.html" data-id="x-workflow"><span class="num">C</span><span>Workflow automation</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/enterprise-platforms.html" data-id="x-enterprise"><span class="num">D</span><span>Enterprise platforms</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/voice-agents.html" data-id="x-voice"><span class="num">E</span><span>Voice agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/computer-use.html" data-id="x-computer"><span class="num">F</span><span>Computer use agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · Code</p>
+<a href="../methods/api-tool-use.html" data-id="x-api"><span class="num">G</span><span>Raw API tool use</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/langgraph.html" data-id="x-langgraph"><span class="num">H</span><span>LangChain + LangGraph</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/crewai.html" data-id="x-crewai"><span class="num">I</span><span>CrewAI</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/microsoft-agent-framework.html" data-id="x-maf"><span class="num">J</span><span>Microsoft Agent Framework</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/openai-agents-sdk.html" data-id="x-openai"><span class="num">K</span><span>OpenAI Agents SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/claude-agent-sdk.html" data-id="x-claude"><span class="num">L</span><span>Claude Agent SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/google-adk.html" data-id="x-adk"><span class="num">M</span><span>Google ADK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/llamaindex.html" data-id="x-llamaindex"><span class="num">N</span><span>LlamaIndex</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/mcp.html" data-id="x-mcp"><span class="num">O</span><span>Build an MCP server</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Practice</p>
+<a href="../chatbots.html" data-id="chatbots"><span class="num"></span><span>Chatbots + live bot</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../lab.html" data-id="lab"><span class="num"></span><span>Agent Lab</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../capstones.html"><span class="num"></span><span>Capstone projects</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Library</p>
+<a href="../media.html"><span class="num"></span><span>Videos &amp; infographics</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../glossary.html"><span class="num"></span><span>Glossary</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../resources.html"><span class="num"></span><span>Books, courses, papers</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="iconbtn" type="button" id="menu-btn" aria-label="Open contents"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+      <span class="brand-name">AI Agents for Management</span>
+      <button class="iconbtn" type="button" data-search-open aria-label="Search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></button>
+      <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+    </div>
+    <div class="page-wrap">
+      <main class="article" id="content">
+<header class="page-head"><p class="eyebrow">Module 08 · Level 2 · Building</p><h1>When one agent is not <em>enough</em></h1><p class="lede">After this page you will be able to decide when a team of agents beats a single agent, design that team the way you would design an org chart, anticipate its costs and failure modes, and build a three-agent market entry research crew.</p><div class="page-meta"><span>50 min read</span><span>Tracked in your progress</span></div></header>
+
+
+<section id="m08-idea">
+<h2>The big idea</h2>
+<p>A single agent with good tools goes a long way. Then you give it fifteen tools, a 40-page brief, three different jobs and access to four systems, and it starts to wobble. It picks the wrong tool. It forgets the brief halfway through. It writes the analysis in the tone of a search query.</p>
+<p>Human organisations hit the same wall and solved it the same way: specialise, then coordinate. A multi-agent system splits the work across several agents, each with a narrow role, its own instructions, its own tools and often its own model, plus a way to hand work between them. A researcher who only searches and takes notes. An analyst who only turns notes into numbers. A writer who only writes. Someone, human or agent, who coordinates.</p>
+<p>Here is the catch. Every extra agent is another model reading, thinking and writing, so costs multiply. Every handoff is a place where context gets lost. Anthropic's engineering team, describing its own multi-agent research system in June 2025, reported that agents typically use about 4 times more tokens than chat interactions, and multi-agent systems about 15 times more. The same write-up reported that the multi-agent setup beat a single agent by a wide margin on its internal research evaluation. Both facts matter. Multi-agent can be much better, and it is always much more expensive.</p>
+<p>So the question is never "can we use multiple agents?" It is "does this job have parts that genuinely need separate expertise, separate context or separate permissions, and is the value high enough to pay for the extra runs?"</p>
+<div class="callout mgr"><b>Manager's lens</b><p>You already know how to do this. Designing a multi-agent system is org design: deciding roles, writing job descriptions, setting spans of control, defining handoffs and assigning accountability. The same mistakes show up too. Overlapping roles cause duplicate work. Vague handoffs cause dropped balls. A team with no single accountable owner produces a report nobody stands behind. If you would not hire three people for this job, do not deploy three agents.</p></div>
+</section>
+
+<section id="m08-how">
+<h2>How it works</h2>
+
+<h3>When one agent isn't enough</h3>
+<p>There are four honest reasons to split work across agents. If none applies, stay with one.</p>
+<ul>
+<li><b>Context overload.</b> The job needs more reading than one context window handles well. A research task across 30 sources is the classic case: separate agents each read a slice and report back a summary.</li>
+<li><b>Tool overload.</b> Past a dozen or so tools, agents choose worse. Giving each specialist three or four tools keeps choices sharp.</li>
+<li><b>Different permissions.</b> The agent that reads the web should not be the agent that can write to the ERP. Separate agents give separate access, which is a security control, not just tidiness.</li>
+<li><b>Parallel work.</b> Independent subtasks can run at the same time, which cuts elapsed time even as total cost rises.</li>
+</ul>
+<p>Anthropic's same write-up is candid about where the approach fits badly: tasks where all agents need to share the same context, and most coding tasks, which have fewer truly parallel parts than research does. A useful rule of thumb follows. Multi-agent works best on "breadth" problems (survey many sources, compare many options) and worst on "depth" problems (one tightly connected piece of reasoning).</p>
+
+<h3>Topologies: how agents are arranged</h3>
+<p>A topology is the shape of who talks to whom. Five shapes cover almost everything you will see.</p>
+
+<figure class="fig" data-dl="m08-multi-agent-systems-figure-1">
+<svg viewBox="0 0 720 280" role="img" aria-label="Supervisor topology: one supervisor with search, analyse and write workers. Hierarchical topology: head agent with research lead and delivery lead, each with two workers">
+  <text class="fx-tb" x="180" y="26" text-anchor="middle">Supervisor</text>
+  <rect class="fx-box fx-hi" x="105" y="45" width="150" height="44" rx="6"/>
+  <text class="fx-tb" x="180" y="72" text-anchor="middle">Supervisor</text>
+  <circle class="fx-box k1" cx="60" cy="180" r="34"/>
+  <text class="fx-ts" x="60" y="184" text-anchor="middle">Search</text>
+  <circle class="fx-box k2" cx="180" cy="180" r="34"/>
+  <text class="fx-ts" x="180" y="184" text-anchor="middle">Analyse</text>
+  <circle class="fx-box k3" cx="300" cy="180" r="34"/>
+  <text class="fx-ts" x="300" y="184" text-anchor="middle">Write</text>
+  <path class="fx-ar" d="M150 89 L80 148"/>
+  <path class="fx-ar" d="M180 89 V143"/>
+  <path class="fx-ar" d="M210 89 L280 148"/>
+  <text class="fx-ts" x="180" y="250" text-anchor="middle">one boss; specialists report back</text>
+  <text class="fx-tb" x="540" y="26" text-anchor="middle">Hierarchical</text>
+  <rect class="fx-box fx-hi" x="465" y="45" width="150" height="40" rx="6"/>
+  <text class="fx-tb" x="540" y="70" text-anchor="middle">Head agent</text>
+  <rect class="fx-box k4" x="385" y="120" width="130" height="40" rx="6"/>
+  <text class="fx-t" x="450" y="145" text-anchor="middle">Research lead</text>
+  <rect class="fx-box k4" x="565" y="120" width="130" height="40" rx="6"/>
+  <text class="fx-t" x="630" y="145" text-anchor="middle">Delivery lead</text>
+  <circle class="fx-box k1" cx="415" cy="210" r="20"/>
+  <circle class="fx-box k1" cx="485" cy="210" r="20"/>
+  <circle class="fx-box k3" cx="595" cy="210" r="20"/>
+  <circle class="fx-box k3" cx="665" cy="210" r="20"/>
+  <path class="fx-ar" d="M510 85 L460 117"/>
+  <path class="fx-ar" d="M570 85 L620 117"/>
+  <path class="fx-ln" d="M435 160 L418 190"/>
+  <path class="fx-ln" d="M465 160 L482 190"/>
+  <path class="fx-ln" d="M615 160 L598 190"/>
+  <path class="fx-ln" d="M645 160 L662 190"/>
+  <text class="fx-ts" x="540" y="260" text-anchor="middle">teams of teams, for big jobs</text>
+</svg>
+<figcaption>Supervisor is the most common shape: one coordinator delegates and collects. Hierarchical stacks supervisors when one coordinator would have too many reports, exactly like adding team leads under a department head.</figcaption>
+</figure>
+
+<p><b>Supervisor (manager).</b> One coordinating agent receives the task, delegates pieces to specialists, checks what comes back and assembles the answer. Specialists do not talk to each other. Easy to reason about, easy to log, and the most common shape in production.</p>
+<p><b>Hierarchical.</b> Here, supervisors manage other supervisors. Useful when the job is big enough that one coordinator would have too many specialists to track. Costs and latency climb with every layer, so most business systems stop at two.</p>
+<p><b>Sequential pipeline.</b> Agent A's output is agent B's input, and so on. No coordinator, because the order is fixed. It is prompt chaining (<a href="../modules/m07-design-patterns.html">Module 07</a>) where each step is a full agent with tools. Our market entry crew below is a pipeline.</p>
+<p><b>Network or swarm.</b> Any agent can hand off to any other, based on the conversation. Flexible, and good for customer service where a chat moves from sales to billing to support. Also the easiest shape to get lost in: without rules, agents pass the parcel in circles.</p>
+<p><b>Debate.</b> Two or more agents argue positions and a judge (an agent or a person) decides. Du and colleagues (2023) found that having several model instances debate improved reasoning and factual accuracy on their benchmarks. In business, debate suits decisions with real trade-offs: build versus buy, which supplier, whether a clause is risky.</p>
+
+<figure class="fig" data-dl="m08-multi-agent-systems-figure-2">
+<svg viewBox="0 0 720 270" role="img" aria-label="Sequential pipeline: research, analyse, write in order. Network: four agents all connected. Debate: agent A and agent B argue, a judge decides">
+  <text class="fx-tb" x="122" y="26" text-anchor="middle">Sequential pipeline</text>
+  <rect class="fx-box k1" x="47" y="45" width="150" height="38" rx="6"/>
+  <text class="fx-t" x="122" y="69" text-anchor="middle">Research</text>
+  <rect class="fx-box k2" x="47" y="113" width="150" height="38" rx="6"/>
+  <text class="fx-t" x="122" y="137" text-anchor="middle">Analyse</text>
+  <rect class="fx-box k3" x="47" y="181" width="150" height="38" rx="6"/>
+  <text class="fx-t" x="122" y="205" text-anchor="middle">Write</text>
+  <path class="fx-ar" d="M122 83 V110"/>
+  <path class="fx-ar" d="M122 151 V178"/>
+  <text class="fx-ts" x="122" y="250" text-anchor="middle">fixed order, no boss</text>
+  <text class="fx-tb" x="360" y="26" text-anchor="middle">Network / swarm</text>
+  <circle class="fx-box k1" cx="305" cy="85" r="26"/>
+  <text class="fx-ts" x="305" y="89" text-anchor="middle">Sales</text>
+  <circle class="fx-box k2" cx="415" cy="85" r="26"/>
+  <text class="fx-ts" x="415" y="89" text-anchor="middle">Billing</text>
+  <circle class="fx-box k3" cx="305" cy="185" r="26"/>
+  <text class="fx-ts" x="305" y="189" text-anchor="middle">Tech</text>
+  <circle class="fx-box k4" cx="415" cy="185" r="26"/>
+  <text class="fx-ts" x="415" y="189" text-anchor="middle">Returns</text>
+  <path class="fx-ln" d="M331 85 H389"/>
+  <path class="fx-ln" d="M331 185 H389"/>
+  <path class="fx-ln" d="M305 111 V159"/>
+  <path class="fx-ln" d="M415 111 V159"/>
+  <path class="fx-ln" d="M324 104 L396 166"/>
+  <path class="fx-ln" d="M396 104 L324 166"/>
+  <text class="fx-ts" x="360" y="250" text-anchor="middle">anyone hands off to anyone</text>
+  <text class="fx-tb" x="600" y="26" text-anchor="middle">Debate</text>
+  <rect class="fx-box k1" x="495" y="50" width="95" height="40" rx="6"/>
+  <text class="fx-t" x="542" y="75" text-anchor="middle">Agent A</text>
+  <rect class="fx-box k2" x="610" y="50" width="95" height="40" rx="6"/>
+  <text class="fx-t" x="657" y="75" text-anchor="middle">Agent B</text>
+  <rect class="fx-box fx-hi" x="545" y="160" width="110" height="44" rx="6"/>
+  <text class="fx-tb" x="600" y="187" text-anchor="middle">Judge</text>
+  <path class="fx-ln fx-dash" d="M590 70 H610"/>
+  <path class="fx-ar" d="M542 90 L580 157"/>
+  <path class="fx-ar" d="M657 90 L620 157"/>
+  <text class="fx-ts" x="600" y="250" text-anchor="middle">argue, then decide</text>
+</svg>
+<figcaption>Pipelines are predictable, networks are flexible, and debates surface disagreement. The more freedom agents have to pass work around, the more you need turn limits and logging.</figcaption>
+</figure>
+
+<h3>Role design is org design</h3>
+<p>This is where managers have an advantage over most engineers. A good agent role is a good job description: a clear title, an objective, the background that shapes judgement, the tools (access rights) it has, the output it owns, and who it hands to. CrewAI even uses the words: every agent has a <code>role</code>, a <code>goal</code> and a <code>backstory</code>.</p>
+<p>Write roles so they do not overlap. If both the researcher and the analyst are told to "assess the market", both will, and you will pay twice for two inconsistent answers. Make each role own a distinct artefact: the researcher owns sourced notes, the analyst owns the numbers, the writer owns the memo.</p>
+<p>Then assign accountability. A RACI chart works surprisingly well for agent teams, with one firm rule: the A (accountable) is always a named human. Agents can be responsible for doing work. They cannot be accountable for it.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Activity</th><th>Researcher agent</th><th>Analyst agent</th><th>Writer agent</th><th>Strategy manager (human)</th><th>Head of Sales (human)</th></tr></thead>
+<tbody>
+<tr><td>Gather sourced facts</td><td>R</td><td>C</td><td>I</td><td>A</td><td></td></tr>
+<tr><td>Size the opportunity</td><td>C</td><td>R</td><td>I</td><td>A</td><td>C</td></tr>
+<tr><td>Write the board memo</td><td>I</td><td>C</td><td>R</td><td>A</td><td>I</td></tr>
+<tr><td>Go / no-go decision</td><td></td><td></td><td></td><td>R</td><td>A</td></tr>
+</tbody></table></div>
+
+<h3>Communication and handoffs</h3>
+<p>Agents coordinate in one of two ways. In <b>message passing</b>, one agent sends another a message or a handoff: "here are my notes, your turn". In a <b>shared workspace</b> (sometimes called a blackboard), agents read and write a common state object, such as a research file everyone can see.</p>
+<p>Either way, the handoff is where quality leaks. Three choices matter:</p>
+<ul>
+<li><b>What travels.</b> Pass the full history and the next agent has to wade through all of it. Pass a one-line summary and it loses the evidence. Pass a structured artefact: notes with sources, a table with assumptions, a list of open questions.</li>
+<li><b>Who controls.</b> In a handoff (the OpenAI Agents SDK's term), control moves to the next agent, which takes over the conversation. In "agent as tool", the caller stays in charge and just asks a specialist for a result. Agent-as-tool is easier to reason about; handoffs suit conversations that genuinely change department.</li>
+<li><b>What "done" means.</b> Each agent needs an expected output it can be checked against. CrewAI calls it <code>expected_output</code>; it is the most underrated field in the framework.</li>
+</ul>
+
+<h3>Shared state</h3>
+<p>Multi-agent systems need one place where the facts of the job live: the inputs, each agent's artefacts, decisions made, and what is still open. Without it, two agents work from different versions of the truth. LangGraph makes this explicit as a typed state object that every node reads and updates, with checkpoints (<a href="../modules/m06-memory-and-state.html">Module 06</a>). CrewAI passes task outputs forward through <code>context</code>. Whatever the framework, the rule is the same as in a project team: one source of truth, written down, versioned.</p>
+
+<h3>Cost multiplication</h3>
+<p>Do the arithmetic before you build. Every agent reads its instructions, the inputs it was handed and its own tool results, then writes. A supervisor reads the reports of every specialist. A debate reads each side's arguments several times. A three-agent pipeline is rarely three times the cost of one agent; with re-reading and retries it is often more. Anthropic's figures (about 4 times chat for an agent, about 15 times for multi-agent) are a sensible order of magnitude to plan with, and the same write-up reports that token usage by itself explained 80% of the variance in performance on the BrowseComp benchmark. In plain terms: much of the quality gain comes from spending more.</p>
+<p>That is fine for a ₹50-lakh market entry decision. It is not fine for answering "what's our leave policy?" ten thousand times a month. Price the run, multiply by volume, and compare it with the value of a better answer.</p>
+
+<h3>Failure modes</h3>
+<p>A 2025 study by Cemri and colleagues analysed failed multi-agent runs across several popular frameworks and grouped the causes into three families: problems with how the system and roles were specified, misalignment between agents (ignoring each other's input, withholding information, drifting off task), and weak verification and termination (stopping too early, or never checking the result). In company terms, these show up as:</p>
+<ul>
+<li><b>Loops.</b> Two agents keep handing work back and forth ("please clarify", "please confirm"). Cap turns per agent and per run.</li>
+<li><b>Blame diffusion.</b> The memo is wrong and every agent's log shows it did its part. Without a named accountable owner and per-step checks, nobody can say where it broke.</li>
+<li><b>Compounding errors.</b> If each of three steps is right 95% of the time and errors pass straight through, the whole chain is right about 86% of the time (0.95 × 0.95 × 0.95). Five steps at 90% each gives about 59%. Add checks between steps, not just at the end.</li>
+<li><b>Groupthink.</b> Agents built on the same model, with similar prompts, agree with each other's mistakes. Use different models or deliberately adversarial roles for review.</li>
+<li><b>Context loss at handoff.</b> The analyst never learns that the researcher marked a key number "unconfirmed". Make uncertainty a required field in every artefact.</li>
+</ul>
+
+<h3>Frameworks that do it</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Framework</th><th>How it models a team (as of 2026)</th><th>Good fit</th></tr></thead>
+<tbody>
+<tr><td><a href="../methods/crewai.html">CrewAI</a></td><td>Agents with role, goal, backstory and tools; tasks with expected outputs; sequential or hierarchical process (a manager LLM delegates)</td><td>Business-readable crews, fast prototypes</td></tr>
+<tr><td><a href="../methods/langgraph.html">LangGraph</a></td><td>A graph of nodes over shared typed state; supervisors and handoffs built from nodes and edges; checkpoints and human interrupts</td><td>Production systems needing precise control and audit</td></tr>
+<tr><td><a href="../methods/microsoft-agent-framework.html">Microsoft Agent Framework</a></td><td>Successor to AutoGen and Semantic Kernel; built-in sequential, concurrent, handoff, group chat and Magentic orchestrations</td><td>Microsoft and Azure shops, .NET or Python</td></tr>
+<tr><td><a href="../methods/openai-agents-sdk.html">OpenAI Agents SDK</a></td><td>Handoffs appear to the model as tools such as <code>transfer_to_refund_agent</code>; agents can also be used as tools</td><td>Conversational triage across specialist agents</td></tr>
+<tr><td><a href="../methods/google-adk.html">Google ADK</a></td><td>Coordinator agents with sub-agents; sequential, parallel and loop workflow templates; graph-based workflows in ADK 2.0</td><td>Google Cloud teams; pairs with A2A for cross-vendor agents</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="m08-build">
+<h2>Hands-on: a research crew</h2>
+<p>Meridian's leadership is considering expanding into Hyderabad's private hospital segment. We will build a three-agent crew that researches the market, sizes the opportunity and writes a board memo: a researcher, an analyst and a writer, in a sequential pipeline. The output is a draft for humans to challenge, not a decision.</p>
+
+<figure class="fig" data-dl="m08-multi-agent-systems-figure-3">
+<svg viewBox="0 0 720 270" role="img" aria-label="Market entry crew: inputs to researcher with search tool, notes to analyst, cases to writer, memo file, then human leadership review">
+  <rect class="fx-box" x="12" y="50" width="120" height="56" rx="6"/>
+  <text class="fx-tb" x="72" y="74" text-anchor="middle">Inputs</text>
+  <text class="fx-ts" x="72" y="94" text-anchor="middle">segment, city</text>
+  <rect class="fx-box k1" x="172" y="50" width="150" height="56" rx="6"/>
+  <text class="fx-tb" x="247" y="74" text-anchor="middle">Researcher</text>
+  <text class="fx-ts" x="247" y="94" text-anchor="middle">sourced notes</text>
+  <rect class="fx-box k2" x="362" y="50" width="150" height="56" rx="6"/>
+  <text class="fx-tb" x="437" y="74" text-anchor="middle">Analyst</text>
+  <text class="fx-ts" x="437" y="94" text-anchor="middle">low / base / high</text>
+  <rect class="fx-box k3" x="552" y="50" width="156" height="56" rx="6"/>
+  <text class="fx-tb" x="630" y="74" text-anchor="middle">Writer</text>
+  <text class="fx-ts" x="630" y="94" text-anchor="middle">board memo</text>
+  <path class="fx-ar" d="M132 78 H169"/>
+  <path class="fx-ar" d="M322 78 H359"/>
+  <path class="fx-ar" d="M512 78 H549"/>
+  <text class="fx-ts" x="342" y="130" text-anchor="middle">notes</text>
+  <text class="fx-ts" x="532" y="130" text-anchor="middle">notes + cases</text>
+  <rect class="fx-box k4" x="172" y="180" width="150" height="44" rx="6"/>
+  <text class="fx-t" x="247" y="207" text-anchor="middle">Web search tool</text>
+  <path class="fx-ln fx-dash" d="M247 106 V180"/>
+  <rect class="fx-box fx-hi" x="552" y="180" width="156" height="44" rx="6"/>
+  <text class="fx-t" x="630" y="207" text-anchor="middle">memo.md</text>
+  <path class="fx-ar" d="M630 106 V177"/>
+  <rect class="fx-box k5" x="362" y="180" width="150" height="44" rx="6"/>
+  <text class="fx-t" x="437" y="207" text-anchor="middle">Leadership review</text>
+  <path class="fx-ar" d="M552 202 H515"/>
+  <text class="fx-ts" x="360" y="255" text-anchor="middle">Only the researcher can search the web; the writer sees the researcher's notes and the analyst's cases.</text>
+</svg>
+<figcaption>The crew as a pipeline. Each agent owns one artefact, only one agent has web access, and the end of the line is a human review, not an automatic decision.</figcaption>
+</figure>
+
+<div class="tabs">
+<div class="tab" data-label="No-code">
+<p>Two no-code routes. The first needs nothing but chat assistants and teaches the most about handoffs. The second automates it.</p>
+<h4>Route 1: three assistants and you as the handoff</h4>
+<ol class="steps">
+<li><b>Create three assistants</b><p>In Claude Projects, Custom GPTs or Gemini Gems, create "Researcher", "Analyst" and "Writer". Paste each one's role, goal and backstory (copy them from the Python tab) into its instructions. Turn on web search for the Researcher only.</p></li>
+<li><b>Run the researcher</b><p>Ask: "Research the market for office and facility supplies among private hospitals in Hyderabad. Bullet-point notes; every fact has a source URL; mark anything unconfirmed." Read the notes and check two sources yourself.</p></li>
+<li><b>Hand off to the analyst</b><p>Paste the notes into the Analyst with: "Estimate the annual revenue opportunity for Meridian with low, base and high cases. List assumptions and the three biggest risks." Notice how much depends on what you chose to paste.</p></li>
+<li><b>Hand off to the writer</b><p>Paste both outputs into the Writer: "Write a board memo under 900 words: recommendation, opportunity size, risks, next 90 days, open questions."</p></li>
+<li><b>Review as the accountable owner</b><p>Check that every number in the memo traces back to a source or a stated assumption. This is the job the agents cannot do for you.</p></li>
+</ol>
+<h4>Route 2: automate it in n8n</h4>
+<p>Create a workflow with a form trigger (fields: segment, city), then three AI Agent nodes in a row. Give the first a web search tool node and the researcher instructions; pass its output into the second agent's prompt; pass both into the third. End with a Google Docs or email node that sends the memo to the strategy manager for review. Set a maximum-iterations limit on the research agent. See <a href="../methods/workflow-automation.html">n8n, Zapier, Make and Power Automate</a>.</p>
+</div>
+<div class="tab" data-label="Python (CrewAI)">
+<p>CrewAI supports Python 3.10 to 3.13 at the time of writing. You need an Anthropic key for the model and a Serper key for web search (Serper is a Google-search API with a free tier; any search tool works).</p>
+<pre class="code"><code class="language-bash">pip install "crewai[anthropic]==1.15.27" "crewai-tools==1.15.27"
+export ANTHROPIC_API_KEY="your-key-here"
+export SERPER_API_KEY="your-serper-key"</code></pre>
+<pre class="code"><code class="language-python"># market_entry_crew.py  -  researcher -&gt; analyst -&gt; writer
+import os
+from crewai import Agent, Task, Crew, Process
+from crewai_tools import SerperDevTool
+
+MODEL = os.getenv("CREW_MODEL", "anthropic/claude-sonnet-5-5")   # any provider/model CrewAI supports
+search = SerperDevTool()                                            # needs SERPER_API_KEY
+
+researcher = Agent(
+    role="Market Researcher",
+    goal="Find current, sourced facts about {segment} buyers in {city}",
+    backstory="You worked in Meridian's strategy team. You never state a number without a source URL.",
+    tools=[search],
+    llm=MODEL,
+    max_iter=8,                 # stop runaway searching
+    verbose=True,
+)
+
+analyst = Agent(
+    role="Commercial Analyst",
+    goal="Turn research notes into a go / no-go view for Meridian entering {city}",
+    backstory="Ex-consultant. You size markets with explicit assumptions and flag weak evidence.",
+    llm=MODEL,
+    allow_delegation=False,
+)
+
+writer = Agent(
+    role="Board Memo Writer",
+    goal="Write a two-page memo the Meridian leadership team can decide on",
+    backstory="You write plainly for busy directors. Recommendation first, evidence after.",
+    llm=MODEL,
+    allow_delegation=False,
+)
+
+research = Task(
+    description=("Research the market for office and facility supplies among {segment} in {city}. "
+                 "Cover: number and size of likely buyers, current suppliers, buying process, price sensitivity."),
+    expected_output="Bullet-point notes. Every fact has a source URL. Mark anything you could not confirm.",
+    agent=researcher,
+)
+
+analysis = Task(
+    description=("Using the research notes, estimate the annual revenue opportunity for Meridian in {city} "
+                 "with low / base / high cases. List assumptions and the three biggest risks."),
+    expected_output="A small table of cases, an assumptions list and a risk list.",
+    agent=analyst,
+    context=[research],
+)
+
+memo = Task(
+    description="Write the board memo: recommendation, opportunity size, risks, next 90 days, open questions.",
+    expected_output="A markdown memo under 900 words.",
+    agent=writer,
+    context=[research, analysis],
+    output_file="market_entry_memo.md",
+)
+
+crew = Crew(
+    agents=[researcher, analyst, writer],
+    tasks=[research, analysis, memo],
+    process=Process.sequential,
+    verbose=True,
+)
+
+if __name__ == "__main__":
+    result = crew.kickoff(inputs={"segment": "private hospitals", "city": "Hyderabad"})
+    print(result.raw)
+    print(result.token_usage)</code></pre>
+<p><b>What this does, in management terms:</b></p>
+<ul>
+<li><b>Agents are job descriptions.</b> <code>role</code>, <code>goal</code> and <code>backstory</code> shape how each agent behaves. The <code>{segment}</code> and <code>{city}</code> placeholders are filled in at kickoff, so the same crew can study a different city tomorrow.</li>
+<li><b>Tools are access rights.</b> Only the researcher gets <code>search</code>. The analyst and writer work only from what they are handed. <code>allow_delegation=False</code> stops them passing work sideways.</li>
+<li><b>Tasks are deliverables.</b> Each has a <code>description</code> (the brief) and an <code>expected_output</code> (the definition of done). <code>context=[research]</code> is the handoff: the analyst receives the researcher's output. The writer gets both.</li>
+<li><b>The crew is the operating model.</b> <code>Process.sequential</code> runs tasks in order. Switching to <code>Process.hierarchical</code> with a <code>manager_llm</code> makes a manager agent delegate instead, the supervisor topology.</li>
+<li><b>Guardrails on cost.</b> <code>max_iter=8</code> caps the researcher's reasoning loop. <code>result.token_usage</code> prints what the run consumed, so you can price it before scaling.</li>
+<li><b>The output</b> is saved to <code>market_entry_memo.md</code> for a human to review.</li>
+</ul>
+<p>We checked that this crew builds against CrewAI 1.15.27. To use another model provider, change <code>CREW_MODEL</code> and install the matching extra; the <a href="../methods/crewai.html">CrewAI method page</a> has details.</p>
+</div>
+</div>
+
+<p>An illustrative run, trimmed. Your search results and numbers will differ; the shape is what matters.</p>
+<div class="trace">
+  <div class="t-user">kickoff(segment="private hospitals", city="Hyderabad")</div>
+  <div class="t-think">[Researcher] I need the number of likely buyers first, then who supplies them today. Start broad.</div>
+  <div class="t-act">search("private multispecialty hospitals Hyderabad list")</div>
+  <div class="t-obs">10 results: directories, news items, a state health department listing...</div>
+  <div class="t-think">[Researcher] The directory counts disagree. I'll report the range with both sources and mark it unconfirmed rather than pick one.</div>
+  <div class="t-obs">Research notes: 14 bullets, 11 with URLs, 3 marked "unconfirmed".</div>
+  <div class="t-think">[Analyst] The buyer count is a range and marked unconfirmed, so it drives my low and high cases. Spend per hospital is not in the notes; I'll use Meridian's Pune hospital accounts as the stated assumption and flag it as the biggest risk.</div>
+  <div class="t-obs">Analysis: three cases, 6 assumptions, 3 risks.</div>
+  <div class="t-think">[Writer] Recommendation first. The evidence supports a pilot, not a full launch, given the unconfirmed buyer count.</div>
+  <div class="t-final">market_entry_memo.md saved: "Recommend a 6-month pilot with a small set of anchor hospitals; three open questions for the Head of Sales."</div>
+  <div class="t-human">Strategy manager reviews: checks two sources, challenges the spend-per-hospital assumption, sends the memo forward with one correction.</div>
+</div>
+</section>
+
+<section id="m08-business">
+<h2>In the business</h2>
+<div class="case"><span class="case-tag">Case · Marketing</span><h4>A campaign crew with a compliance reviewer</h4><p>A D2C brand runs a small crew for festive campaigns: a planner agent drafts the brief from last year's results, a copy agent writes variants per channel, and a reviewer agent on a different model checks claims, brand voice and platform ad policies. The reviewer has no ability to edit, only to approve or return with reasons. The team found the separation useful mostly for accountability: when a claim slips through, the log shows exactly which check missed it.</p></div>
+<div class="case"><span class="case-tag">Case · Finance</span><h4>Month-end close with a supervisor</h4><p>A shared-services centre trialled a supervisor with three specialists: bank reconciliation, intercompany matching and accruals review. Each specialist has read-only access to its own systems and produces an exceptions list. The supervisor compiles the close checklist and flags blockers to the controller. No agent can post journals. Elapsed time for the first pass dropped because the specialists run in parallel; the controller still signs every entry.</p></div>
+<div class="case"><span class="case-tag">Case · Supply chain</span><h4>Supplier selection by debate</h4><p>A manufacturer's category team uses a debate setup for single-source decisions above a set value. One agent argues for the incumbent, one for the challenger, both working from the same tender pack; a judge agent summarises the strongest points on each side for the sourcing committee. The committee reported that the format surfaced risks (single-plant dependence, payment-term creep) that a single summary had glossed over. The judge never picks the winner; the committee does.</p></div>
+<div class="case"><span class="case-tag">Case · Customer service</span><h4>Handoffs that respect the customer</h4><p>A broadband provider's chat assistant hands customers between sales, billing and technical agents. Early versions passed the full transcript at every handoff, which was slow and occasionally exposed payment details to the technical agent. The redesign passes a structured case summary plus only the fields each agent needs, caps handoffs at three per chat, and offers a human after the second.</p></div>
+</section>
+
+<section id="m08-pitfalls">
+<h2>Pitfalls</h2>
+<ul class="checklist">
+<li><b>Multi-agent because it demos well.</b> A crew of agents chatting looks impressive in a meeting. Ask for the single-agent baseline and the cost per run before approving.</li>
+<li><b>Overlapping roles.</b> Two agents both "analyse", producing two answers. Give each role one owned artefact.</li>
+<li><b>No turn limits.</b> Agents politely bounce work between them until the budget runs out. Cap turns per agent, per handoff and per run.</li>
+<li><b>Uncertainty lost in transit.</b> "Unconfirmed" in the researcher's notes becomes a confident number in the memo. Make confidence and sources required fields in every handoff.</li>
+<li><b>Same model everywhere.</b> Reviewers built on the same model as the makers share their blind spots. Mix models for high-stakes checks.</li>
+<li><b>Permissions sprawl.</b> Every agent gets every tool "for flexibility". Give tools to the one role that needs them.</li>
+<li><b>No accountable human.</b> If the RACI has no human A, you do not have a process; you have a liability.</li>
+<li><b>Testing only the end result.</b> Evaluate each agent's artefact as well as the final output, so you can tell which step broke.</li>
+</ul>
+</section>
+
+<section id="m08-practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>One agent or three?</b><p>For each, decide single agent or multi-agent and justify in two lines: (a) answer employee questions on the leave policy; (b) produce a quarterly competitor review across 12 competitors; (c) handle a customer chat that may touch sales, billing and tech support; (d) approve discounts for the Deal Desk.</p><details><summary>Hint / model answer</summary><p>(a) Single agent with retrieval. (b) Multi-agent (orchestrator or parallel researchers): breadth problem, high value. (c) Multi-agent with handoffs, or one agent with routing; handoffs help if each department needs different tools and permissions. (d) Single agent with tools and human approval; depth problem, low tolerance for drift.</p></details></li>
+<li><b>Write the job descriptions</b><p>Design a three-agent crew for Meridian's annual customer review of Sahyadri Hospitals (account history, satisfaction signals, renewal proposal). Write role, goal, backstory, tools and expected output for each.</p><details><summary>Hint / model answer</summary><p>Account historian (tools: CRM, order history; output: dated timeline), Voice-of-customer analyst (tools: support tickets, survey results; output: themes with counts and quotes), Proposal writer (no tools; output: two-page renewal proposal citing both). Check that no two roles own the same artefact.</p></details></li>
+<li><b>Build the RACI</b><p>Extend the RACI table on this page with two new activities: "Check sources" and "Approve sharing with the board". Who is R and A for each?</p><details><summary>Hint / model answer</summary><p>Check sources: R could be a reviewer agent or the strategy manager, A is the strategy manager. Approve sharing: R and A are humans (strategy manager R, Head of Sales A). Agents can be R for doing work, never A.</p></details></li>
+<li><b>Price the crew</b><p>Run the CrewAI crew (or the no-code version) once, note the token usage, and estimate monthly cost if the strategy team runs it for 20 cities a quarter. Compare with the cost of a single analyst-day.</p><details><summary>Hint / model answer</summary><p>Use <code>result.token_usage</code> and your provider's current price list. Multiply per-run cost by runs per month, add a margin for retries. The point is the comparison: for a decision worth lakhs, the crew is cheap; for a high-volume FAQ it would not be.</p></details></li>
+<li><b>Switch the topology</b><p>Change the crew to <code>Process.hierarchical</code> with a <code>manager_llm</code>. Run both versions on the same inputs. What changed in cost, order of work and quality?</p><details><summary>Hint / model answer</summary><p>Expect higher token usage (the manager reads and delegates), less predictable ordering, and sometimes better coverage if the manager sends the researcher back for gaps. If quality did not clearly improve, keep the sequential version.</p></details></li>
+</ol>
+</section>
+
+<section id="m08-quiz">
+<h2>Quiz</h2>
+<div class="quiz">
+  <div class="q" data-answer="c">
+    <p class="q-text">Which is the strongest reason to split a job across multiple agents?</p>
+    <ol class="q-opts"><li data-k="a">It looks more advanced to stakeholders</li><li data-k="b">It always lowers cost</li><li data-k="c">Parts of the job need separate context, tools or permissions</li><li data-k="d">Single agents cannot call tools</li></ol>
+    <p class="q-why">Context overload, tool overload, separate permissions and parallel work are the honest reasons. Multi-agent systems usually cost more, not less.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">According to Anthropic's June 2025 write-up, roughly how many more tokens did multi-agent systems use than chat interactions?</p>
+    <ol class="q-opts"><li data-k="a">About 15 times</li><li data-k="b">About the same</li><li data-k="c">About half</li><li data-k="d">About 1,000 times</li></ol>
+    <p class="q-why">The write-up reported about 4 times for agents and about 15 times for multi-agent systems, compared with chat.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Three agents in a pipeline are each right 95% of the time and errors pass through unchecked. Roughly how often is the final output right?</p>
+    <ol class="q-opts"><li data-k="a">95%</li><li data-k="b">99%</li><li data-k="c">75%</li><li data-k="d">About 86%</li></ol>
+    <p class="q-why">0.95 × 0.95 × 0.95 ≈ 0.857. Errors compound across steps, which is why checks between steps matter.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">In a RACI for an agent team, who should be "Accountable"?</p>
+    <ol class="q-opts"><li data-k="a">The supervisor agent</li><li data-k="b">A named human</li><li data-k="c">Whichever agent produced the final output</li><li data-k="d">The framework vendor</li></ol>
+    <p class="q-why">Agents can do the work (Responsible) but cannot carry accountability. Without a human A, nobody stands behind the result.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">In the CrewAI code, what does <code>context=[research]</code> on the analysis task do?</p>
+    <ol class="q-opts"><li data-k="a">Gives the analyst web search</li><li data-k="b">Makes the analyst the manager</li><li data-k="c">Passes the research task's output to the analyst: the handoff</li><li data-k="d">Saves the output to a file</li></ol>
+    <p class="q-why"><code>context</code> lists the tasks whose outputs this task receives. Tools come from the agent's <code>tools</code>; files from <code>output_file</code>.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">A customer chat moves from sales to billing to tech support. Which topology fits most naturally?</p>
+    <ol class="q-opts"><li data-k="a">Debate</li><li data-k="b">Network with handoffs (with limits)</li><li data-k="c">Hierarchical with three layers</li><li data-k="d">A fixed sequential pipeline</li></ol>
+    <p class="q-why">The conversation's path is not known in advance, so agents need to hand off to whichever department is relevant, with caps on handoffs and a route to a human.</p>
+  </div>
+</div>
+</section>
+
+<section id="m08-learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="multi-agent"><div class="vid"><button class="vid-thumb" type="button" data-yt="sWH0T4Zez6I" aria-label="Play: Multi Agent Systems Explained: How AI Agents &amp; LLMs Work Together"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/sWH0T4Zez6I/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Multi Agent Systems Explained: How AI Agents &amp; LLMs Work Together</b><span class="ch">IBM Technology</span><span class="nt">What multi-agent systems are and how agents coordinate.</span><a href="https://www.youtube.com/watch?v=sWH0T4Zez6I" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="kYkZI3oj2W4" aria-label="Play: Multi AI Agent Systems: When One AI Brain Isn’t Enough"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/kYkZI3oj2W4/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Multi AI Agent Systems: When One AI Brain Isn’t Enough</b><span class="ch">IBM Technology</span><span class="nt">When splitting work across several agents pays off, and when it does not.</span><a href="https://www.youtube.com/watch?v=kYkZI3oj2W4" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="0Z0GUDakR_A" aria-label="Play: Intro to multi-agent systems with ADK"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/0Z0GUDakR_A/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Intro to multi-agent systems with ADK</b><span class="ch">Google Cloud Tech</span><span class="nt">Concrete orchestrator and sub-agent example using Google ADK.</span><a href="https://www.youtube.com/watch?v=0Z0GUDakR_A" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="d3WiKofD-34" aria-label="Play: Learn Multi AI Agent Systems with crewAI: Lesson 1"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/d3WiKofD-34/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Learn Multi AI Agent Systems with crewAI: Lesson 1</b><span class="ch">DeepLearningAI</span><span class="nt">Role-based agent teams, first lesson of the DeepLearning.AI crewAI course.</span><a href="https://www.youtube.com/watch?v=d3WiKofD-34" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div></div>
+<div class="res-list">
+  <a class="res" href="https://www.anthropic.com/engineering/multi-agent-research-system" target="_blank" rel="noopener"><span class="res-kind">Article</span><span class="res-title">How we built our multi-agent research system</span><span class="res-by">Anthropic, Jun 2025 · real costs, benefits and lessons from production</span></a>
+  <a class="res" href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Why Do Multi-Agent LLM Systems Fail?</span><span class="res-by">Cemri et al., 2025 · a taxonomy of failure modes</span></a>
+  <a class="res" href="https://arxiv.org/abs/2305.14325" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Improving Factuality and Reasoning through Multiagent Debate</span><span class="res-by">Du et al., 2023 · the debate topology</span></a>
+  <a class="res" href="https://docs.crewai.com/en/concepts/crews" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">CrewAI: Crews</span><span class="res-by">CrewAI · agents, tasks and sequential or hierarchical processes</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/agent-framework/workflows/orchestrations/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Agent Framework orchestrations</span><span class="res-by">Microsoft Learn · sequential, concurrent, handoff, group chat, Magentic</span></a>
+  <a class="res" href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Handoffs</span><span class="res-by">OpenAI Agents SDK · handoffs versus agents as tools</span></a>
+  <a class="res" href="https://adk.dev/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Agent Development Kit</span><span class="res-by">Google · sub-agents and workflow templates</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul>
+<li>Split work across agents only for separate context, tools, permissions or parallel work; otherwise one agent is better.</li>
+<li>Multi-agent can be markedly better on breadth problems, and is always more expensive. Price runs before scaling.</li>
+<li>Five topologies: supervisor, hierarchical, sequential pipeline, network/swarm and debate.</li>
+<li>Design agent teams like org charts: non-overlapping roles, one owned artefact each, and a human who is accountable.</li>
+<li>Handoffs leak quality; pass structured artefacts with sources and confidence, and define "done" for every task.</li>
+<li>Expect loops, blame diffusion, compounding errors and groupthink; counter them with turn limits, step checks and mixed models.</li>
+</ul></div>
+</section>
+
+<div class="endcap"><button class="donebtn" type="button">Mark this page complete</button><nav class="pager" aria-label="Previous and next"><a class="prev" href="../modules/m07-design-patterns.html"><small>Previous</small>M07 Agent design patterns</a><a class="next" href="../modules/m09-protocols-mcp-a2a.html"><small>Next</small>M09 Protocols: MCP and A2A</a></nav></div>
+      </main>
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+    <footer class="site-foot"><span>AI Agents for Management · an open course for business students and managers</span><span>Product names, features and prices change fast: check vendor docs before you rely on a detail. Last reviewed October 2026.</span></footer>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="../assets/app.js" defer></script>
+
+</body>
+</html>

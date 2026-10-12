@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Enterprise platforms · AI Agents for Management</title>
+<meta name="description" content="Compare the big vendor agent platforms (Salesforce, ServiceNow, SAP, AWS, Google, Microsoft, OpenAI) by the question that actually decides it, where your data already lives, and sketch the Meridian Deal Desk on Agentforce and on Bedrock AgentCore.">
+<meta property="og:title" content="Enterprise platforms · AI Agents for Management">
+<meta property="og:description" content="Compare the big vendor agent platforms (Salesforce, ServiceNow, SAP, AWS, Google, Microsoft, OpenAI) by the question that actually decides it, where your data already lives, and sketch the Meridian Deal Desk on Agentforce and on Bedrock AgentCore.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23151826'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6'%3E%3Ccircle cx='12' cy='6' r='2.2'/%3E%3Ccircle cx='6' cy='17' r='2.2'/%3E%3Ccircle cx='18' cy='17' r='2.2'/%3E%3Cpath d='M11 8 7 15M13 8l4 7M8.2 17h7.6'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('aiam.theme');if(t)document.documentElement.setAttribute('data-theme',JSON.parse(t));}catch(e){}</script>
+</head>
+<body data-root="../" data-page="x-enterprise" data-track="m01,m02,m03,m04,m05,m06,m07,m08,m09,m10,m11,m12,m13,x-nocode,x-copilot,x-workflow,x-enterprise,x-voice,x-computer,x-api,x-langgraph,x-crewai,x-maf,x-openai,x-claude,x-adk,x-llamaindex,x-mcp,chatbots,lab">
+<a class="skip-link" href="#content">Skip to content</a>
+<svg id="fx-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="fx-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fx-head" d="M0,0 L10,5 L0,10 z"/></marker></defs></svg>
+<div class="shell">
+  <aside class="rail" aria-label="Course contents">
+    <div class="rail-head">
+      <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M11 7.2 6.2 15.8M13 7.2l4.8 8.6M7.4 18h9.2"/></svg></span><span><span class="brand-name">AI Agents for Management</span><span class="brand-sub">Concept to corporate deployment</span></span></a>
+      <div class="rail-tools">
+        <button class="searchbtn" type="button" data-search-open><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg><span>Search</span><kbd>/</kbd></button>
+        <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+    </div>
+    <div class="rail-progress"><div class="rail-progress-top"><span>Pages completed</span><b id="pcount">0 / 30</b></div><div class="meter"><i id="pbar"></i></div></div>
+    <nav class="nav" aria-label="Course pages">
+<div class="nav-group"><p>Orientation</p>
+<a href="../index.html"><span class="num"></span><span>Start here</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../mindmap.html"><span class="num"></span><span>Concept map: ways to build agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../roadmap.html"><span class="num"></span><span>Learning roadmap</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 1 · Foundations</p>
+<a href="../modules/m01-what-is-an-agent.html" data-id="m01"><span class="num">01</span><span>M01 What an AI agent is</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m02-llms-for-managers.html" data-id="m02"><span class="num">02</span><span>M02 How LLMs work</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m03-instructions-and-prompts.html" data-id="m03"><span class="num">03</span><span>M03 Instructions and prompts</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m04-tools-and-function-calling.html" data-id="m04"><span class="num">04</span><span>M04 Tools and function calling</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 2 · Building</p>
+<a href="../modules/m05-knowledge-and-rag.html" data-id="m05"><span class="num">05</span><span>M05 Knowledge and RAG</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m06-memory-and-state.html" data-id="m06"><span class="num">06</span><span>M06 Memory and state</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m07-design-patterns.html" data-id="m07"><span class="num">07</span><span>M07 Agent design patterns</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m08-multi-agent-systems.html" data-id="m08"><span class="num">08</span><span>M08 Multi-agent systems</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m09-protocols-mcp-a2a.html" data-id="m09"><span class="num">09</span><span>M09 Protocols: MCP and A2A</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 3 · Corporate</p>
+<a href="../modules/m10-evaluation.html" data-id="m10"><span class="num">10</span><span>M10 Evaluation and testing</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m11-guardrails-and-responsible-ai.html" data-id="m11"><span class="num">11</span><span>M11 Guardrails and security</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m12-deployment-and-llmops.html" data-id="m12"><span class="num">12</span><span>M12 Deployment and LLMOps</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m13-business-case-and-governance.html" data-id="m13"><span class="num">13</span><span>M13 Business case and governance</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · No-code &amp; low-code</p>
+<a href="../methods/index.html"><span class="num"></span><span>Choose your method</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/no-code-assistants.html" data-id="x-nocode"><span class="num">A</span><span>No-code assistants</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/copilot-studio.html" data-id="x-copilot"><span class="num">B</span><span>Copilot Studio</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/workflow-automation.html" data-id="x-workflow"><span class="num">C</span><span>Workflow automation</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/enterprise-platforms.html" data-id="x-enterprise" aria-current="page"><span class="num">D</span><span>Enterprise platforms</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/voice-agents.html" data-id="x-voice"><span class="num">E</span><span>Voice agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/computer-use.html" data-id="x-computer"><span class="num">F</span><span>Computer use agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · Code</p>
+<a href="../methods/api-tool-use.html" data-id="x-api"><span class="num">G</span><span>Raw API tool use</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/langgraph.html" data-id="x-langgraph"><span class="num">H</span><span>LangChain + LangGraph</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/crewai.html" data-id="x-crewai"><span class="num">I</span><span>CrewAI</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/microsoft-agent-framework.html" data-id="x-maf"><span class="num">J</span><span>Microsoft Agent Framework</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/openai-agents-sdk.html" data-id="x-openai"><span class="num">K</span><span>OpenAI Agents SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/claude-agent-sdk.html" data-id="x-claude"><span class="num">L</span><span>Claude Agent SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/google-adk.html" data-id="x-adk"><span class="num">M</span><span>Google ADK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/llamaindex.html" data-id="x-llamaindex"><span class="num">N</span><span>LlamaIndex</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/mcp.html" data-id="x-mcp"><span class="num">O</span><span>Build an MCP server</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Practice</p>
+<a href="../chatbots.html" data-id="chatbots"><span class="num"></span><span>Chatbots + live bot</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../lab.html" data-id="lab"><span class="num"></span><span>Agent Lab</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../capstones.html"><span class="num"></span><span>Capstone projects</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Library</p>
+<a href="../media.html"><span class="num"></span><span>Videos &amp; infographics</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../glossary.html"><span class="num"></span><span>Glossary</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../resources.html"><span class="num"></span><span>Books, courses, papers</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="iconbtn" type="button" id="menu-btn" aria-label="Open contents"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+      <span class="brand-name">AI Agents for Management</span>
+      <button class="iconbtn" type="button" data-search-open aria-label="Search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></button>
+      <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+    </div>
+    <div class="page-wrap">
+      <main class="article" id="content">
+<header class="page-head"><p class="eyebrow">Method · Enterprise platforms</p><h1>Enterprise <em>agent</em> platforms</h1><p class="lede">Compare the big vendor agent platforms (Salesforce, ServiceNow, SAP, AWS, Google, Microsoft, OpenAI) by the question that actually decides it, where your data already lives, and sketch the Meridian Deal Desk on Agentforce and on Bedrock AgentCore.</p><div class="page-meta"><span>45 min read</span><span>Tracked in your progress</span></div></header>
+
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Intermediate to advanced; usually a platform team</dd></div><div><dt>Time to first agent</dt><dd>A day in a sandbox; weeks to production</dd></div><div><dt>Typical cost</dt><dd>Enterprise contracts, often with consumption-based agent pricing</dd></div><div><dt>Best for</dt><dd>Agents that act on a system of record you already run on that vendor</dd></div><div><dt>Runs where</dt><dd>Vendor SaaS, or your own cloud account (AWS, Google Cloud, Azure)</dd></div><div><dt>Lock-in risk</dt><dd>High, by design</dd></div></dl>
+<p>Every large enterprise software vendor now sells an agent platform. They fall into two groups, and the difference matters more than any feature list.</p>
+<p><b>Application platforms</b> put agents inside the system where your business data and workflows already live: Salesforce (Agentforce) for customer data, ServiceNow for IT and employee workflows, SAP (Joule) for ERP. The agent inherits the platform's records, permissions and processes on day one.</p>
+<p><b>Cloud platforms</b> give you managed infrastructure to build and run your own agents: AWS (Bedrock Agents and Bedrock AgentCore), Google (Gemini Enterprise Agent Platform, formerly Vertex AI, plus the Gemini Enterprise app), Microsoft (Foundry Agent Service), and OpenAI's developer platform. You bring the data and the logic; they bring hosting, identity, memory, observability and security controls.</p>
+<h3>Where things stand (as of October 2026)</h3>
+<p>Names change fast here, so check the vendor's docs before quoting any of this in a proposal.</p>
+<ul>
+<li><b>Salesforce Agentforce</b>: agents built from topics, actions and instructions, run by the Atlas Reasoning Engine. A new Agentforce Builder (February 2026) adds <em>Agent Script</em>, mixing deterministic steps with LLM reasoning ("hybrid reasoning"). Grounding comes from Salesforce data and Data 360 (renamed from Data Cloud in October 2025); the Einstein Trust Layer wraps model calls.</li>
+<li><b>ServiceNow</b>: AI agents on the ServiceNow AI Platform. At Knowledge 2026 (May) it expanded <b>AI Control Tower</b> into a governance layer that can discover, observe and govern agents including other vendors', announced <b>Action Fabric</b> to expose ServiceNow workflows to any agent over MCP, and launched "AI specialists" under the Autonomous Workforce banner.</li>
+<li><b>SAP</b>: Joule, SAP's assistant, plus agents built in <b>Joule Studio</b>. At Sapphire in May 2026 SAP announced a managed Joule Studio, an AI Agent Hub for inventorying agents, LLMs and MCP servers, and a unique identity for each agent by default; a June 2026 announcement described Joule Studio 2.0 within a consolidated Business AI Platform.</li>
+<li><b>AWS</b>: Bedrock Agents (the original managed agent service) and <b>Bedrock AgentCore</b>, a set of services to run agents built with any framework: Runtime, Memory, Gateway (turns APIs and Lambda functions into MCP tools), Identity, Code Interpreter, Browser, Observability, Evaluations, Policy, Registry and a managed Harness, among others.</li>
+<li><b>Google</b>: the <b>Gemini Enterprise Agent Platform</b>, announced April 2026 as the successor to Vertex AI, with Agent Studio, the open-source Agent Development Kit (ADK), a managed runtime, Model Garden, evaluation tools, agent identity and a registry. Employees reach agents through the <b>Gemini Enterprise</b> app, which absorbed Agentspace. Older material calls the build pieces Vertex AI Agent Builder and Agent Engine.</li>
+<li><b>Microsoft</b>: <b>Foundry Agent Service</b> (in Microsoft Foundry, formerly Azure AI Foundry) offers prompt agents, workflow agents and hosted code agents, each with an Entra identity, and publishes to Microsoft 365 Copilot and Teams. For low-code, see <a href="../methods/copilot-studio.html">Copilot Studio</a>.</li>
+<li><b>OpenAI</b>: AgentKit launched in October 2025 (Agent Builder, ChatKit, Connector Registry, Evals). In June 2026 OpenAI said Agent Builder and Evals will no longer be available on its platform from 30 November 2026, pointing developers to the <a href="../methods/openai-agents-sdk.html">Agents SDK</a> and business users to workspace agents in ChatGPT.</li>
+</ul>
+<div class="callout mgr"><b>Manager's lens</b><p>Don't start with "which platform has the best agents?" Start with "where does the data this agent needs already live, and who already governs it?" An agent's value comes from what it can read and change. A beautiful agent that can't see your customer records is a demo. A plain one sitting on top of them is a product.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Pick an application platform when the agent's job happens inside that application. A service agent answering case questions belongs in the CRM that holds the cases. An IT agent resetting access belongs in the ITSM tool that owns the workflow. You get permissions, audit and process integration for free, and your existing admin team can run it.</p>
+<p>Pick a cloud platform when the agent spans several systems, when you have engineers, or when you want framework freedom: build with LangGraph, CrewAI, ADK or the Agents SDK and run it on managed infrastructure with enterprise identity and monitoring.</p>
+<p>Don't pick either because a vendor's keynote impressed the CEO. Price is usually consumption-based and hard to predict, and every one of these platforms raises switching costs on purpose. Pilot the specific use case on your own data first, with an exit plan written down.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>Agents act on real records with the platform's permission model.</li><li>Security, audit and compliance controls built in and already reviewed by your IT team.</li><li>Vendor support, SLAs and roadmaps that procurement understands.</li><li>Cloud platforms take on the hard infrastructure: scaling, memory, identity, tracing.</li><li>Growing support for MCP and A2A makes cross-vendor agents more realistic.</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Deep lock-in: agent definitions rarely move between vendors.</li><li>Consumption pricing is difficult to forecast before real usage.</li><li>Product names and features change several times a year.</li><li>Application platforms are weak at data outside their walls without integration work.</li><li>Every vendor wants to be <em>the</em> agent control plane; you will likely end up with several.</li></ul></div></div>
+<h3>How a manager chooses</h3>
+<div class="table-wrap"><table><thead><tr><th>Platform</th><th>Choose it when your data lives in</th><th>Build experience</th><th>Grounding and governance</th></tr></thead><tbody>
+<tr><td>Salesforce Agentforce</td><td>Salesforce CRM (accounts, opportunities, cases)</td><td>Agentforce Builder: topics, actions (Flow, Apex, prompts), Agent Script</td><td>CRM data and Data 360; Einstein Trust Layer</td></tr>
+<tr><td>ServiceNow AI agents</td><td>ServiceNow ITSM, HR service, customer service workflows</td><td>Low-code agent building on the ServiceNow AI Platform</td><td>Platform records and workflows; AI Control Tower</td></tr>
+<tr><td>SAP Joule and Joule Studio</td><td>SAP S/4HANA, SuccessFactors, Ariba</td><td>Joule Studio, no-code and pro-code</td><td>SAP business data; AI Agent Hub; per-agent identity</td></tr>
+<tr><td>AWS Bedrock AgentCore</td><td>AWS (databases, Lambda, S3) or many systems</td><td>Any framework in code; CLI deploy</td><td>Gateway, Identity, Policy, Observability</td></tr>
+<tr><td>Google Gemini Enterprise Agent Platform</td><td>Google Cloud, BigQuery, Google Workspace</td><td>Agent Studio (visual) and ADK (code)</td><td>Agent identity, registry, gateway; delivered via Gemini Enterprise app</td></tr>
+<tr><td>Microsoft Foundry Agent Service</td><td>Azure and Microsoft 365</td><td>Prompt agents, workflow agents, hosted code agents</td><td>Entra identity per agent; publish to M365 Copilot and Teams</td></tr>
+<tr><td>OpenAI platform</td><td>Anywhere, via your own code</td><td>Agents SDK in code (Agent Builder retiring 30 Nov 2026)</td><td>You build most governance yourself</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>Strip away the branding and every enterprise platform has the same five layers. Knowing them helps you read any vendor's architecture slide in thirty seconds.</p>
+<figure class="fig" data-dl="enterprise-platforms-figure-1">
+<svg viewBox="0 0 720 380" role="img" aria-label="Five layers of an enterprise agent platform: channels, agent definition and reasoning, tools and actions, data and grounding, and a governance layer spanning all">
+  <rect class="fx-box" x="12" y="16" width="560" height="52" rx="6"/>
+  <text class="fx-tb" x="292" y="39" text-anchor="middle">Channels</text>
+  <text class="fx-ts" x="292" y="57" text-anchor="middle">CRM console · Slack/Teams · portal · phone · other agents (A2A)</text>
+  <rect class="fx-box fx-hi" x="12" y="86" width="560" height="62" rx="6"/>
+  <text class="fx-tb" x="292" y="110" text-anchor="middle">Agent definition and reasoning</text>
+  <text class="fx-ts" x="292" y="130" text-anchor="middle">instructions · topics or skills · planner (e.g. Atlas) · memory</text>
+  <rect class="fx-box k3" x="12" y="166" width="560" height="62" rx="6"/>
+  <text class="fx-tb" x="292" y="190" text-anchor="middle">Tools and actions</text>
+  <text class="fx-ts" x="292" y="210" text-anchor="middle">flows · APIs · Lambda · MCP servers · approvals</text>
+  <rect class="fx-box k4" x="12" y="246" width="560" height="62" rx="6"/>
+  <text class="fx-tb" x="292" y="270" text-anchor="middle">Data and grounding</text>
+  <text class="fx-ts" x="292" y="290" text-anchor="middle">system of record · unified customer data · documents</text>
+  <rect class="fx-box k6" x="592" y="16" width="116" height="292" rx="6"/>
+  <text class="fx-tb" x="650" y="130" text-anchor="middle">Trust and</text>
+  <text class="fx-tb" x="650" y="150" text-anchor="middle">governance</text>
+  <text class="fx-ts" x="650" y="180" text-anchor="middle">identity</text>
+  <text class="fx-ts" x="650" y="198" text-anchor="middle">policy</text>
+  <text class="fx-ts" x="650" y="216" text-anchor="middle">audit</text>
+  <text class="fx-ts" x="650" y="234" text-anchor="middle">cost</text>
+  <path class="fx-ar" d="M292 68 L292 84"/>
+  <path class="fx-ar" d="M292 148 L292 164"/>
+  <path class="fx-ar" d="M292 228 L292 244"/>
+  <text class="fx-ts" x="360" y="340" text-anchor="middle">Application platforms own the data layer; cloud platforms own the governance column.</text>
+</svg>
+<figcaption>Read any vendor diagram against these five layers. The questions to ask: which layers do they own, which do I build, and where does the governance column actually enforce anything?</figcaption>
+</figure>
+<p>The reasoning layer is where vendors differ most in vocabulary. Salesforce speaks of topics (a job the agent can do, with a description used for classification, a scope and instructions) and actions (Flows, Apex, prompt templates). Copilot Studio speaks of topics and tools; AWS of tools behind a gateway. Same idea: the planner reads descriptions and picks.</p>
+<p>The governance column is where they differ most in substance. Some enforce policy <em>outside</em> the model, which is the strong version: AgentCore Policy, for instance, intercepts tool calls through the Gateway and checks them against rules before they run. Others mostly rely on instructions and filters on the model's input and output. Ask which one you are buying.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk agent</h2>
+<p>Two sketches: one on an application platform (Agentforce), one on a cloud platform (Bedrock AgentCore). Both implement the same Meridian policy and the same tool names used across this site.</p>
+<div class="tabs">
+<div class="tab" data-label="Agentforce">
+<p>Assume Meridian runs Salesforce Sales Cloud. Accounts carry three custom fields: <code>Tier__c</code>, <code>Late_Payments_FY__c</code> and <code>Gross_Margin_Pct__c</code>, synced from the ERP. The discount policy is a knowledge article.</p>
+<ol class="steps">
+<li><b>Model the data first</b><p>Make sure the five Meridian accounts have tier, late payments and margin populated. If late payments live in the ERP, bring them in through your integration or Data 360. Grounding is only as good as these fields.</p></li>
+<li><b>Create the agent in Agentforce Builder</b><p>In Agentforce Studio, create an employee-facing agent, "Meridian Deal Desk". Write the role and the hard rule: never confirm an out-of-policy discount; always escalate.</p></li>
+<li><b>Add a topic: Discount requests</b><p>Classification description: "Salesperson asks whether a customer can have a discount on an order." Scope: discount checks and approval requests only. Instructions: the policy rules in order (late-payment cap first, then tier cap, then the 12% margin floor).</p></li>
+<li><b>Add three actions</b><p><b>get_customer</b>: a Flow that finds the Account by name and returns the three fields. <b>evaluate_discount</b>: an invocable Apex method or Flow with formulas that returns cap, margin after and APPROVE or ESCALATE; this is deterministic, so put it in Agent Script or code, not in the LLM's hands. <b>request_approval</b>: a Flow that creates a discount request record and submits it to a Salesforce approval process routed to the Sales Manager, or the Regional Head above 15%.</p></li>
+<li><b>Test in preview and the testing tools</b><p>Agent previews use mock data so the live org isn't touched. Run Sahyadri 10%, Bluewave 6% and Kite 5%, and check the reasoning summary shows the right actions in the right order.</p></li>
+<li><b>Deploy to the Salesforce console and Slack</b><p>Salespeople use it from the opportunity page or Slack. Approvals appear in the normal Salesforce approval queue.</p></li>
+</ol>
+<div class="table-wrap"><table><thead><tr><th>Deal Desk concept</th><th>Agentforce element</th></tr></thead><tbody>
+<tr><td>Agent role and hard rules</td><td>Agent instructions</td></tr>
+<tr><td>"Handle discount requests"</td><td>Topic with classification description and scope</td></tr>
+<tr><td>get_customer, evaluate_discount, request_approval</td><td>Actions (Flow, Apex)</td></tr>
+<tr><td>Fixed order of checks</td><td>Agent Script deterministic steps ("hybrid reasoning")</td></tr>
+<tr><td>Customer facts and payment history</td><td>CRM records, Data 360 grounding</td></tr>
+<tr><td>Masking, retention, audit of LLM calls</td><td>Einstein Trust Layer</td></tr>
+<tr><td>Human approval</td><td>Salesforce approval process</td></tr>
+</tbody></table></div>
+</div>
+<div class="tab" data-label="Bedrock AgentCore">
+<p>Assume Meridian's customer data is in an AWS database and engineers prefer Python. AgentCore runs the agent; we write the agent with Strands Agents (AWS's open-source framework), though LangGraph, CrewAI or ADK would also work.</p>
+<ol class="steps">
+<li><b>Scaffold the project</b><p>Install the AgentCore CLI and create a Strands project with Bedrock as the model provider.</p>
+<pre class="code"><code class="language-bash">npm install -g @aws/agentcore
+agentcore create --project-name MeridianDealDesk --name DealDesk \
+  --language Python --framework Strands --model-provider Bedrock \
+  --memory none --build CodeZip
+cd MeridianDealDesk
+agentcore dev        # run locally and chat with it</code></pre>
+<p>What this does: installs the CLI, generates a project with an agent entry file, and starts a local test server. These commands follow AWS's 2026 getting-started guide; check it for the current flags.</p></li>
+<li><b>Write the tools and agent</b><p>In the generated agent file, define the tools and the agent:</p>
+<pre class="code"><code class="language-python">from strands import Agent, tool
+
+# Demo data. In production get_customer queries your database via a Gateway tool.
+CUSTOMERS = {
+    "sahyadri hospitals": {"id": "C-101", "tier": "Gold", "late": 0, "margin": 22},
+    "bluewave logistics": {"id": "C-102", "tier": "Silver", "late": 2, "margin": 18},
+    "orchid schools trust": {"id": "C-103", "tier": "Gold", "late": 0, "margin": 25},
+    "kite fintech": {"id": "C-104", "tier": "Bronze", "late": 0, "margin": 16},
+    "trident engineering": {"id": "C-105", "tier": "Silver", "late": 1, "margin": 20},
+}
+
+@tool
+def find_customer(name: str) -&gt; dict:
+    """Look up a Meridian customer by name. Returns id, tier, late payments, margin %."""
+    return CUSTOMERS.get(name.strip().lower(), {"error": "customer not found"})
+
+@tool
+def margin_after_discount(current_margin_pct: float, discount_pct: float) -&gt; float:
+    """Gross margin % after a discount (simplified: current minus discount)."""
+    return current_margin_pct - discount_pct
+
+@tool
+def request_approval(customer_id: str, discount_pct: float, approver: str, reason: str) -&gt; str:
+    """File a discount approval request. Use only when a request is outside policy."""
+    # Production: call the approvals service; a human decides.
+    return f"Approval request filed for {customer_id} at {discount_pct}% with {approver}."
+
+SYSTEM = (
+    "You are the Meridian Deal Desk agent. Cap is 3% if late payments &gt;= 2, "
+    "else Bronze 5%, Silver 8%, Gold 12%. Margin after discount must be &gt;= 12%. "
+    "Approve only within both rules; otherwise call request_approval "
+    "(Regional Head above 15%, else Sales Manager). Never promise unapproved discounts."
+)
+
+agent = Agent(system_prompt=SYSTEM,
+              tools=[find_customer, margin_after_discount, request_approval])</code></pre>
+<p>What this does, line by line: <code>@tool</code> turns each Python function into a tool the model can call, using the function's name, type hints and docstring as its description. <code>CUSTOMERS</code> is demo data standing in for the real database. <code>find_customer</code> returns the row or a clear "not found". <code>margin_after_discount</code> does the subtraction exactly. <code>request_approval</code> is a stub; in production it calls a real approvals service. The system prompt carries the policy, and the last line creates an agent that can use all three tools.</p></li>
+<li><b>Move tools behind Gateway</b><p>For production, expose <code>find_customer</code> and <code>request_approval</code> as Lambda functions or APIs registered in AgentCore Gateway, which presents them to the agent as MCP tools. Now the same tools can serve other agents and frameworks too.</p></li>
+<li><b>Add Policy and Identity</b><p>Use AgentCore Policy to enforce rules on tool calls outside the model, for example that <code>request_approval</code> may only name "Sales Manager" or "Regional Head", and that no tool can write a discount record directly. Use AgentCore Identity with your identity provider (Entra ID, Okta and others) so the agent acts for an authenticated salesperson.</p></li>
+<li><b>Deploy and observe</b><p>Run <code>agentcore deploy</code>, then <code>agentcore invoke --prompt "Bluewave Logistics wants 6% off"</code>. Traces flow to AgentCore Observability (OpenTelemetry-compatible), and Evaluations can score runs against your test set.</p></li>
+</ol>
+</div>
+</div>
+<p>Either way, a good run looks the same from the salesperson's side:</p>
+<div class="trace">
+  <div class="t-user">Orchid Schools Trust wants 13% for the annual stationery contract.</div>
+  <div class="t-act">find_customer(name="Orchid Schools Trust")</div>
+  <div class="t-obs">{"id":"C-103","tier":"Gold","late":0,"margin":25}</div>
+  <div class="t-think">Gold cap is 12%, so 13% is above the cap even though margin after (25 − 13 = 12%) meets the floor. Not above 15%, so Sales Manager.</div>
+  <div class="t-act">margin_after_discount(current_margin_pct=25, discount_pct=13)</div>
+  <div class="t-obs">12</div>
+  <div class="t-act">request_approval(customer_id="C-103", discount_pct=13, approver="Sales Manager", reason="1 point above Gold cap of 12%; margin after 12% meets floor.")</div>
+  <div class="t-obs">Approval request filed for C-103 at 13% with Sales Manager.</div>
+  <div class="t-final">13% needs approval: it's 1 point over Orchid's Gold cap. Margin stays at the 12% floor. I've sent it to the Sales Manager. Meanwhile you can confirm 12% is available within policy.</div>
+</div>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<p>Enterprise platforms are sold on production readiness, so hold them to it. These are the questions to put to your vendor or platform team, in order.</p>
+<h3>Identity</h3>
+<p>Does the agent act as the signed-in user, as a service identity, or both? Each platform now gives agents their own identities (Entra identities in Foundry, per-agent identities in SAP and Google, AgentCore Identity on AWS). Insist that every action in the audit log shows both the agent and the human it acted for.</p>
+<h3>Data access and residency</h3>
+<p>Which records can the agent read, and does it respect the user's sharing rules? Where are prompts and outputs processed and stored, and is there an Indian region option where you need one? What do the model providers retain? Under the DPDP Act, customer contact data in prompts is personal data; under RBI and SEBI rules, regulated entities have further outsourcing and data localisation obligations to check with compliance.</p>
+<h3>Cost control</h3>
+<p>Get the pricing unit in writing (per conversation, per action, per credit, per token) and run a two-week pilot that measures real consumption. Set budgets and alerts per agent. Watch for agents that loop: a planner that calls five tools per request costs five times what you modelled.</p>
+<h3>Monitoring and evaluation</h3>
+<p>You want traces of every run (which tools, what inputs, what outputs), a test set that runs before every change, and a dashboard a business owner reads. <a href="../modules/m10-evaluation.html">M10</a> and <a href="../modules/m12-deployment-and-llmops.html">M12</a> cover what good looks like.</p>
+<h3>Approvals and policy</h3>
+<p>Keep human approval in the platform's native approval mechanism, not in the chat. Where the platform supports policy enforcement outside the model, use it for your hard rules. Instructions are advice to the model; a policy engine is a lock.</p>
+<ul class="checklist"><li>Use case piloted on your own data with measured consumption</li><li>Agent identity and user identity both recorded in the audit log</li><li>Data residency, retention and model-provider terms reviewed by legal</li><li>Hard rules enforced outside the model where possible</li><li>Approvals through the native approval process</li><li>Test set and traces in place before go-live</li><li>Exit plan: where the business rules and data would go if you left</li></ul>
+<div class="callout warn"><b>Watch out</b><p>Several vendors now pitch themselves as the governance layer for <em>all</em> your agents, including other vendors' (ServiceNow's AI Control Tower and SAP's AI Agent Hub both lean this way). That may suit you. But decide on one inventory of agents for the company, or in two years nobody will know how many agents you run or what they can touch. <a href="../modules/m13-business-case-and-governance.html">M13</a> covers agent governance.</p></div>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales (CRM platform)</td><td>Deal Desk and quote review</td><td>Checks discounts against account data and policy; files approvals</td><td>Approval process owner signs off out-of-policy deals</td></tr>
+<tr><td>Customer service (CRM)</td><td>Case resolution agent</td><td>Answers order and warranty questions from case and order records</td><td>Escalation to a service rep for refunds and complaints</td></tr>
+<tr><td>IT (ITSM platform)</td><td>Service desk agent</td><td>Resolves password and access requests through existing catalogue workflows</td><td>Access to sensitive systems needs manager approval</td></tr>
+<tr><td>Finance (ERP)</td><td>Invoice exception handling</td><td>Explains three-way match failures and proposes a resolution</td><td>AP lead approves before posting</td></tr>
+<tr><td>HR (HCM platform)</td><td>Employee self-service</td><td>Answers leave balances and policy questions; starts HR transactions</td><td>HR approves changes to pay or status</td></tr>
+<tr><td>Supply chain (cloud platform)</td><td>Cross-system shortage agent</td><td>Combines ERP stock, supplier emails and logistics data to flag risks</td><td>Planner decides on expediting or substitution</td></tr>
+</tbody></table></div>
+<div class="case"><span class="case-tag">Case · Customer service</span><h4>A consumer durables company picks two platforms</h4><p>A typical outcome in a large Indian company: service agents built on the CRM platform, because cases, warranties and customer history already live there, and a cloud-platform agent for the supply chain team, because shortage analysis needs ERP, logistics and email data together. The CIO's real decision is not which vendor wins but how both agents are inventoried, monitored and costed in one place.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice and quiz</h2>
+<ol class="exercises">
+<li><b>Map your data</b><p>For your own organisation (or a company you know), list the five systems that hold the most important business data. For each, name the vendor's agent offering, if any. Which platform would you pilot first, and why?</p><details><summary>Hint / model answer</summary><p>Rank systems by how many agent use cases need their data. If most ideas need CRM data, the CRM vendor's agent platform is the natural pilot. If ideas cut across three or four systems, a cloud platform plus MCP connectors to each system is usually cleaner.</p></details></li>
+<li><b>Vendor questions</b><p>Write ten questions for a vendor demo of an agent platform. At least three must be about cost and three about governance.</p><details><summary>Hint / model answer</summary><p>Cost: pricing unit, how a looping agent is billed, budget caps and alerts. Governance: where policy is enforced (inside or outside the model), how agent identity appears in audit logs, how approvals work, data retention by model providers. Plus: how to export agent definitions, A2A/MCP support, Indian region availability, and what changed in the last two releases.</p></details></li>
+<li><b>Find the policy gap</b><p>In the AgentCore sketch, the policy rules live in the system prompt. Which rule would you move into AgentCore Policy, and which into code, and why?</p><details><summary>Hint / model answer</summary><p>Put "request_approval approver must be Sales Manager or Regional Head" and "no direct write of discounts" into Policy, because they constrain actions and must never be bypassed. Put the cap and margin calculation into a deterministic tool (an evaluate_discount function), because arithmetic should not depend on the model. The prompt keeps only the conversational guidance.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="b">
+    <p class="q-text">What is the best first question when choosing an enterprise agent platform?</p>
+    <ol class="q-opts"><li data-k="a">Which vendor has the largest model?</li><li data-k="b">Where does the data this agent needs already live, and who governs it?</li><li data-k="c">Which platform has the most prebuilt agents?</li><li data-k="d">Which vendor announced agents first?</li></ol>
+    <p class="q-why">Agents create value by acting on data and workflows. The platform that already holds and governs that data usually wins on cost, security and speed.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">In Agentforce, what does a topic's classification description do?</p>
+    <ol class="q-opts"><li data-k="a">Encrypts the conversation</li><li data-k="b">Lists the Apex classes the agent may call</li><li data-k="c">Sets the price per conversation</li><li data-k="d">Helps the reasoning engine decide which topic a request belongs to</li></ol>
+    <p class="q-why">Like tool descriptions elsewhere, the classification description is what the planner reads to route a request to the right topic.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">AgentCore Gateway's main job is to:</p>
+    <ol class="q-opts"><li data-k="a">Turn APIs and Lambda functions into MCP-compatible tools for agents</li><li data-k="b">Host the chat user interface</li><li data-k="c">Train custom models</li><li data-k="d">Store conversation memory</li></ol>
+    <p class="q-why">Gateway converts existing services into tools. Memory is a separate AgentCore service, and model training isn't part of AgentCore.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">Why is policy enforced outside the model stronger than a rule in the system prompt?</p>
+    <ol class="q-opts"><li data-k="a">It is cheaper</li><li data-k="b">The model reads it more carefully</li><li data-k="c">It blocks a disallowed tool call even if the model is confused or manipulated</li><li data-k="d">It makes the agent respond faster</li></ol>
+    <p class="q-why">A prompt is guidance the model can ignore under pressure or prompt injection. An external check intercepts the action itself.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">Which statement about OpenAI's AgentKit is accurate as of October 2026?</p>
+    <ol class="q-opts"><li data-k="a">Agent Builder is the recommended long-term no-code tool</li><li data-k="b">OpenAI has said Agent Builder will no longer be available on its platform from 30 November 2026</li><li data-k="c">AgentKit replaced the Agents SDK</li><li data-k="d">AgentKit only works inside Salesforce</li></ol>
+    <p class="q-why">OpenAI's June 2026 update announced the wind-down of Agent Builder and Evals, recommending the Agents SDK for code and workspace agents in ChatGPT for natural-language use.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="enterprise"><div class="vid"><button class="vid-thumb" type="button" data-yt="irdNqlytsLc" aria-label="Play: What Is Agentforce and How Businesses Use AI Agents | Dreamforce 2024"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/irdNqlytsLc/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>What Is Agentforce and How Businesses Use AI Agents | Dreamforce 2024</b><span class="ch">Salesforce</span><span class="nt">Salesforce Agentforce overview.</span><a href="https://www.youtube.com/watch?v=irdNqlytsLc" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="oDjESsByBmM" aria-label="Play: AWS re:Invent 2025 - Bridging from POC to production: An intro to Amazon Bedrock AgentCore (AIM2204)"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/oDjESsByBmM/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>AWS re:Invent 2025 - Bridging from POC to production: An intro to Amazon Bedrock AgentCore (AIM2204)</b><span class="ch">AWS Events</span><span class="nt">Amazon Bedrock AgentCore from AWS.</span><a href="https://www.youtube.com/watch?v=oDjESsByBmM" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="8rlNdKywldQ" aria-label="Play: Building AI agents on Google Cloud"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/8rlNdKywldQ/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Building AI agents on Google Cloud</b><span class="ch">Google Cloud Tech</span><span class="nt">Google Cloud&#x27;s agent stack: Vertex AI, ADK and Agent Engine.</span><a href="https://www.youtube.com/watch?v=8rlNdKywldQ" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="URJbG8HF5D0" aria-label="Play: Now Assist AI agents"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/URJbG8HF5D0/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Now Assist AI agents</b><span class="ch">ServiceNow Documentation</span><span class="nt">ServiceNow&#x27;s Now Assist AI agents for IT and service workflows.</span><a href="https://www.youtube.com/watch?v=URJbG8HF5D0" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="rF5cub9WSYo" aria-label="Play: How Salesforce Uses Agentforce for Service | Agentforce"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/rF5cub9WSYo/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>How Salesforce Uses Agentforce for Service | Agentforce</b><span class="ch">Salesforce Support</span><span class="nt">Case study: Salesforce running Agentforce on its own support.</span><a href="https://www.youtube.com/watch?v=rF5cub9WSYo" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div></div>
+<div class="res-list">
+  <a class="res" href="https://admin.salesforce.com/blog/2026/build-with-confidence-inside-the-new-agentforce-builder" target="_blank" rel="noopener"><span class="res-kind">Article</span><span class="res-title">Inside the new Agentforce Builder</span><span class="res-by">Salesforce Admins · Agent Script, hybrid reasoning, previews</span></a>
+  <a class="res" href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">What is Amazon Bedrock AgentCore?</span><span class="res-by">AWS · every AgentCore service in one page</span></a>
+  <a class="res" href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-toolkit.html" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Get started with the AgentCore CLI</span><span class="res-by">AWS · create, run locally, deploy, invoke</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Foundry Agent Service overview</span><span class="res-by">Microsoft Learn · agent types, tools, identity, publishing</span></a>
+  <a class="res" href="https://cloud.google.com/products/gemini-enterprise-agent-platform" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Gemini Enterprise Agent Platform</span><span class="res-by">Google Cloud · the successor to Vertex AI for building agents</span></a>
+  <a class="res" href="https://cloud.google.com/gemini-enterprise" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Gemini Enterprise</span><span class="res-by">Google Cloud · where employees use agents</span></a>
+  <a class="res" href="https://openai.com/index/introducing-agentkit/" target="_blank" rel="noopener"><span class="res-kind">Article</span><span class="res-title">Introducing AgentKit</span><span class="res-by">OpenAI · launch post with the 2026 status note</span></a>
+  <a class="res" href="https://www.servicenow.com/products/ai-control-tower.html" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">ServiceNow AI Control Tower</span><span class="res-by">ServiceNow · governance for AI agents</span></a>
+</div>
+<div class="cards"><a class="card" href="../methods/google-adk.html"><span class="card-kicker">Method · Code</span><b>Google ADK</b><span>The open-source kit behind Google's agent platform.</span></a><a class="card" href="../modules/m13-business-case-and-governance.html"><span class="card-kicker">Module 13</span><b>Business case and governance</b><span>How to decide, fund and govern platform choices.</span></a></div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>Application platforms (Salesforce, ServiceNow, SAP) put agents on your system of record; cloud platforms (AWS, Google, Microsoft, OpenAI) give you infrastructure to run your own.</li><li>Choose by where the data lives and who governs it, not by keynote demos.</li><li>Every platform has the same five layers; ask which ones the vendor really owns and where policy is enforced.</li><li>Names and products change several times a year: verify against current docs before you commit.</li></ul></div>
+</section>
+
+<div class="endcap"><button class="donebtn" type="button">Mark this page complete</button><nav class="pager" aria-label="Previous and next"><a class="prev" href="../methods/workflow-automation.html"><small>Previous</small>Workflow automation</a><a class="next" href="../methods/voice-agents.html"><small>Next</small>Voice agents</a></nav></div>
+      </main>
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+    <footer class="site-foot"><span>AI Agents for Management · an open course for business students and managers</span><span>Product names, features and prices change fast: check vendor docs before you rely on a detail. Last reviewed October 2026.</span></footer>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="../assets/app.js" defer></script>
+
+</body>
+</html>

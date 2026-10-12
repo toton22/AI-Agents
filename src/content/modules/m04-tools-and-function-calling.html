@@ -1,0 +1,507 @@
+<!--META {"title":"M04 Tools and function calling","h1":"Tools and <em>function calling</em>","eyebrow":"Module 04 · Level 1 · Foundations","lede":"After this page you will be able to explain how a model asks your systems to do things, design tools that are safe to hand to an agent, and run a working Deal Desk agent loop in Python or a no-code builder.","minutes":50} -->
+
+<section id="m04-idea">
+<h2>The big idea</h2>
+
+<p>A language model on its own can only write. It cannot look up a customer, check stock, raise a ticket or send an email. Every one of those needs something outside the model to actually do the work.</p>
+
+<p>That something is a <b>tool</b>. A tool is a function in your systems, such as "get this customer's record" or "create an approval request", that you describe to the model in a structured way. When the model decides it needs one, it does not run anything itself. It writes a small, structured request: "please call <code>find_customer</code> with name = Sahyadri Hospitals". Your code reads that request, runs the real function, and hands the result back.</p>
+
+<p>This mechanism is called <b>function calling</b> or <b>tool use</b>, and every major model vendor supports it as of 2026.</p>
+
+<p>The single most important idea on this page is in that last paragraph. <b>The model only asks. Your code decides whether to act.</b> That gap between request and action is where you put permissions, validation, logging and human approval. It is the control point that makes agents safe enough for business.</p>
+
+<p>Think of the model as a capable analyst who sits in a glass room without a computer. They can pass notes through a slot: "Please pull Kite Fintech's record." A clerk outside reads each note, checks it is allowed, does the lookup and passes back the result. The analyst never touches the systems. The clerk never makes the judgement. The tool layer is the clerk.</p>
+
+<div class="callout mgr"><b>Manager's lens</b><p>Tools are where an agent's risk lives. A model with only read tools can give bad advice. A model with write tools can give away discounts, email customers and change records. When you approve an agent, you are really approving its tool list and the permissions behind each tool. Ask to see that list before you look at the demo.</p></div>
+</section>
+
+<section id="m04-how">
+<h2>How it works</h2>
+
+<h3>The request and response cycle</h3>
+
+<figure class="fig">
+<svg viewBox="0 0 720 340" role="img" aria-label="The tool-calling cycle: user request goes to the model, the model emits a tool call as JSON, your code runs the function, the result goes back to the model, which answers or calls another tool">
+  <text class="fx-th" x="360" y="28" text-anchor="middle">One round of tool calling</text>
+  <rect class="fx-box k1" x="12" y="56" width="150" height="64" rx="6"/>
+  <text class="fx-tb" x="87" y="84" text-anchor="middle">1. User</text>
+  <text class="fx-ts" x="87" y="104" text-anchor="middle">"Kite wants 5%"</text>
+  <rect class="fx-box fx-hi" x="226" y="56" width="150" height="64" rx="6"/>
+  <text class="fx-tb" x="301" y="84" text-anchor="middle">2. Model</text>
+  <text class="fx-ts" x="301" y="104" text-anchor="middle">reads tools, decides</text>
+  <rect class="fx-box k4" x="440" y="56" width="268" height="64" rx="6"/>
+  <text class="fx-tb" x="574" y="84" text-anchor="middle">3. Tool call (JSON)</text>
+  <text class="fx-ts" x="574" y="104" text-anchor="middle">find_customer {"name": "Kite"}</text>
+  <rect class="fx-box k2" x="440" y="196" width="268" height="64" rx="6"/>
+  <text class="fx-tb" x="574" y="224" text-anchor="middle">4. Your code runs it</text>
+  <text class="fx-ts" x="574" y="244" text-anchor="middle">checks, permissions, CRM lookup</text>
+  <rect class="fx-box k3" x="226" y="196" width="150" height="64" rx="6"/>
+  <text class="fx-tb" x="301" y="224" text-anchor="middle">5. Result</text>
+  <text class="fx-ts" x="301" y="244" text-anchor="middle">back to the model</text>
+  <rect class="fx-box k6" x="12" y="196" width="150" height="64" rx="6"/>
+  <text class="fx-tb" x="87" y="224" text-anchor="middle">6. Answer</text>
+  <text class="fx-ts" x="87" y="244" text-anchor="middle">or another tool call</text>
+  <path class="fx-ar" d="M162 88 L226 88"/>
+  <path class="fx-ar" d="M376 88 L440 88"/>
+  <path class="fx-ar" d="M574 120 L574 196"/>
+  <path class="fx-ar" d="M440 228 L376 228"/>
+  <path class="fx-ar" d="M226 228 L162 228"/>
+  <path class="fx-ar fx-dash" d="M301 196 L301 120"/>
+  <text class="fx-ts" x="312" y="154">loop if more</text>
+  <text class="fx-ts" x="312" y="170">tools needed</text>
+  <path class="fx-ln fx-dash" d="M420 46 L420 290"/>
+  <text class="fx-ts" x="216" y="312" text-anchor="middle">Model side: decides, never executes</text>
+  <text class="fx-ts" x="574" y="312" text-anchor="middle">Your side: executes, enforces rules</text>
+</svg>
+<figcaption>The dashed line is the trust boundary. Everything right of it is ordinary software you control: that is where permissions, validation and approvals belong.</figcaption>
+</figure>
+
+<p>Step by step, in plain English:</p>
+
+<ol class="steps">
+<li><b>You send the request and the tool list</b><p>Along with the system prompt and the user's message, your code sends a list of tool definitions: name, description and the parameters each tool accepts.</p></li>
+<li><b>The model decides</b><p>It reads everything and either answers directly or decides it needs a tool. If it needs one, it stops and returns a tool-use block instead of a final answer. With the Anthropic API, the response's <code>stop_reason</code> is <code>"tool_use"</code>.</p></li>
+<li><b>The model writes a structured request</b><p>The tool-use block contains a unique ID, the tool name and the input arguments as JSON. It may call several tools in one turn.</p></li>
+<li><b>Your code runs the function</b><p>You look up the tool name, validate the arguments, check permissions, call the real system and capture the result or error.</p></li>
+<li><b>You send the result back</b><p>The result goes back as a tool-result block that quotes the original ID, so the model knows which request it answers.</p></li>
+<li><b>Repeat until done</b><p>The model reads the result and either calls another tool or writes the final answer. That repetition is the agent loop.</p></li>
+</ol>
+
+<p>Here is the Kite Fintech request with the raw exchanges visible. It is a good case because the customer is within its tier cap, so a careless agent would approve it.</p>
+
+<div class="trace">
+  <div class="t-user">Kite Fintech wants 5% on the next order. OK?</div>
+  <div class="t-think">I need Kite's record. I have a name, not an ID.</div>
+  <div class="t-act">{"type":"tool_use","id":"toolu_01","name":"find_customer","input":{"name":"Kite Fintech"}}</div>
+  <div class="t-obs">{"type":"tool_result","tool_use_id":"toolu_01","content":"{\"id\":\"C-104\",\"name\":\"Kite Fintech\",\"tier\":\"Bronze\",\"annual_revenue_lakh\":6,\"late_payments\":0,\"margin_pct\":16}"}</div>
+  <div class="t-act">{"type":"tool_use","id":"toolu_02","name":"get_discount_policy","input":{}}</div>
+  <div class="t-obs">"Max discount by tier: Bronze 5%, Silver 8%, Gold 12%. 2 or more late payments this FY: cap 3%. Margin after discount must stay at or above 12%. Above cap: Sales Manager. Above 15%: Regional Head."</div>
+  <div class="t-think">Bronze cap is 5%, so 5% is at the cap. No late payments. Now margin.</div>
+  <div class="t-act">{"type":"tool_use","id":"toolu_03","name":"margin_after_discount","input":{"current_margin_pct":16,"discount_pct":5}}</div>
+  <div class="t-obs">11.0</div>
+  <div class="t-think">11% is below the 12% floor. Rule 4 fails, so this needs the Sales Manager even though it is within the tier cap. This is a write action, so the approval gate will ask first.</div>
+  <div class="t-act">{"type":"tool_use","id":"toolu_04","name":"request_approval","input":{"customer_id":"C-104","discount_pct":5,"approver":"Sales Manager","reason":"Within Bronze cap of 5%, but margin after discount would be 11%, below the 12% floor."}}</div>
+  <div class="t-human">Salesperson confirms the approval request may be filed.</div>
+  <div class="t-obs">"Approval request APR-1001 created for Sales Manager. Status: pending."</div>
+  <div class="t-final">Can't approve 5% on our own. Kite is Bronze (cap 5%) with no late payments, but margin would drop from 16% to 11%, below our 12% floor. I've raised APR-1001 for the Sales Manager. If you need an answer today, 4% keeps margin at 12% and is within policy.</div>
+</div>
+
+<h3>Writing tool schemas</h3>
+
+<p>A tool definition has three parts. With Anthropic's API they are <code>name</code>, <code>description</code> and <code>input_schema</code>; OpenAI and Google use near-identical shapes with slightly different field names. The parameters are described in JSON Schema, the same standard used for structured outputs in <a href="{{root}}modules/m03-instructions-and-prompts.html">M03</a>.</p>
+
+<pre class="code"><code class="language-json">{
+  "name": "margin_after_discount",
+  "description": "Compute Meridian's gross margin after a discount, in percentage points: current margin minus discount. Use this for every margin check instead of doing the arithmetic yourself. Returns a single number, e.g. 12.0. Does not apply the 12% floor; you compare against the policy.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "current_margin_pct": {
+        "type": "number",
+        "description": "Customer's current gross margin in percent, from the customer record, e.g. 22"
+      },
+      "discount_pct": {
+        "type": "number",
+        "description": "Requested discount in percent, e.g. 10. Not a rupee amount."
+      }
+    },
+    "required": ["current_margin_pct", "discount_pct"]
+  }
+}</code></pre>
+
+<p><b>What this does.</b> The <code>name</code> is what the model writes when it wants the tool. The <code>description</code> is, frankly, the most important part: it is the only thing the model knows about the tool, so it says what the tool does, when to use it, what it returns and what it does not do. Each parameter has a type and its own description with an example. <code>required</code> lists the arguments the model must always supply.</p>
+
+<p>Anthropic's documentation calls detailed descriptions "by far the most important factor" in tool performance and suggests at least three or four sentences per tool. Write them the way you would brief a new colleague on an internal system.</p>
+
+<h3>Designing good tools</h3>
+
+<p>Tool design is product design for a very literal user. A few principles, drawn from vendor guidance and from what tends to go wrong:</p>
+
+<p><b>Few and clear.</b> Five well-described tools beat thirty overlapping ones. Every extra tool is something the model can pick by mistake, and every definition costs tokens on every call. Anthropic's engineering guidance on writing tools makes the same point: build a few well-scoped tools for high-impact work rather than wrapping every API endpoint you have.</p>
+
+<p><b>Shaped around the task, not your database.</b> <code>find_customer(name)</code> is better than <code>query_crm(sql)</code>. The first matches what the agent is trying to do and limits what it can touch. The second hands it the keys to the CRM.</p>
+
+<p><b>Return what the model needs, no more.</b> A customer record with six fields beats a dump of ninety columns. Smaller results are cheaper, faster and less confusing.</p>
+
+<p><b>Idempotent where possible.</b> An idempotent tool gives the same result if called twice. Lookups naturally are. Write tools usually are not: call <code>request_approval</code> twice and you get two tickets. Protect write tools with a check such as "if an open request already exists for this customer and discount, return its ID instead of creating a new one".</p>
+
+<p><b>Enforce rules inside the tool.</b> The tool is code, so it can refuse. If someone asks for 18% with the Sales Manager as approver, <code>request_approval</code> should reject it and say that discounts above 15% need the Regional Head. The model's good intentions are a bonus, not the control.</p>
+
+<p><b>Helpful errors.</b> "Error" teaches nothing. "No customer matches 'Kyte'. Did you mean Kite Fintech?" lets the agent recover on its own.</p>
+
+<h3>Read tools, write tools and permissions</h3>
+
+<figure class="fig">
+<svg viewBox="0 0 720 330" role="img" aria-label="A two by two grid classifying tools by read or write and by low or high business impact, with the controls each quadrant needs">
+  <text class="fx-th" x="380" y="28" text-anchor="middle">Classify every tool before you grant it</text>
+  <text class="fx-tb" x="250" y="58" text-anchor="middle">Read</text>
+  <text class="fx-tb" x="530" y="58" text-anchor="middle">Write</text>
+  <text class="fx-tb" x="56" y="130" text-anchor="middle">Low</text>
+  <text class="fx-tb" x="56" y="148" text-anchor="middle">impact</text>
+  <text class="fx-tb" x="56" y="250" text-anchor="middle">High</text>
+  <text class="fx-tb" x="56" y="268" text-anchor="middle">impact</text>
+  <rect class="fx-box k2" x="110" y="72" width="280" height="110" rx="6"/>
+  <text class="fx-tb" x="250" y="100" text-anchor="middle">get_discount_policy</text>
+  <text class="fx-ts" x="250" y="122" text-anchor="middle">margin_after_discount</text>
+  <text class="fx-ts" x="250" y="154" text-anchor="middle">Control: log it. Run freely.</text>
+  <rect class="fx-box k3" x="400" y="72" width="280" height="110" rx="6"/>
+  <text class="fx-tb" x="540" y="100" text-anchor="middle">request_approval</text>
+  <text class="fx-ts" x="540" y="122" text-anchor="middle">create internal draft or ticket</text>
+  <text class="fx-ts" x="540" y="154" text-anchor="middle">Control: validate, de-duplicate</text>
+  <rect class="fx-box k1" x="110" y="192" width="280" height="110" rx="6"/>
+  <text class="fx-tb" x="250" y="220" text-anchor="middle">get_customer, find_customer</text>
+  <text class="fx-ts" x="250" y="242" text-anchor="middle">financial and personal data</text>
+  <text class="fx-ts" x="250" y="274" text-anchor="middle">Control: scope to user's access</text>
+  <rect class="fx-box fx-hi" x="400" y="192" width="280" height="110" rx="6"/>
+  <text class="fx-tb" x="540" y="220" text-anchor="middle">send_email, update_price</text>
+  <text class="fx-ts" x="540" y="242" text-anchor="middle">external or irreversible</text>
+  <text class="fx-ts" x="540" y="274" text-anchor="middle">Control: human approval, every time</text>
+</svg>
+<figcaption>Customer lookups are "read" but still high impact, because they expose financial data. Sending anything outside the company sits in the bottom-right box and should always wait for a person.</figcaption>
+</figure>
+
+<p>Two permission ideas matter most. First, <b>least privilege</b>: each tool gets the narrowest access that does the job. The Deal Desk's lookup tool reads six fields of the customer table; it has no access to payroll, and no write access to anything.</p>
+
+<p>Second, <b>act as the user, not as a super-user</b>. If a salesperson in the West region cannot see North region accounts in the CRM, the agent working for that salesperson should not either. Pass the user's identity through to the tool and let your existing access rules apply.</p>
+
+<h3>The agent loop</h3>
+
+<figure class="fig">
+<svg viewBox="0 0 720 360" role="img" aria-label="Flowchart of the agent loop: call the model, check whether it requested a tool, run read tools directly, pass write tools through an approval gate, append results, and stop at the final answer or the step limit">
+  <text class="fx-th" x="360" y="28" text-anchor="middle">The agent loop, with an approval gate</text>
+  <rect class="fx-box k1" x="12" y="60" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="92" y="86" text-anchor="middle">Call the model</text>
+  <text class="fx-ts" x="92" y="104" text-anchor="middle">prompt, tools, history</text>
+  <rect class="fx-box fx-hi" x="230" y="60" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="310" y="86" text-anchor="middle">Tool requested?</text>
+  <text class="fx-ts" x="310" y="104" text-anchor="middle">stop_reason</text>
+  <rect class="fx-box k6" x="548" y="60" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="628" y="86" text-anchor="middle">Final answer</text>
+  <text class="fx-ts" x="628" y="104" text-anchor="middle">return to user</text>
+  <rect class="fx-box k4" x="230" y="170" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="310" y="196" text-anchor="middle">Write tool?</text>
+  <text class="fx-ts" x="310" y="214" text-anchor="middle">check the list</text>
+  <rect class="fx-box k5" x="460" y="170" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="540" y="196" text-anchor="middle">Approval gate</text>
+  <text class="fx-ts" x="540" y="214" text-anchor="middle">human says yes or no</text>
+  <rect class="fx-box k2" x="230" y="280" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="310" y="306" text-anchor="middle">Run tool</text>
+  <text class="fx-ts" x="310" y="324" text-anchor="middle">catch errors</text>
+  <rect class="fx-box k3" x="12" y="280" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="92" y="306" text-anchor="middle">Append result</text>
+  <text class="fx-ts" x="92" y="324" text-anchor="middle">step + 1, limit 8</text>
+  <path class="fx-ar" d="M172 88 L230 88"/>
+  <path class="fx-ar" d="M390 88 L548 88"/>
+  <text class="fx-ts" x="470" y="80" text-anchor="middle">no</text>
+  <path class="fx-ar" d="M310 116 L310 170"/>
+  <text class="fx-ts" x="320" y="148">yes</text>
+  <path class="fx-ar" d="M390 198 L460 198"/>
+  <text class="fx-ts" x="425" y="190" text-anchor="middle">yes</text>
+  <path class="fx-ar" d="M310 226 L310 280"/>
+  <text class="fx-ts" x="320" y="258">no</text>
+  <path class="fx-ar" d="M540 226 L540 308 L390 308"/>
+  <text class="fx-ts" x="548" y="270">approved</text>
+  <path class="fx-ar" d="M230 308 L172 308"/>
+  <path class="fx-ar" d="M92 280 L92 116"/>
+</svg>
+<figcaption>Only two things end the loop: a final answer or the step limit. The approval gate sits on the path to execution, so a write tool cannot run without a person's yes. A "no" is returned to the model as a result, and it explains what was blocked.</figcaption>
+</figure>
+</section>
+
+<section id="m04-build">
+<h2>Hands-on</h2>
+
+<p>Time to build the real thing: the Meridian Deal Desk agent with all five tools, an approval gate and a step limit. Pick your path.</p>
+
+<div class="tabs">
+<div class="tab" data-label="No-code (n8n / Zapier)">
+
+<p>This is the n8n version, since n8n's AI Agent node maps closely onto the concepts above. Menus change often, so treat this as a map and check <a href="{{root}}methods/workflow-automation.html">the workflow automation page</a> and n8n's docs for the current click path.</p>
+
+<ol class="steps">
+<li><b>Put the data somewhere a tool can read</b><p>Create a Google Sheet called "Meridian customers" with the five rows: id, name, tier, annual revenue, late payments, margin. In a second tab, paste the discount policy text.</p></li>
+<li><b>Add a chat trigger and an AI Agent node</b><p>Start a workflow with a Chat Trigger so you can test in n8n's chat panel. Add an AI Agent node, attach a chat model sub-node (Anthropic, OpenAI or another provider) with your API key stored as an n8n credential, and paste the M03 version 3 prompt into the agent's system message.</p></li>
+<li><b>Attach the read tools</b><p>Connect a Google Sheets tool configured to look up rows by name or ID. That covers find_customer and get_customer. Give it a clear description, just as you would in code: "Look up a Meridian customer by name or ID; returns tier, late payments and margin." Add a second Sheets tool reading the policy tab for get_discount_policy.</p></li>
+<li><b>Attach the calculation tool</b><p>Add a Code tool for margin_after_discount that returns current margin minus discount. Describe its two inputs precisely. n8n lets the model fill tool parameters for you; check that the parameter names and descriptions match what the prompt expects.</p></li>
+<li><b>Attach the write tool behind human review</b><p>For request_approval, use a Slack (or Microsoft Teams, or email) tool that posts the request to a #discount-approvals channel. Then add n8n's human review step to that tool, so the workflow pauses and shows a reviewer the tool name and the parameters the model chose. If the reviewer denies it, the action does not run and the agent is told it was rejected.</p></li>
+<li><b>Test the three cases</b><p>In the chat panel, try Sahyadri 10%, Bluewave 6% and Kite 5%. Open each execution log and check which tools were called and in what order. That log is your trace.</p></li>
+</ol>
+
+<p><b>In Zapier terms.</b> Zapier Agents expresses the same ideas with different words: you write the agent's instructions, and you give it actions, each connected to an app such as Google Sheets, Slack or your CRM. Those actions are its tools. The design rules do not change: few actions, clear descriptions, read before write, and a person in the path for anything that leaves the company. Check Zapier's current documentation for its approval options before you rely on them.</p>
+
+</div>
+<div class="tab" data-label="Python">
+
+<p>The whole agent is three short blocks: the tools (your business logic), the tool definitions (what the model sees), and the loop. Install and configure first.</p>
+
+<pre class="code"><code class="language-bash">pip install anthropic==1.13.0
+export ANTHROPIC_API_KEY="your-key-here"
+export MODEL="claude-sonnet-5-5"     # check the models page for current IDs
+# Save the M03 version 3 prompt as deal_desk_prompt_v3.txt, with its Output
+# section changed to: "Reply in plain text: decision, numbers used, next step."</code></pre>
+
+<h4>Block 1: the tools</h4>
+
+<pre class="code"><code class="language-python">import os, json, difflib, itertools
+import anthropic
+
+CUSTOMERS = {
+    "C-101": {"id": "C-101", "name": "Sahyadri Hospitals", "tier": "Gold", "annual_revenue_lakh": 48, "late_payments": 0, "margin_pct": 22},
+    "C-102": {"id": "C-102", "name": "Bluewave Logistics", "tier": "Silver", "annual_revenue_lakh": 19, "late_payments": 2, "margin_pct": 18},
+    "C-103": {"id": "C-103", "name": "Orchid Schools Trust", "tier": "Gold", "annual_revenue_lakh": 31, "late_payments": 0, "margin_pct": 25},
+    "C-104": {"id": "C-104", "name": "Kite Fintech", "tier": "Bronze", "annual_revenue_lakh": 6, "late_payments": 0, "margin_pct": 16},
+    "C-105": {"id": "C-105", "name": "Trident Engineering", "tier": "Silver", "annual_revenue_lakh": 22, "late_payments": 1, "margin_pct": 20},
+}
+POLICY = ("Max discount by tier: Bronze 5%, Silver 8%, Gold 12%. Customers with 2 or more late "
+          "payments this FY are capped at 3%. Margin after discount must stay at or above 12%. "
+          "Above the cap needs Sales Manager approval; above 15% needs Regional Head approval.")
+_ticket_numbers = itertools.count(1001)
+_open_requests = {}
+
+def get_customer(customer_id: str) -&gt; dict:
+    return CUSTOMERS.get(customer_id) or {"error": f"No customer with id {customer_id}. Try find_customer."}
+
+def find_customer(name: str) -&gt; dict:
+    by_name = {c["name"].lower(): c for c in CUSTOMERS.values()}
+    hits = [c for n, c in by_name.items() if name.lower() in n]
+    if not hits:
+        hits = [by_name[n] for n in difflib.get_close_matches(name.lower(), by_name, n=3, cutoff=0.6)]
+    if len(hits) == 1:
+        return hits[0]
+    if not hits:
+        return {"error": f"No customer matches '{name}'. Ask the salesperson for the exact name."}
+    return {"error": "Several customers match; ask which one.", "candidates": [c["name"] for c in hits]}
+
+def get_discount_policy() -&gt; str:
+    return POLICY
+
+def margin_after_discount(current_margin_pct: float, discount_pct: float) -&gt; float:
+    return round(float(current_margin_pct) - float(discount_pct), 2)
+
+def request_approval(customer_id: str, discount_pct: float, approver: str, reason: str) -&gt; str:
+    if customer_id not in CUSTOMERS:
+        return f"Error: unknown customer_id {customer_id}."
+    if discount_pct &gt; 15 and approver != "Regional Head":
+        return "Error: discounts above 15% must go to the Regional Head."
+    key = (customer_id, discount_pct, approver)
+    if key in _open_requests:                       # idempotent: no duplicate tickets
+        return f"Request {_open_requests[key]} already exists. Status: pending."
+    ticket = f"APR-{next(_ticket_numbers)}"
+    _open_requests[key] = ticket                    # in production: create a real ticket here
+    return f"Approval request {ticket} created for {approver}. Status: pending."</code></pre>
+
+<p><b>What this does.</b> <code>CUSTOMERS</code> and <code>POLICY</code> stand in for your CRM and policy store; in production these functions would call real systems. <code>find_customer</code> tries a simple "name contains" match, then a fuzzy match, and returns either one record, an error, or a list of candidates so the agent can ask which one. <code>margin_after_discount</code> does the arithmetic so the model never has to. <code>request_approval</code> is the write tool, and it enforces rules itself: it rejects unknown customers, refuses to send a request above 15% to anyone but the Regional Head, and returns the existing ticket rather than creating a duplicate.</p>
+
+<h4>Block 2: the tool definitions</h4>
+
+<pre class="code"><code class="language-python">def tool(name, description, properties=None, required=None):
+    return {"name": name, "description": description,
+            "input_schema": {"type": "object", "properties": properties or {}, "required": required or []}}
+
+TOOLS = [
+    tool("find_customer",
+         "Find a Meridian customer by name; partial or misspelt names are fine. Returns id, tier, "
+         "annual revenue, late payments this FY and current gross margin %. Use this when the "
+         "salesperson gives a name. If it returns candidates, ask the salesperson which one.",
+         {"name": {"type": "string", "description": "Customer name as written, e.g. 'Sahyadri'"}}, ["name"]),
+    tool("get_customer",
+         "Get one customer record by exact ID such as 'C-101'. Use only when you already know the ID.",
+         {"customer_id": {"type": "string", "description": "Customer ID, e.g. 'C-104'"}}, ["customer_id"]),
+    tool("get_discount_policy",
+         "Return Meridian's current discount policy. Call it before every decision; never rely on memory."),
+    tool("margin_after_discount",
+         "Compute gross margin after a discount in percentage points (current margin minus discount). "
+         "Use it for every margin check. Returns one number; compare it with the 12% floor yourself.",
+         {"current_margin_pct": {"type": "number", "description": "Current margin %, from the customer record"},
+          "discount_pct": {"type": "number", "description": "Requested discount %, not a rupee amount"}},
+         ["current_margin_pct", "discount_pct"]),
+    tool("request_approval",
+         "WRITE ACTION: create an approval request for a discount outside policy. Use only when the "
+         "discount is above the customer's cap or margin would fall below 12%. Approver is 'Sales Manager' "
+         "for up to 15%, 'Regional Head' above 15%. Never use it for discounts within policy.",
+         {"customer_id": {"type": "string"},
+          "discount_pct": {"type": "number"},
+          "approver": {"type": "string", "enum": ["Sales Manager", "Regional Head"]},
+          "reason": {"type": "string", "description": "One sentence with the numbers, e.g. cap and margin"}},
+         ["customer_id", "discount_pct", "approver", "reason"]),
+]</code></pre>
+
+<p><b>What this does.</b> The small <code>tool()</code> helper builds the three-part definition the API expects, so each tool takes a few lines instead of fifteen. Each description says what the tool does, when to use it and what it returns. The <code>enum</code> on <code>approver</code> means the model can only choose one of the two valid approvers. Note that <code>request_approval</code> announces itself as a write action in its description; that helps the model treat it with care, but the real control is in Block 3.</p>
+
+<h4>Block 3: the agent loop</h4>
+
+<pre class="code"><code class="language-python">MODEL = os.getenv("MODEL", "claude-sonnet-5-5")
+client = anthropic.Anthropic()
+SYSTEM = open("deal_desk_prompt_v3.txt", encoding="utf-8").read()
+FUNCTIONS = {"find_customer": find_customer, "get_customer": get_customer,
+             "get_discount_policy": get_discount_policy,
+             "margin_after_discount": margin_after_discount, "request_approval": request_approval}
+WRITE_TOOLS = {"request_approval"}
+MAX_STEPS = 8
+
+def run_tool(name: str, args: dict) -&gt; tuple[str, bool]:
+    """Run one tool. Returns (result_text, is_error)."""
+    if name in WRITE_TOOLS:
+        print(f"\n[approval gate] The agent wants to call {name} with {args}")
+        if input("Allow this action? (y/n) ").strip().lower() != "y":
+            return "The user declined this action. Do not retry it; explain what was blocked.", True
+    try:
+        return json.dumps(FUNCTIONS[name](**args)), False
+    except Exception as exc:
+        return f"Tool {name} failed: {exc}. Check the arguments and try again.", True
+
+def run_agent(request: str) -&gt; str:
+    messages = [{"role": "user", "content": request}]
+    for step in range(MAX_STEPS):
+        response = client.messages.create(model=MODEL, max_tokens=1500, system=SYSTEM,
+                                          tools=TOOLS, messages=messages)
+        messages.append({"role": "assistant", "content": response.content})
+        if response.stop_reason != "tool_use":
+            return "".join(block.text for block in response.content if block.type == "text")
+        results = []
+        for block in response.content:
+            if block.type == "tool_use":
+                print(f"  step {step + 1}: {block.name}({block.input})")
+                output, is_error = run_tool(block.name, block.input)
+                results.append({"type": "tool_result", "tool_use_id": block.id,
+                                "content": output, "is_error": is_error})
+        messages.append({"role": "user", "content": results})
+    return "Stopped at the step limit. Please pass this request to the Sales Manager."
+
+if __name__ == "__main__":
+    print(run_agent("Kite Fintech wants 5% on the next order. OK?"))</code></pre>
+
+<p><b>What this does, line by line.</b></p>
+<ul>
+<li>The first lines read the model ID and system prompt from outside the code and create the API client. <code>FUNCTIONS</code> maps each tool name the model might write to the real Python function. <code>WRITE_TOOLS</code> lists the tools that change something. <code>MAX_STEPS</code> caps the loop.</li>
+<li><code>run_tool</code> is the clerk outside the glass room. For a write tool it first prints what the agent wants to do and asks a person to confirm; a "no" goes back to the model as an error result, with an instruction not to retry. Otherwise it calls the function with the model's arguments, turns the result into text, and catches any failure so a bad call becomes a helpful error message instead of a crash.</li>
+<li><code>run_agent</code> is the loop. It sends the conversation, system prompt and tool list to the model and stores the model's reply in the history. If <code>stop_reason</code> is anything other than <code>"tool_use"</code>, the model has finished, so we return its text.</li>
+<li>Otherwise, for every tool-use block in the reply (there may be several), we run the tool and build a <code>tool_result</code> that quotes the block's <code>id</code>. All results go back together in one user message, and the loop goes round again.</li>
+<li>If eight rounds pass without a final answer, the agent stops and hands over to a person rather than spending more money.</li>
+</ul>
+
+<p>Run <code>python deal_desk_agent.py</code>. You should see the steps printed as the agent works, the approval gate asking you to confirm, and a final message close to the Kite trace above. Change the request to Sahyadri 10% and Bluewave 6% and compare. That is a working Level 4 agent in about 120 lines, and the loop itself is around 40 of them. The rest is business logic and tool descriptions, which is where your effort should go.</p>
+
+<div class="callout note"><b>Note</b><p>In the trace earlier, the salesperson confirms that the approval request may be filed, and the Sales Manager then makes the actual decision in the approval system. Those are two different human checkpoints. The gate in this code protects the action; the approval request routes the decision. For a low-risk internal action like filing a request, many teams later remove the first gate. For anything that reaches a customer, keep it.</p></div>
+
+</div>
+</div>
+</section>
+
+<section id="m04-business">
+<h2>In the business</h2>
+
+<p>Composite, anonymised examples of tool design choices in real functions.</p>
+
+<div class="case"><span class="case-tag">Case · Sales operations</span><h4>The CRM tool that could do everything</h4><p>A sales-ops team at a B2B software firm gave their agent one tool: a general CRM API wrapper that could read or update any object. In testing, the agent "helpfully" updated a deal stage while answering a question about it. They replaced the wrapper with four narrow tools (find account, get open deals, log a note, request a stage change), of which only the note tool writes directly. Stage changes now go to the account owner for a click to confirm.</p></div>
+
+<div class="case"><span class="case-tag">Case · Customer service</span><h4>Refunds behind a threshold</h4><p>An e-commerce service team let its agent issue refunds through a tool. The tool itself checks the amount: below a set rupee limit with a matching order, it processes; above it, it creates a supervisor task instead and tells the agent so. The prompt describes the threshold too, but the team knows the tool is what actually holds the line.</p></div>
+
+<div class="case"><span class="case-tag">Case · Supply chain</span><h4>Idempotency saves a duplicate order</h4><p>A distributor's reorder agent hit a timeout while creating a purchase order, retried, and created a second one. Nobody noticed until two trucks arrived. The fix was a request key on the create-PO tool: the same key twice returns the existing PO. It is a standard pattern in payments and ordering systems, and it belongs on every write tool an agent can retry.</p></div>
+
+<div class="case"><span class="case-tag">Case · HR</span><h4>Acting as the employee, not as HR admin</h4><p>An HR agent that answers "how much leave do I have?" was first built with an admin service account, so in principle it could read anyone's balance. Security review sent it back. The rebuilt tool passes the logged-in employee's identity to the HR system, which returns only that person's data. Same agent, same prompt; very different risk.</p></div>
+</section>
+
+<section id="m04-pitfalls">
+<h2>Pitfalls</h2>
+
+<p><b>Too many tools.</b> Teams expose every endpoint "in case it's useful". Selection accuracy drops, token costs rise, and the attack surface grows. Start with the five tools the job needs and add only when tests show a gap.</p>
+
+<p><b>Vague descriptions.</b> "Gets customer data" leaves the model guessing what comes back and when to call it. Most "the agent picked the wrong tool" problems are description problems.</p>
+
+<p><b>Trusting model arguments.</b> The model can pass a wrong customer ID, a discount as 0.1 instead of 10, or a rupee amount where a percentage was expected. Validate types, ranges and existence in the tool, and return a clear error.</p>
+
+<p><b>No step limit or timeout.</b> A tool that fails silently can send the agent round in circles, calling the model again and again. Always cap steps, put timeouts on tool calls, and alert on runs that hit the cap.</p>
+
+<p><b>Ignoring cost and latency.</b> Every round trip costs a model call plus the tool's own time. Tool definitions are sent as input tokens on every call, and Anthropic's pricing page notes that enabling tools also adds a few hundred tokens of system instructions behind the scenes.</p>
+
+<p>A five-step agent with slow tools can easily take 15 to 30 seconds. Keep tool results short, let the model call independent tools in the same turn where your vendor supports it, and use prompt caching for the stable prefix.</p>
+
+<p><b>Fuzzy matching gone wrong.</b> "Hospital" matches Sahyadri Hospitals today, because Meridian has only one hospital customer. The day it signs a second one, the same lookup quietly picks whichever comes first, unless the tool checks. The <code>find_customer</code> above returns a list of candidates whenever more than one customer matches; make sure your real tool does too, and that the prompt tells the agent to ask.</p>
+
+<p><b>Write tools without an audit trail.</b> If you cannot answer "which agent run created APR-1001, with what inputs, approved by whom?", you will struggle in your first audit. Log every tool call with its inputs, result, user identity and timestamp.</p>
+
+<ul class="checklist">
+<li>Every tool is classified read or write and low or high impact, with the matching control.</li>
+<li>Descriptions say what, when, what it returns and what it does not do.</li>
+<li>Tools validate inputs and enforce hard business rules themselves.</li>
+<li>Write tools are idempotent or de-duplicated, and external writes need human approval.</li>
+<li>Tools act with the user's permissions, not a super-user account.</li>
+<li>The loop has a step limit, tool timeouts and a full log of calls.</li>
+</ul>
+</section>
+
+<section id="m04-practice">
+<h2>Practice</h2>
+
+<ol class="exercises">
+<li><b>Write a tool description</b><p>Meridian wants a <code>get_order_history(customer_id, months)</code> tool so the agent can see recent order values. Write the description and the parameter descriptions.</p><details><summary>Hint / model answer</summary><p>Description: "Return a customer's orders for the last N months: order date, order value in rupees and product categories. Use when the salesperson mentions order size or volume, or when a discount request depends on order value. Read-only. Returns at most 24 months; does not include quotes or cancelled orders." Parameters: customer_id (string, "Customer ID such as C-101"), months (integer, "Number of months back, 1 to 24; default to 6 if unsure").</p></details></li>
+<li><b>Classify the tools</b><p>Put these into the read/write and low/high impact grid and name the control for each: get_stock_level, send_quote_to_customer, create_draft_invoice, get_employee_salary, update_customer_credit_limit.</p><details><summary>Hint / model answer</summary><p>get_stock_level: read, low; log it. send_quote_to_customer: write, high (external); human approval every time. create_draft_invoice: write, low (internal draft); validate and de-duplicate. get_employee_salary: read, high (personal data); restrict to the user's own access, probably not an agent tool at all. update_customer_credit_limit: write, high (financial exposure); approval by credit control plus limits enforced in the tool.</p></details></li>
+<li><b>Trace the Orchid case</b><p>Write the full tool-call trace for "Orchid Schools wants 14% for the new academic year".</p><details><summary>Hint / model answer</summary><p>find_customer("Orchid Schools") returns C-103, Gold, 0 late, margin 25. get_discount_policy(). 14% is above the Gold cap of 12% but not above 15%, so the Sales Manager approves. margin_after_discount(25, 14) returns 11, below the floor, which is a second reason. request_approval(customer_id="C-103", discount_pct=14, approver="Sales Manager", reason="14% exceeds Gold cap of 12%; margin after discount would be 11%, below the 12% floor."). Final answer explains both reasons and suggests 12% as the most that is within policy (margin 13%).</p></details></li>
+<li><b>Break the loop</b><p>What happens in the Python code if <code>find_customer</code> raises an exception because the CRM is down? Walk through it and suggest one improvement.</p><details><summary>Hint / model answer</summary><p>run_tool catches the exception and returns "Tool find_customer failed: ..." with is_error True. The model sees the error and will probably retry or tell the user it cannot reach the customer data. It might retry several times until MAX_STEPS. Improvement: return a specific message such as "CRM unavailable; do not retry; tell the salesperson to try again later", and add a timeout plus an alert when a tool fails repeatedly.</p></details></li>
+<li><b>Estimate the latency</b><p>Each model call takes about 2 seconds and each tool about 0.5 seconds. The Kite request needs four tool calls in four separate rounds, then a final answer. Roughly how long does the salesperson wait (ignore the human gate)? How could you cut it?</p><details><summary>Hint / model answer</summary><p>Five model calls × 2 s = 10 s, plus four tools × 0.5 s = 2 s, so about 12 seconds. To cut it: let the model request find_customer and get_discount_policy in the same turn (they are independent), put the policy in the cached system prompt so no tool call is needed, use a faster model for this simple task, and stream a "checking..." message so the wait feels shorter.</p></details></li>
+</ol>
+</section>
+
+<section id="m04-quiz">
+<h2>Quiz</h2>
+
+<div class="quiz">
+  <div class="q" data-answer="b">
+    <p class="q-text">When a model "calls a tool", what actually happens?</p>
+    <ol class="q-opts"><li data-k="a">The model connects to your database and runs the query</li><li data-k="b">The model returns a structured request; your code decides whether to run the function and sends back the result</li><li data-k="c">The vendor's servers run your Python function</li><li data-k="d">The model guesses the result without running anything</li></ol>
+    <p class="q-why">For tools you define, the model only emits a request with a name and arguments. Execution happens in your code, which is exactly why you can add permissions and approvals there.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Which part of a tool definition most affects whether the model uses the tool correctly?</p>
+    <ol class="q-opts"><li data-k="a">The tool's name length</li><li data-k="b">The order of the tools in the list</li><li data-k="c">Whether parameters are marked required</li><li data-k="d">The description: what it does, when to use it, what it returns</li></ol>
+    <p class="q-why">The description is all the model knows about the tool. Vendor documentation singles out detailed descriptions as the most important factor.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">Kite Fintech (Bronze, margin 16%, no late payments) asks for 5%. What should the agent do?</p>
+    <ol class="q-opts"><li data-k="a">Escalate to the Sales Manager, because margin would fall to 11%</li><li data-k="b">Approve, because 5% equals the Bronze cap</li><li data-k="c">Escalate to the Regional Head</li><li data-k="d">Refuse and end the conversation</li></ol>
+    <p class="q-why">The cap check passes, but the margin check fails: 16 minus 5 is 11, below the 12% floor. Margin failures go to the Sales Manager. Option (b) is the trap the Kite case is designed to catch.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">Why should request_approval check for an existing open request before creating a new one?</p>
+    <ol class="q-opts"><li data-k="a">To make the tool faster</li><li data-k="b">Because the API requires it</li><li data-k="c">So that retries do not create duplicate tickets, making the write tool idempotent</li><li data-k="d">To hide requests from managers</li></ol>
+    <p class="q-why">Agents and networks retry. Without de-duplication, each retry creates another ticket or order. Idempotency makes retries safe.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">An HR agent's leave tool runs under an HR admin account. What is the main risk, and the fix?</p>
+    <ol class="q-opts"><li data-k="a">It will be slow; use a faster model</li><li data-k="b">It could expose any employee's data; pass the user's identity so existing access rules apply</li><li data-k="c">It costs more tokens; shorten the description</li><li data-k="d">There is no risk, because the prompt says to protect privacy</li></ol>
+    <p class="q-why">Least privilege and acting as the user keep the agent inside the same access rules as the person it serves. A prompt instruction is not an access control.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">In the Python loop, what ends a run?</p>
+    <ol class="q-opts"><li data-k="a">The first tool call</li><li data-k="b">Any tool error</li><li data-k="c">A response whose stop_reason is not "tool_use", or reaching MAX_STEPS</li><li data-k="d">The approval gate saying yes</li></ol>
+    <p class="q-why">The loop keeps going while the model asks for tools. It stops on a final answer or at the step limit. Errors and approval decisions are returned to the model as results so it can respond to them.</p>
+  </div>
+</div>
+</section>
+
+<section id="m04-learn">
+<h2>Watch and read</h2>
+
+<div class="videos" data-topic="tool-calling"></div>
+
+<div class="res-list">
+  <a class="res" href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Tool use with Claude</span><span class="res-by">Anthropic · definitions, tool_use and tool_result blocks, errors and tool_choice</span></a>
+  <a class="res" href="https://www.anthropic.com/engineering/writing-tools-for-agents" target="_blank" rel="noopener"><span class="res-kind">Article</span><span class="res-title">Writing effective tools for agents, with agents</span><span class="res-by">Anthropic · practical principles for scoping, naming and describing tools</span></a>
+  <a class="res" href="https://platform.openai.com/docs/guides/function-calling" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Function calling</span><span class="res-by">OpenAI · the same idea in OpenAI's API, useful for comparison</span></a>
+  <a class="res" href="https://ai.google.dev/gemini-api/docs/function-calling" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Function calling with the Gemini API</span><span class="res-by">Google · Gemini's version of tool definitions and calls</span></a>
+  <a class="res" href="https://docs.n8n.io/advanced-ai/human-in-the-loop-tools" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Human-in-the-loop for AI tool calls</span><span class="res-by">n8n · how to put a reviewer in front of selected tools</span></a>
+  <a class="res" href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Toolformer: Language Models Can Teach Themselves to Use Tools</span><span class="res-by">Schick et al. · early research on models deciding when to call tools</span></a>
+</div>
+
+<p>Next steps: the <a href="{{root}}methods/api-tool-use.html">raw API method page</a> extends this loop toward production, and <a href="{{root}}modules/m09-protocols-mcp-a2a.html">M09</a> shows how MCP lets you publish these same tools once for any agent to use.</p>
+
+<div class="takeaways"><h3>Key takeaways</h3><ul>
+<li>The model only requests tool calls. Your code runs them, which makes the tool layer your main control point.</li>
+<li>A tool is a name, a detailed description and a JSON schema of parameters. The description matters most.</li>
+<li>Design few, task-shaped tools that return only what is needed, validate inputs and enforce hard rules themselves.</li>
+<li>Classify tools as read or write and by impact. Write tools need de-duplication; external or irreversible ones need human approval.</li>
+<li>The agent loop is short: call, check for tool use, run tools, return results, repeat, with a step limit and full logging.</li>
+</ul></div>
+</section>

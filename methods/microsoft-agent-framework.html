@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Microsoft Agent Framework · AI Agents for Management</title>
+<meta name="description" content="Build the Meridian Deal Desk with Microsoft Agent Framework, the open-source successor to AutoGen and Semantic Kernel: a single agent with an approval-gated tool, then a workflow where code makes the policy decision and a person approves exceptions, ready to move onto Microsoft Foundry.">
+<meta property="og:title" content="Microsoft Agent Framework · AI Agents for Management">
+<meta property="og:description" content="Build the Meridian Deal Desk with Microsoft Agent Framework, the open-source successor to AutoGen and Semantic Kernel: a single agent with an approval-gated tool, then a workflow where code makes the policy decision and a person approves exceptions, ready to move onto Microsoft Foundry.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23151826'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6'%3E%3Ccircle cx='12' cy='6' r='2.2'/%3E%3Ccircle cx='6' cy='17' r='2.2'/%3E%3Ccircle cx='18' cy='17' r='2.2'/%3E%3Cpath d='M11 8 7 15M13 8l4 7M8.2 17h7.6'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('aiam.theme');if(t)document.documentElement.setAttribute('data-theme',JSON.parse(t));}catch(e){}</script>
+</head>
+<body data-root="../" data-page="x-maf" data-track="m01,m02,m03,m04,m05,m06,m07,m08,m09,m10,m11,m12,m13,x-nocode,x-copilot,x-workflow,x-enterprise,x-voice,x-computer,x-api,x-langgraph,x-crewai,x-maf,x-openai,x-claude,x-adk,x-llamaindex,x-mcp,chatbots,lab">
+<a class="skip-link" href="#content">Skip to content</a>
+<svg id="fx-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="fx-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fx-head" d="M0,0 L10,5 L0,10 z"/></marker></defs></svg>
+<div class="shell">
+  <aside class="rail" aria-label="Course contents">
+    <div class="rail-head">
+      <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M11 7.2 6.2 15.8M13 7.2l4.8 8.6M7.4 18h9.2"/></svg></span><span><span class="brand-name">AI Agents for Management</span><span class="brand-sub">Concept to corporate deployment</span></span></a>
+      <div class="rail-tools">
+        <button class="searchbtn" type="button" data-search-open><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg><span>Search</span><kbd>/</kbd></button>
+        <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+    </div>
+    <div class="rail-progress"><div class="rail-progress-top"><span>Pages completed</span><b id="pcount">0 / 30</b></div><div class="meter"><i id="pbar"></i></div></div>
+    <nav class="nav" aria-label="Course pages">
+<div class="nav-group"><p>Orientation</p>
+<a href="../index.html"><span class="num"></span><span>Start here</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../mindmap.html"><span class="num"></span><span>Concept map: ways to build agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../roadmap.html"><span class="num"></span><span>Learning roadmap</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 1 · Foundations</p>
+<a href="../modules/m01-what-is-an-agent.html" data-id="m01"><span class="num">01</span><span>M01 What an AI agent is</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m02-llms-for-managers.html" data-id="m02"><span class="num">02</span><span>M02 How LLMs work</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m03-instructions-and-prompts.html" data-id="m03"><span class="num">03</span><span>M03 Instructions and prompts</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m04-tools-and-function-calling.html" data-id="m04"><span class="num">04</span><span>M04 Tools and function calling</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 2 · Building</p>
+<a href="../modules/m05-knowledge-and-rag.html" data-id="m05"><span class="num">05</span><span>M05 Knowledge and RAG</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m06-memory-and-state.html" data-id="m06"><span class="num">06</span><span>M06 Memory and state</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m07-design-patterns.html" data-id="m07"><span class="num">07</span><span>M07 Agent design patterns</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m08-multi-agent-systems.html" data-id="m08"><span class="num">08</span><span>M08 Multi-agent systems</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m09-protocols-mcp-a2a.html" data-id="m09"><span class="num">09</span><span>M09 Protocols: MCP and A2A</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 3 · Corporate</p>
+<a href="../modules/m10-evaluation.html" data-id="m10"><span class="num">10</span><span>M10 Evaluation and testing</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m11-guardrails-and-responsible-ai.html" data-id="m11"><span class="num">11</span><span>M11 Guardrails and security</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m12-deployment-and-llmops.html" data-id="m12"><span class="num">12</span><span>M12 Deployment and LLMOps</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m13-business-case-and-governance.html" data-id="m13"><span class="num">13</span><span>M13 Business case and governance</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · No-code &amp; low-code</p>
+<a href="../methods/index.html"><span class="num"></span><span>Choose your method</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/no-code-assistants.html" data-id="x-nocode"><span class="num">A</span><span>No-code assistants</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/copilot-studio.html" data-id="x-copilot"><span class="num">B</span><span>Copilot Studio</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/workflow-automation.html" data-id="x-workflow"><span class="num">C</span><span>Workflow automation</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/enterprise-platforms.html" data-id="x-enterprise"><span class="num">D</span><span>Enterprise platforms</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/voice-agents.html" data-id="x-voice"><span class="num">E</span><span>Voice agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/computer-use.html" data-id="x-computer"><span class="num">F</span><span>Computer use agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · Code</p>
+<a href="../methods/api-tool-use.html" data-id="x-api"><span class="num">G</span><span>Raw API tool use</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/langgraph.html" data-id="x-langgraph"><span class="num">H</span><span>LangChain + LangGraph</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/crewai.html" data-id="x-crewai"><span class="num">I</span><span>CrewAI</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/microsoft-agent-framework.html" data-id="x-maf" aria-current="page"><span class="num">J</span><span>Microsoft Agent Framework</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/openai-agents-sdk.html" data-id="x-openai"><span class="num">K</span><span>OpenAI Agents SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/claude-agent-sdk.html" data-id="x-claude"><span class="num">L</span><span>Claude Agent SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/google-adk.html" data-id="x-adk"><span class="num">M</span><span>Google ADK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/llamaindex.html" data-id="x-llamaindex"><span class="num">N</span><span>LlamaIndex</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/mcp.html" data-id="x-mcp"><span class="num">O</span><span>Build an MCP server</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Practice</p>
+<a href="../chatbots.html" data-id="chatbots"><span class="num"></span><span>Chatbots + live bot</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../lab.html" data-id="lab"><span class="num"></span><span>Agent Lab</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../capstones.html"><span class="num"></span><span>Capstone projects</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Library</p>
+<a href="../media.html"><span class="num"></span><span>Videos &amp; infographics</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../glossary.html"><span class="num"></span><span>Glossary</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../resources.html"><span class="num"></span><span>Books, courses, papers</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="iconbtn" type="button" id="menu-btn" aria-label="Open contents"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+      <span class="brand-name">AI Agents for Management</span>
+      <button class="iconbtn" type="button" data-search-open aria-label="Search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></button>
+      <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+    </div>
+    <div class="page-wrap">
+      <main class="article" id="content">
+<header class="page-head"><p class="eyebrow">Method · Code</p><h1>Build the Deal Desk with <em>Microsoft</em> Agent Framework</h1><p class="lede">Build the Meridian Deal Desk with Microsoft Agent Framework, the open-source successor to AutoGen and Semantic Kernel: a single agent with an approval-gated tool, then a workflow where code makes the policy decision and a person approves exceptions, ready to move onto Microsoft Foundry.</p><div class="page-meta"><span>50 min read</span><span>Tracked in your progress</span></div></header>
+
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Intermediate Python (or C#/.NET)</dd></div><div><dt>Time to first agent</dt><dd>1 to 2 hours</dd></div><div><dt>Typical cost</dt><dd>Library free (MIT); model tokens; Azure costs if you host on Foundry</dd></div><div><dt>Best for</dt><dd>Microsoft-centric companies; agents plus workflows in Python or .NET</dd></div><div><dt>Runs where</dt><dd>Anywhere; first-class hosting on Microsoft Foundry and Azure</dd></div><div><dt>Lock-in risk</dt><dd>Low for the library; medium to high if you build deeply on Foundry services</dd></div></dl>
+<p>Microsoft used to have two agent projects that overlapped awkwardly. <b>AutoGen</b>, from Microsoft Research, made multi-agent conversations popular. <b>Semantic Kernel</b> was the enterprise SDK that many .NET shops used to wire models into their applications. In October 2025 Microsoft announced <b>Microsoft Agent Framework</b> (MAF), one open-source framework that takes the agent ideas from AutoGen and the enterprise plumbing from Semantic Kernel. It shipped as a public preview that month, and version 1.0 of the Python package appeared on PyPI in April 2026.</p>
+<p>As of October 2026, MAF is the stable, recommended path. The core packages are past 1.0 and release frequently (this page was checked against 1.21). Some connectors, such as Copilot Studio, are still marked preview. AutoGen's repository now says it is in maintenance mode and points new users to MAF, and Semantic Kernel's repository describes MAF as its successor. Both have official migration guides.</p>
+<p>The framework has two main parts. <b>Agents</b> are a model plus instructions, tools, middleware and sessions (conversation memory). <b>Workflows</b> are graphs of "executors" joined by edges, with checkpoints, human-in-the-loop requests and ready-made multi-agent orchestrations: sequential, concurrent, handoff, group chat and Magentic. Around them: OpenTelemetry tracing, a developer UI, and hosting on Microsoft Foundry (formerly Azure AI Foundry).</p>
+<div class="callout mgr"><b>Manager's lens</b><p>If your company already runs on Microsoft 365, Entra ID and Azure, MAF is the path of least resistance with your IT and security teams: the identity, hosting, monitoring and procurement are already in place. That is a real advantage. The risk is the mirror image: the more Foundry services you build on, the harder it is to leave. Keep your tools as plain Python functions and you keep your options open.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Pick MAF when you are a Microsoft shop, when you have .NET developers as well as Python ones (the APIs are deliberately parallel), or when you are migrating an existing AutoGen or Semantic Kernel project. It is also a solid general-purpose choice: it works with OpenAI, Anthropic, Ollama and other providers, not only Azure.</p>
+<p>Its workflow engine is a good fit for processes with approvals and long waits, similar in spirit to LangGraph. The built-in orchestrations (handoff, group chat, Magentic) give you multi-agent patterns without writing the coordination yourself.</p>
+<p>Look elsewhere if your team wants the smallest possible dependency (the full install pulls in many integration packages; install only what you need), if you need a no-code tool (<a href="../methods/copilot-studio.html">Copilot Studio</a> is Microsoft's low-code option), or if you have no Azure footprint and prefer another ecosystem's hosting.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>One framework for agents and workflows, in Python and .NET</li><li>Tool approval built in (<code>approval_mode="always_require"</code>)</li><li>Workflows with checkpoints and human requests</li><li>OpenTelemetry tracing out of the box</li><li>Natural fit with Entra ID, Azure and Foundry</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Fast release pace; older preview-era samples may not match 1.x</li><li>Many tutorials online still show AutoGen or Semantic Kernel code</li><li>The full package installs a lot; prefer selective installs in production</li><li>Some connectors remain preview as of 2026</li><li>Foundry-specific features increase switching cost</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<figure class="fig" data-dl="microsoft-agent-framework-figure-1">
+<svg viewBox="0 0 720 290" role="img" aria-label="Microsoft Agent Framework building blocks: chat clients feed agents and workflows; agents can be hosted on Foundry; workflows offer orchestrations; everything emits OpenTelemetry traces">
+  <rect class="fx-box" x="12" y="100" width="150" height="80" rx="6"/>
+  <text class="fx-tb" x="87" y="126" text-anchor="middle">Chat clients</text>
+  <text class="fx-ts" x="87" y="146" text-anchor="middle">OpenAI · Foundry</text>
+  <text class="fx-ts" x="87" y="164" text-anchor="middle">Anthropic · Ollama</text>
+  <rect class="fx-box fx-hi" x="210" y="30" width="220" height="90" rx="6"/>
+  <text class="fx-tb" x="320" y="58" text-anchor="middle">Agent</text>
+  <text class="fx-ts" x="320" y="80" text-anchor="middle">instructions + tools</text>
+  <text class="fx-ts" x="320" y="100" text-anchor="middle">approval_mode · sessions</text>
+  <rect class="fx-box k2" x="210" y="160" width="220" height="110" rx="6"/>
+  <text class="fx-tb" x="320" y="188" text-anchor="middle">Workflow</text>
+  <text class="fx-ts" x="320" y="210" text-anchor="middle">executors + edges</text>
+  <text class="fx-ts" x="320" y="230" text-anchor="middle">request_info (a person)</text>
+  <text class="fx-ts" x="320" y="250" text-anchor="middle">checkpoints</text>
+  <rect class="fx-box k3" x="470" y="40" width="238" height="60" rx="6"/>
+  <text class="fx-tb" x="589" y="64" text-anchor="middle">Hosting</text>
+  <text class="fx-ts" x="589" y="84" text-anchor="middle">Foundry hosted agents · A2A</text>
+  <rect class="fx-box k5" x="470" y="140" width="238" height="56" rx="6"/>
+  <text class="fx-tb" x="589" y="163" text-anchor="middle">Orchestrations</text>
+  <text class="fx-ts" x="589" y="183" text-anchor="middle">sequential · handoff · group chat</text>
+  <rect class="fx-box k6" x="470" y="212" width="238" height="56" rx="6"/>
+  <text class="fx-tb" x="589" y="235" text-anchor="middle">Observability</text>
+  <text class="fx-ts" x="589" y="255" text-anchor="middle">OpenTelemetry · DevUI</text>
+  <path class="fx-ar" d="M162 125 L210 90"/>
+  <path class="fx-ar" d="M162 160 L210 200"/>
+  <path class="fx-ar" d="M320 120 L320 160"/>
+  <path class="fx-ar" d="M430 70 L470 70"/>
+  <path class="fx-ar" d="M430 180 L470 170"/>
+  <path class="fx-ar fx-dash" d="M430 240 L470 240"/>
+</svg>
+<figcaption>The chat client is the only provider-specific piece. Agents can run alone or inside workflows, and the same agent object can later be hosted on Foundry.</figcaption>
+</figure>
+<p>Start on the left. A <b>chat client</b> talks to one model provider: <code>OpenAIChatClient</code>, <code>FoundryChatClient</code>, and others. Swap the client and the rest of your code stays the same.</p>
+<p>An <b>agent</b> wraps a client with instructions and tools. Tools can be plain Python functions; MAF reads the type hints and docstring. Wrap a function with <code>tool(approval_mode="always_require")</code> and the agent will stop before calling it, returning an approval request instead. Your app shows the request to a person, sends back their yes or no, and the agent continues. A <b>session</b> holds the conversation, including the pending approval, so the answer is tied to the right request.</p>
+<p>A <b>workflow</b> is a graph. Each node is an executor: a class with <code>@handler</code> methods, or a function with <code>@executor</code>. Executors pass typed messages along edges with <code>ctx.send_message()</code> and produce final results with <code>ctx.yield_output()</code>. When an executor needs a person, it calls <code>ctx.request_info()</code>; the workflow pauses and the run result lists the open requests. You answer by running the workflow again with <code>responses={request_id: answer}</code>, and a <code>@response_handler</code> method picks it up. Add a checkpoint store and the pause can outlive the process.</p>
+<p>The <b>orchestrations</b> package builds common multi-agent workflows for you, for example <code>SequentialBuilder(participants=[analyst, writer]).build()</code>. And because every agent and workflow emits OpenTelemetry traces, you can watch runs in Azure Monitor, or in any OpenTelemetry-compatible tool you already use.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk</h2>
+<ol class="steps">
+<li><b>Install and set keys</b><p>Python 3.10 or newer. The OpenAI client is used here; a tab shows the Foundry version.</p></li>
+<li><b>Write the tools in plain Python</b><p>The same <code>meridian_tools.py</code> as every method page.</p></li>
+<li><b>Single agent with an approval-gated tool</b><p>The model decides; the escalation tool cannot run without a person.</p></li>
+<li><b>Workflow version</b><p>Code applies the policy, a person approves exceptions through <code>request_info</code>, an agent writes.</p></li>
+<li><b>Run, trace and open the developer UI</b><p>See both in a browser and in OpenTelemetry traces.</p></li>
+</ol>
+<h3>Step 1: install</h3>
+<pre class="code"><code class="language-bash">python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install agent-framework==1.21.0         # checked Oct 2026; installs core + standard integrations
+export OPENAI_API_KEY="your-key"
+export OPENAI_MODEL="gpt-5.5"               # any current model id your account can use</code></pre>
+<p>What this does: installs the framework and its standard integrations at the version this page was checked against. For production, Microsoft recommends installing only what you use, for example <code>agent-framework-core</code> plus <code>agent-framework-foundry</code>. <code>OpenAIChatClient</code> reads the key and model from these environment variables. Note that if both OpenAI and Azure variables are set, the OpenAI key wins unless you pass an Azure credential explicitly.</p>
+<h3>Step 2: the tools (meridian_tools.py)</h3>
+<pre class="code"><code class="language-python">"""meridian_tools.py - the Deal Desk agent's tools, in plain Python.
+
+In a real company these functions would call the CRM and the ERP.
+Here they read a small in-memory table so the whole agent runs on a laptop.
+"""
+import difflib
+from datetime import datetime
+
+CUSTOMERS = {
+    "C-101": {"id": "C-101", "name": "Sahyadri Hospitals", "tier": "Gold",
+              "annual_revenue_lakh": 48, "late_payments_fy": 0, "gross_margin_pct": 22},
+    "C-102": {"id": "C-102", "name": "Bluewave Logistics", "tier": "Silver",
+              "annual_revenue_lakh": 19, "late_payments_fy": 2, "gross_margin_pct": 18},
+    "C-103": {"id": "C-103", "name": "Orchid Schools Trust", "tier": "Gold",
+              "annual_revenue_lakh": 31, "late_payments_fy": 0, "gross_margin_pct": 25},
+    "C-104": {"id": "C-104", "name": "Kite Fintech", "tier": "Bronze",
+              "annual_revenue_lakh": 6, "late_payments_fy": 0, "gross_margin_pct": 16},
+    "C-105": {"id": "C-105", "name": "Trident Engineering", "tier": "Silver",
+              "annual_revenue_lakh": 22, "late_payments_fy": 1, "gross_margin_pct": 20},
+}
+
+POLICY = """Meridian Supplies discount policy (FY 2026-27)
+1. Maximum discount by tier: Bronze 5%, Silver 8%, Gold 12%.
+2. Customers with 2 or more late payments this financial year are capped at 3%.
+3. Gross margin after discount must stay at or above 12%
+   (margin_after = current_margin - discount).
+4. Anything above the cap needs Sales Manager approval;
+   anything above 15% needs Regional Head approval."""
+
+TIER_CAP = {"Bronze": 5, "Silver": 8, "Gold": 12}
+MARGIN_FLOOR = 12
+APPROVALS = []  # stands in for your ticketing system
+
+
+def get_customer(customer_id: str) -&gt; dict:
+    """Return the customer record for an id such as C-101."""
+    record = CUSTOMERS.get(customer_id.strip().upper())
+    return record or {"error": f"No customer with id {customer_id}"}
+
+
+def find_customer(name: str) -&gt; dict:
+    """Fuzzy lookup by customer name. Returns the best-matching record."""
+    by_name = {c["name"].lower(): c for c in CUSTOMERS.values()}
+    query = name.strip().lower()
+    for full_name, record in by_name.items():
+        if query and (query in full_name or full_name in query):
+            return record
+    close = difflib.get_close_matches(query, list(by_name), n=1, cutoff=0.5)
+    return by_name[close[0]] if close else {"error": f"No customer matching '{name}'"}
+
+
+def get_discount_policy() -&gt; str:
+    """Return the current discount policy text."""
+    return POLICY
+
+
+def margin_after_discount(current_margin_pct: float, discount_pct: float) -&gt; float:
+    """Gross margin % left after the discount (simplified: margin minus discount)."""
+    return round(current_margin_pct - discount_pct, 2)
+
+
+def request_approval(customer_id: str, discount_pct: float, approver: str, reason: str) -&gt; str:
+    """Log an approval request for a discount above policy. A named person must decide."""
+    ticket = f"APR-{len(APPROVALS) + 1:04d}"
+    APPROVALS.append({"ticket": ticket, "customer_id": customer_id, "discount_pct": discount_pct,
+                      "approver": approver, "reason": reason,
+                      "raised_at": datetime.now().isoformat(timespec="seconds")})
+    return f"{ticket} logged with {approver} for {discount_pct}% on {customer_id}."
+
+
+def evaluate_request(customer: dict, discount_pct: float) -&gt; dict:
+    """The policy written as code: the same rules, checked the same way every time."""
+    cap = 3 if customer["late_payments_fy"] &gt;= 2 else TIER_CAP[customer["tier"]]
+    margin_after = margin_after_discount(customer["gross_margin_pct"], discount_pct)
+    problems = []
+    if discount_pct &gt; cap:
+        problems.append(f"{discount_pct}% is above the {cap}% cap")
+    if margin_after &lt; MARGIN_FLOOR:
+        problems.append(f"margin after discount would be {margin_after}%, below the {MARGIN_FLOOR}% floor")
+    approver = None
+    if problems:
+        approver = "Regional Head" if discount_pct &gt; 15 else "Sales Manager"
+    return {"within_policy": not problems, "cap_pct": cap, "margin_after_pct": margin_after,
+            "problems": problems, "approver": approver}</code></pre>
+<p>What this does: the customer table and discount policy from the course case, five plain tool functions, and <code>evaluate_request</code>, the policy written as code. MAF builds tool descriptions from each function's name, type hints and docstring, so no decorators are needed except where you want behaviour such as approval.</p>
+<h3>Step 3: one agent with an approval gate (maf_agent.py)</h3>
+<div class="tabs"><div class="tab" data-label="OpenAI client">
+<pre class="code"><code class="language-python">"""maf_agent.py - Deal Desk as a single Microsoft Agent Framework agent with an approval gate."""
+import asyncio
+
+from agent_framework import Agent, Message, tool
+from agent_framework.openai import OpenAIChatClient
+
+import meridian_tools as mt
+
+# Plain functions work as tools. The escalation tool is wrapped so it never runs unseen.
+request_approval = tool(approval_mode="always_require")(mt.request_approval)
+
+agent = Agent(
+    client=OpenAIChatClient(),     # reads OPENAI_API_KEY and OPENAI_MODEL from the environment
+    name="DealDesk",
+    instructions=(
+        "You are the Deal Desk assistant at Meridian Supplies, Pune. Look the customer up, read "
+        "the discount policy and compute the margin with the tool. Approve only within every "
+        "rule and draft a short reply. Otherwise call request_approval and never promise the "
+        "discount. request_approval only runs after the approver says yes; if it is rejected, "
+        "say so and offer the within-policy maximum. Quote the numbers you used."),
+    tools=[mt.find_customer, mt.get_customer, mt.get_discount_policy,
+           mt.margin_after_discount, request_approval],
+)
+
+
+async def main():
+    session = agent.create_session()     # keeps history, including the pending approval
+    result = await agent.run(input("Salesperson: "), session=session)
+
+    while result.user_input_requests:    # the agent paused at the gate
+        answers = []
+        for req in result.user_input_requests:
+            print(f"\nAPPROVAL NEEDED: {req.function_call.name} {req.function_call.arguments}")
+            ok = input("Approve? (y/n): ").strip().lower() == "y"
+            answers.append(Message("user", [req.to_function_approval_response(ok)]))
+        result = await agent.run(answers, session=session)
+
+    print("\n" + result.text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+</div><div class="tab" data-label="Microsoft Foundry client">
+<pre class="code"><code class="language-python"># Foundry version of maf_agent.py: change two imports and one argument.
+# Setup once:  pip install azure-identity   (already included with agent-framework)
+#              az login                      (a managed identity replaces this when deployed)
+#              export FOUNDRY_PROJECT_ENDPOINT="&lt;your Foundry project endpoint&gt;"
+#              export FOUNDRY_MODEL="&lt;your model deployment name&gt;"
+from agent_framework.foundry import FoundryChatClient
+from azure.identity import AzureCliCredential
+
+# in Agent(...), replace  client=OpenAIChatClient()  with:
+#     client=FoundryChatClient(credential=AzureCliCredential()),</code></pre>
+<p>What changes: the agent now calls a model deployed in your Foundry project, and it authenticates with your Azure identity instead of an API key. On a server, a managed identity takes the place of <code>az login</code>, which means no secret to rotate or leak.</p>
+</div></div>
+<p>What this does:</p>
+<ul>
+<li><code>tool(approval_mode="always_require")(mt.request_approval)</code> wraps the escalation tool so the framework will not run it on the model's say-so. The other four tools are passed as plain functions and run freely.</li>
+<li><code>Agent(client=..., name=..., instructions=..., tools=[...])</code> is the whole agent. The instructions include the order of work and the rule about never promising a discount.</li>
+<li><code>agent.create_session()</code> creates the conversation memory. Every call passes the same session, so the approval answer is matched to the pending request. MAF ignores approval responses that do not match a pending request in the session, which stops a replayed or forged "yes".</li>
+<li>After each run, <code>result.user_input_requests</code> lists any tool calls waiting for approval. The loop shows each one, asks for y or n, and sends back <code>to_function_approval_response(ok)</code>.</li>
+<li>When nothing is pending, <code>result.text</code> is the reply.</li>
+</ul>
+<p>Like every model-led design, this version relies on the model to recognise that Kite at 5% breaks the margin rule. The gate guarantees no escalation goes out unseen; it does not guarantee the model escalates when it should. That is what the workflow fixes.</p>
+<h3>Step 4: the workflow version (maf_workflow.py)</h3>
+<pre class="code"><code class="language-python">"""maf_workflow.py - the policy decision as a deterministic workflow; the model only writes."""
+import asyncio
+from dataclasses import dataclass
+
+from typing_extensions import Never
+from agent_framework import (Agent, Executor, WorkflowBuilder, WorkflowContext,
+                             executor, handler, response_handler)
+from agent_framework.openai import OpenAIChatClient
+
+import meridian_tools as mt
+
+
+@dataclass
+class DealRequest:            # what the salesperson's form sends
+    customer_name: str
+    discount_pct: float
+
+
+@dataclass
+class DealCase:               # what the policy gate hands to the writer
+    customer: dict
+    discount_pct: float
+    verdict: dict
+    decision: str
+
+
+@dataclass
+class ApprovalNeeded:         # what the human approver sees
+    ticket: str
+    question: str
+    case: DealCase
+
+
+class PolicyGate(Executor):
+    @handler
+    async def check(self, req: DealRequest, ctx: WorkflowContext[DealCase]) -&gt; None:
+        customer = mt.find_customer(req.customer_name)
+        if "error" in customer:
+            raise ValueError(customer["error"])
+        verdict = mt.evaluate_request(customer, req.discount_pct)
+        case = DealCase(customer, req.discount_pct, verdict, "")
+        if verdict["within_policy"]:
+            case.decision = "approved within policy"
+            await ctx.send_message(case)
+            return
+        ticket = mt.request_approval(customer["id"], req.discount_pct, verdict["approver"],
+                                     "; ".join(verdict["problems"]))
+        question = (f"{verdict['approver']}: allow {req.discount_pct}% for {customer['name']}? "
+                    f"Problems: {'; '.join(verdict['problems'])}")
+        await ctx.request_info(ApprovalNeeded(ticket, question, case), str)   # pause here
+
+    @response_handler
+    async def on_decision(self, request: ApprovalNeeded, decision: str,
+                          ctx: WorkflowContext[DealCase]) -&gt; None:
+        request.case.decision = decision
+        await ctx.send_message(request.case)
+
+
+writer = Agent(client=OpenAIChatClient(), name="DealWriter",
+               instructions="Write short, warm, accurate replies for Meridian Supplies' sales team. "
+                            "Offer only what the decision allows.")
+
+
+@executor(id="draft")
+async def draft(case: DealCase, ctx: WorkflowContext[Never, str]) -&gt; None:
+    reply = await writer.run(f"Customer: {case.customer}. Asked: {case.discount_pct}%. "
+                             f"Policy check: {case.verdict}. Decision: {case.decision}. Draft the reply.")
+    await ctx.yield_output(reply.text)
+
+
+gate = PolicyGate(id="policy_gate")
+workflow = WorkflowBuilder(start_executor=gate).add_edge(gate, draft).build()
+
+
+async def main():
+    result = await workflow.run(DealRequest("Bluewave Logistics", 6))
+    while requests := result.get_request_info_events():
+        answers = {}
+        for event in requests:
+            print("\nAPPROVAL NEEDED:", event.data.question, f"[{event.data.ticket}]")
+            answers[event.request_id] = input("Decision (e.g. 'approve 4%' or 'reject'): ")
+        result = await workflow.run(responses=answers)
+    print("\n" + result.get_outputs()[0])
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+<p>What this does:</p>
+<ul>
+<li>Three small data classes describe what flows through the graph: the salesperson's request, the case after the policy check, and the question shown to the approver.</li>
+<li><code>PolicyGate</code> is an executor. Its <code>check</code> handler looks the customer up and runs <code>evaluate_request</code>. Within policy, it sends the case straight on. Otherwise it raises a ticket and calls <code>ctx.request_info(...)</code>, which pauses the workflow and publishes the question.</li>
+<li><code>on_decision</code>, marked <code>@response_handler</code>, receives the approver's answer, records it on the case and sends the case on.</li>
+<li><code>draft</code> is a function executor that asks the writer agent for a reply and yields it as the workflow's output. It is the only model call.</li>
+<li><code>WorkflowBuilder(start_executor=gate).add_edge(gate, draft).build()</code> wires the two steps together.</li>
+<li><code>main</code> runs the workflow, answers any open requests with <code>workflow.run(responses=...)</code>, and prints the output.</li>
+</ul>
+<h3>Step 5: run it</h3>
+<div class="trace">
+  <div class="t-user">workflow.run(DealRequest("Bluewave Logistics", 6))</div>
+  <div class="t-act">policy_gate.check: find_customer("Bluewave Logistics") → evaluate_request(customer, 6)</div>
+  <div class="t-obs">{"within_policy":false,"cap_pct":3,"margin_after_pct":12,"problems":["6% is above the 3% cap"],"approver":"Sales Manager"}</div>
+  <div class="t-act">request_approval("C-102", 6, "Sales Manager", "6% is above the 3% cap") → ctx.request_info(ApprovalNeeded(...), str)</div>
+  <div class="t-obs">Workflow paused. 1 request_info event: "Sales Manager: allow 6% for Bluewave Logistics? Problems: 6% is above the 3% cap [APR-0001]"</div>
+  <div class="t-human">Sales Manager answers "approve 4%" → workflow.run(responses={request_id: "approve 4%"})</div>
+  <div class="t-act">policy_gate.on_decision → send case to draft → writer.run(facts + decision)</div>
+  <div class="t-final">"Thank you for your request. We're pleased to offer 4% on your next order, approved by our Sales Manager..."</div>
+</div>
+<p>Sahyadri at 10% passes the gate and goes straight to the writer. Kite at 5% is stopped by the margin rule, because the decision is code, not the model's reading of a policy.</p>
+<h3>See it in the developer UI</h3>
+<pre class="code"><code class="language-python">"""maf_devui.py - open the agent and the workflow in Agent Framework's developer UI."""
+from agent_framework.devui import serve
+
+from maf_agent import agent
+from maf_workflow import workflow
+
+serve(entities=[agent, workflow], auto_open=True)   # local browser UI, for development only</code></pre>
+<p>What this does: starts MAF's local developer UI in your browser with both the agent and the workflow loaded, so you can send requests, watch tool calls and answer approval requests by clicking. It is a development tool; do not expose it on a network. For tracing, <code>configure_otel_providers()</code> from <code>agent_framework.observability</code> switches on OpenTelemetry export using the standard <code>OTEL_EXPORTER_OTLP_*</code> environment variables, so spans flow to Azure Monitor or whichever collector you use.</p>
+<div class="callout note"><b>Note</b><p>Reading older material? AutoGen code uses classes such as <code>AssistantAgent</code> and group chats from the <code>autogen_agentchat</code> package; Semantic Kernel code uses a <code>Kernel</code> with "plugins". Both ideas live on in MAF as agents, tools and workflows. Use the official migration guides (linked below) rather than translating line by line, and do not start a new project on either.</p></div>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<h3>Identity and SSO</h3>
+<p>This is where MAF fits most naturally. Use Entra ID for the people (salespeople and approvers) and managed identities for the service itself, so the agent reaches Foundry models without API keys. Microsoft's own guidance is to prefer a specific credential, such as <code>ManagedIdentityCredential</code>, over <code>DefaultAzureCredential</code> in production. Map approver roles to Entra groups so only Sales Managers can answer Sales Manager requests.</p>
+<h3>Data access</h3>
+<p>Tools call your CRM and ERP with a least-privilege identity. If the CRM is Dynamics 365 or data sits in SharePoint, keep access going through governed connectors rather than broad service accounts. Decide what reaches traces: the OpenTelemetry setup has an option to include or exclude sensitive message content, and for customer data under the DPDP Act 2023 you will usually exclude it outside development.</p>
+<h3>Hosting</h3>
+<p>Options as of 2026: your own container or Azure App Service behind an API; Azure Functions with Microsoft's durable extension for long-running agents; or Foundry hosted agents, which the MAF README describes as deploying an agent to Foundry-hosted infrastructure with a couple of extra lines. Choose an Azure region that meets your data residency needs; India has Azure regions, but check that the model you want is offered there.</p>
+<h3>Cost control</h3>
+<p>The workflow version makes one model call per request; the single agent makes several. Use the workflow for anything high-volume. Set tool invocation limits (<code>max_invocations</code> on a tool), use smaller model deployments for simple steps, and set Azure budgets and alerts on the Foundry resource.</p>
+<h3>Monitoring and approvals</h3>
+<p>Send OpenTelemetry traces to Azure Monitor or Application Insights and build a dashboard for escalation rate, latency and errors. For approvals, connect <code>request_info</code> or <code>user_input_requests</code> to Teams with an adaptive card or to a Power Automate approval, and add a checkpoint store so pending approvals survive restarts. Add expiry and no-self-approval rules, as on every page.</p>
+<ul class="checklist"><li>Managed identity for the service, Entra ID for users</li><li>Approver roles mapped to Entra groups</li><li>Sensitive content excluded from production traces</li><li>Checkpoint storage for paused workflows</li><li>Selective package install, versions pinned</li><li>Budget alerts on the Foundry resource</li></ul>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<p>MAF fits best where the data and the people already live in Microsoft systems.</p>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales</td><td>Deal Desk (this page)</td><td>Applies policy in a workflow, drafts the reply</td><td>Sales Manager approves via Teams card</td></tr>
+<tr><td>Finance</td><td>Month-end variance commentary</td><td>Reads ledger extracts, explains variances above threshold, drafts notes</td><td>Controller edits and signs off</td></tr>
+<tr><td>HR</td><td>Policy helpdesk on SharePoint</td><td>Answers leave and travel policy questions with citations</td><td>HR reviews flagged or low-confidence answers</td></tr>
+<tr><td>IT</td><td>Access request triage</td><td>Checks role, manager and policy, prepares the Entra group change</td><td>IT admin approves before the change is applied</td></tr>
+<tr><td>Operations</td><td>Supplier delay handling</td><td>Handoff orchestration: triage agent routes to logistics or procurement agent</td><td>Ops manager approves expediting costs</td></tr>
+</tbody></table></div>
+<div class="callout mgr"><b>Manager's lens</b><p>In Microsoft-heavy firms, the deciding factor is rarely the framework's features. It is that the security review, the identity model and the cloud bill are already approved. Ask your IT team which Azure services are pre-approved before your developers pick a stack.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Gate a second tool</b><p>Suppose the agent can also email the customer through a <code>send_reply</code> tool. Which <code>approval_mode</code> would you use for it, and why?</p><details><summary>Hint / model answer</summary><p><code>always_require</code>, at least during the pilot. Sending an email to a customer is an external action that cannot be undone. Once the team trusts within-policy replies, you might gate only replies that mention a discount above the cap.</p></details></li>
+<li><b>Two-step approval</b><p>Orchid Schools Trust asks for 18%. Using the workflow, sketch how you would require both the Sales Manager and the Regional Head to approve.</p><details><summary>Hint / model answer</summary><p>Add a second executor after <code>PolicyGate</code>: if the first approval says yes and the discount is above 15%, it calls <code>ctx.request_info</code> again with a Regional Head question, and its response handler sends the case to <code>draft</code>. Alternatively, have <code>on_decision</code> raise the second request itself before sending anything on.</p></details></li>
+<li><b>Read an old tutorial</b><p>You find a 2024 AutoGen tutorial with an <code>AssistantAgent</code> and a <code>UserProxyAgent</code> chatting. What are the MAF equivalents, and what would you check before reusing its design?</p><details><summary>Hint / model answer</summary><p>The assistant becomes an MAF <code>Agent</code> with tools; the user proxy's role (a human or code stepping in) becomes tool approval or a workflow <code>request_info</code>. Check whether the design relies on free-form agent chat to make decisions; for business rules, move them into an executor.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="b">
+    <p class="q-text">Microsoft Agent Framework is the successor to which two projects?</p>
+    <ol class="q-opts"><li data-k="a">Copilot Studio and Power Automate</li><li data-k="b">AutoGen and Semantic Kernel</li><li data-k="c">Bot Framework and LUIS</li><li data-k="d">Azure ML and Prompt Flow</li></ol>
+    <p class="q-why">MAF combines AutoGen's agent ideas with Semantic Kernel's enterprise features; both projects point new users to it.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">In the single-agent version, what happens when the model calls request_approval?</p>
+    <ol class="q-opts"><li data-k="a">The tool runs and the manager is emailed</li><li data-k="b">The run fails with an error</li><li data-k="c">The run returns with a user_input_request; the tool runs only after an approval response</li><li data-k="d">The model is asked to try a different tool</li></ol>
+    <p class="q-why">approval_mode="always_require" turns the call into a pending request. You send back to_function_approval_response(True or False) in the same session.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">In the workflow, how does the PolicyGate executor pause for a person?</p>
+    <ol class="q-opts"><li data-k="a">It calls ctx.request_info(...), and a @response_handler receives the answer</li><li data-k="b">It raises an exception that the app catches</li><li data-k="c">It calls input() inside the handler</li><li data-k="d">It sends a message to the writer agent asking for approval</li></ol>
+    <p class="q-why">request_info publishes a request event and pauses; workflow.run(responses=...) delivers the answer to the response handler.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Why is the workflow version safer for Kite Fintech at 5% than the single agent?</p>
+    <ol class="q-opts"><li data-k="a">It uses a larger model</li><li data-k="b">It has more tools</li><li data-k="c">It runs on Foundry</li><li data-k="d">The margin rule is applied in code by evaluate_request, not left to the model</li></ol>
+    <p class="q-why">The approval gate only controls what happens when the model escalates; the workflow makes sure escalation happens whenever a rule fails.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">For a production service on Azure calling Foundry models, which authentication approach fits Microsoft's guidance best?</p>
+    <ol class="q-opts"><li data-k="a">An API key in the code</li><li data-k="b">A managed identity via a specific credential such as ManagedIdentityCredential</li><li data-k="c">A developer's az login session</li><li data-k="d">DefaultAzureCredential with every fallback enabled</li></ol>
+    <p class="q-why">A specific credential avoids secrets in code and the unintended fallbacks of DefaultAzureCredential; az login is for development.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="autogen"><div class="vid"><button class="vid-thumb" type="button" data-yt="JlzteydCK_Q" aria-label="Play: Deep Dive into Microsoft Agent Framework for AutoGen Users"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/JlzteydCK_Q/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Deep Dive into Microsoft Agent Framework for AutoGen Users</b><span class="ch">Microsoft Developer</span><span class="nt">Official guide to how AutoGen concepts map onto the new Microsoft Agent Framework.</span><a href="https://www.youtube.com/watch?v=JlzteydCK_Q" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="TvgUim_3vrU" aria-label="Play: Build an AI agent with Microsoft Agent Framework, PostgreSQL, and API Management"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/TvgUim_3vrU/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Build an AI agent with Microsoft Agent Framework, PostgreSQL, and API Management</b><span class="ch">Microsoft Reactor</span><span class="nt">Microsoft Reactor build session with the new framework.</span><a href="https://www.youtube.com/watch?v=TvgUim_3vrU" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="MCYzYzaWChY" aria-label="Play: AutoGen: A Multi-Agent AI Framework - Victor Dibia &amp; Chi Wang, Microsoft"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/MCYzYzaWChY/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>AutoGen: A Multi-Agent AI Framework - Victor Dibia &amp; Chi Wang, Microsoft</b><span class="ch">The Linux Foundation</span><span class="nt">AutoGen&#x27;s creators on its multi-agent conversation design.</span><a href="https://www.youtube.com/watch?v=MCYzYzaWChY" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="u1YOPRdGqxQ" aria-label="Play: AI Show: On Demand | Agent Framework Lab - The Experimental Modules of Microsoft Agent Framework"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/u1YOPRdGqxQ/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>AI Show: On Demand | Agent Framework Lab - The Experimental Modules of Microsoft Agent Framework</b><span class="ch">The AI Show</span><span class="nt">Microsoft AI Show segment on the framework&#x27;s lab modules.</span><a href="https://www.youtube.com/watch?v=u1YOPRdGqxQ" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div></div>
+<div class="res-list">
+  <a class="res" href="https://learn.microsoft.com/en-us/agent-framework/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Microsoft Agent Framework documentation</span><span class="res-by">Microsoft Learn · overview, tutorials and user guide</span></a>
+  <a class="res" href="https://github.com/microsoft/agent-framework" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">microsoft/agent-framework</span><span class="res-by">GitHub · source and Python/.NET samples</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/agent-framework/agents/tools/tool-approval" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Tool approval</span><span class="res-by">Microsoft Learn · the approval flow used on this page</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/agent-framework/workflows/overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Workflows</span><span class="res-by">Microsoft Learn · executors, human-in-the-loop, checkpoints, orchestrations</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/agent-framework/migration-guide/from-autogen" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Migrating from AutoGen</span><span class="res-by">Microsoft Learn · for teams with AutoGen code</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/agent-framework/migration-guide/from-semantic-kernel" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Migrating from Semantic Kernel</span><span class="res-by">Microsoft Learn · for teams with Semantic Kernel code</span></a>
+</div>
+<div class="cards">
+  <a class="card" href="../methods/copilot-studio.html"><span class="card-kicker">Method · No-code</span><b>Copilot Studio</b><span>Microsoft's low-code route to the same agent.</span></a>
+  <a class="card" href="../methods/langgraph.html"><span class="card-kicker">Method · Code</span><b>LangGraph</b><span>A comparable graph engine outside the Microsoft ecosystem.</span></a>
+  <a class="card" href="../modules/m12-deployment-and-llmops.html"><span class="card-kicker">Module 12</span><b>Deployment and LLMOps</b><span>Hosting, monitoring and cost control in depth.</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>Microsoft Agent Framework replaces AutoGen and Semantic Kernel for new work; 1.0 shipped in April 2026.</li><li>Agents take plain Python functions as tools; <code>approval_mode="always_require"</code> gates risky ones.</li><li>Workflows put business rules in code and pause for people with <code>request_info</code>.</li><li>Swap the chat client to move between OpenAI and Microsoft Foundry without touching the rest.</li><li>Its biggest advantage is fit with Entra ID, Azure and existing Microsoft governance.</li></ul></div>
+</section>
+
+<div class="endcap"><button class="donebtn" type="button">Mark this page complete</button><nav class="pager" aria-label="Previous and next"><a class="prev" href="../methods/crewai.html"><small>Previous</small>CrewAI</a><a class="next" href="../methods/openai-agents-sdk.html"><small>Next</small>OpenAI Agents SDK</a></nav></div>
+      </main>
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+    <footer class="site-foot"><span>AI Agents for Management · an open course for business students and managers</span><span>Product names, features and prices change fast: check vendor docs before you rely on a detail. Last reviewed October 2026.</span></footer>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="../assets/app.js" defer></script>
+
+</body>
+</html>

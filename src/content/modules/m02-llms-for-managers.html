@@ -1,0 +1,446 @@
+<!--META {"title":"M02 How LLMs work","h1":"How LLMs work, for <em>managers</em>","eyebrow":"Module 02 · Level 1 · Foundations","lede":"After this page you will be able to explain tokens, context windows and hallucinations to your team, choose between models on quality, speed and cost, and estimate what an agent will cost per month in rupees.","minutes":45} -->
+
+<section id="m02-idea">
+<h2>The big idea</h2>
+
+<p>You do not need to know how an engine is machined to run a logistics fleet. But you do need to know about fuel consumption, load limits and what happens when a driver ignores the warning light.</p>
+
+<p>Large language models are the same. A manager who understands about ten ideas can make good calls on which model to use, what it will cost, where it will go wrong and what to tell the legal team. That is what this page covers. No maths beyond multiplication.</p>
+
+<p>The one-sentence version: <b>a large language model (LLM) is a program that has read an enormous amount of text and learned to predict what comes next, one small chunk at a time.</b> Everything it does, from writing a discount email to choosing a tool, comes out of that prediction process.</p>
+
+<p>That sounds too simple to be useful. It is not. To predict the next word in a contract, a policy or a support ticket well, a model has to pick up grammar, facts, formats, a lot of common-sense reasoning and a fair amount of domain knowledge. It also explains the failures: a prediction engine will produce a fluent, plausible answer even when it has no reliable basis for one.</p>
+
+<div class="callout mgr"><b>Manager's lens</b><p>Three numbers drive most LLM decisions: how good the answers are on your task, how long they take, and what they cost per request. You will trade these against each other on every project. Data privacy and language support are the two filters you apply before any of that.</p></div>
+</section>
+
+<section id="m02-how">
+<h2>How it works</h2>
+
+<h3>Tokens: the unit of everything</h3>
+
+<p>Models do not read words. They read <b>tokens</b>, which are chunks of text: a whole common word, part of a rarer word, a space plus a word, a punctuation mark. "Meridian" might be one token or two, depending on the model. "Sahyadri" is probably split into a few pieces because it is rare in the training data.</p>
+
+<p>For English, a common rule of thumb is that one token is about four characters, or about three-quarters of a word. So 1,000 words is roughly 1,300 to 1,400 tokens.</p>
+
+<p>Treat that as a planning estimate only. Every model family has its own tokenizer, and counts differ: Anthropic's own documentation notes that its newer Claude models use a tokenizer that produces roughly 30% more tokens for the same text than earlier ones. Always measure on the model you will actually use.</p>
+
+<p>Tokens matter to a manager for three reasons. You are billed per token. Limits on how much a model can read are set in tokens. And speed is measured in tokens per second.</p>
+
+<div class="callout warn"><b>Watch out: Indian languages cost more tokens</b><p>Tokenizers are built mostly from English-heavy data, so the same sentence in Hindi, Tamil or Bengali often splits into many more tokens than its English version. A 2023 study by Petrov and colleagues found gaps of up to 15 times across languages for some tokenizers. A Marathi customer-support agent can therefore cost noticeably more per conversation than an English one. Measure it before you budget.</p></div>
+
+<h3>Next-token prediction</h3>
+
+<p>When you send a prompt, the model looks at all the tokens so far and produces a probability for every possible next token. One is picked. It is added to the text. Then the whole thing repeats, token by token, until the model produces a stop signal or hits the length limit you set.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 330" role="img" aria-label="Next-token prediction: given a prompt about Sahyadri Hospitals, the model assigns probabilities to candidate next tokens">
+  <text class="fx-th" x="360" y="28" text-anchor="middle">One step of next-token prediction</text>
+  <rect class="fx-box" x="12" y="50" width="696" height="44" rx="6"/>
+  <text class="fx-t" x="24" y="77">"Sahyadri is Gold with a 22% margin, so a 10% discount is ___"</text>
+  <text class="fx-ts" x="24" y="124">Candidate next tokens (illustrative probabilities)</text>
+  <text class="fx-t" x="24" y="160">within</text>
+  <rect class="fx-box fx-hi" x="130" y="144" width="276" height="24" rx="4"/>
+  <text class="fx-ts" x="416" y="161">0.46</text>
+  <text class="fx-t" x="24" y="196">allowed</text>
+  <rect class="fx-box k2" x="130" y="180" width="132" height="24" rx="4"/>
+  <text class="fx-ts" x="272" y="197">0.22</text>
+  <text class="fx-t" x="24" y="232">fine</text>
+  <rect class="fx-box k2" x="130" y="216" width="84" height="24" rx="4"/>
+  <text class="fx-ts" x="224" y="233">0.14</text>
+  <text class="fx-t" x="24" y="268">possible</text>
+  <rect class="fx-box k2" x="130" y="252" width="48" height="24" rx="4"/>
+  <text class="fx-ts" x="188" y="269">0.08</text>
+  <text class="fx-t" x="24" y="304">not</text>
+  <rect class="fx-box k2" x="130" y="288" width="30" height="24" rx="4"/>
+  <text class="fx-ts" x="170" y="305">0.05</text>
+  <rect class="fx-box k3" x="480" y="150" width="228" height="120" rx="6"/>
+  <text class="fx-tb" x="594" y="178" text-anchor="middle">Sampling picks one</text>
+  <text class="fx-ts" x="594" y="200" text-anchor="middle">Low temperature: almost</text>
+  <text class="fx-ts" x="594" y="216" text-anchor="middle">always "within"</text>
+  <text class="fx-ts" x="594" y="240" text-anchor="middle">High temperature: the</text>
+  <text class="fx-ts" x="594" y="256" text-anchor="middle">rarer words get a chance</text>
+</svg>
+<figcaption>The model never "looks up" an answer. It scores possible continuations. Notice that "not" still has a small probability: run the same prompt enough times and occasionally you will see it, which is one reason agent outputs need checking.</figcaption>
+</figure>
+
+<p>Two consequences follow. First, the model is only as good as what is in front of it. If the customer's margin is not in the prompt or in a tool result, the model will predict a plausible margin rather than say it does not know. Second, the output is probabilistic. Ask the same question twice and you may get two different wordings, and occasionally two different answers.</p>
+
+<h3>Temperature and sampling</h3>
+
+<p><b>Temperature</b> is the dial that controls how adventurous the picking is. Low temperature makes the model nearly always pick the most likely token, which gives consistent, slightly bland output. High temperature flattens the odds so less likely tokens get picked more often, which gives variety and, past a point, nonsense. Related settings such as top-p limit sampling to the most likely slice of candidates.</p>
+
+<p>In practice you want low variability for decisions and extraction, and more for brainstorming campaign taglines. One wrinkle as of 2026: some vendors now manage sampling themselves on their newest models. Anthropic's API reference, for example, says models released after Claude Opus 4.6 no longer accept custom temperature values. So check your model's documentation before you build a design around the dial, and get consistency from good instructions, structured outputs and code checks instead.</p>
+
+<h3>The context window</h3>
+
+<p>The <b>context window</b> is the maximum number of tokens a model can consider at once: your instructions, the tool definitions, any documents, the whole conversation so far, every tool result, and the answer it is writing. Think of it as the model's desk. Whatever is not on the desk does not exist for it.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 250" role="img" aria-label="A context window filled by system prompt, tool definitions, documents, conversation and tool results, and space reserved for the answer">
+  <text class="fx-th" x="360" y="28" text-anchor="middle">What fills the context window on one Deal Desk call</text>
+  <rect class="fx-box k1" x="12" y="60" width="120" height="70" rx="6"/>
+  <text class="fx-tb" x="72" y="90" text-anchor="middle">System</text>
+  <text class="fx-tb" x="72" y="108" text-anchor="middle">prompt</text>
+  <rect class="fx-box k4" x="136" y="60" width="110" height="70" rx="6"/>
+  <text class="fx-tb" x="191" y="90" text-anchor="middle">Tool</text>
+  <text class="fx-tb" x="191" y="108" text-anchor="middle">definitions</text>
+  <rect class="fx-box k2" x="250" y="60" width="130" height="70" rx="6"/>
+  <text class="fx-tb" x="315" y="90" text-anchor="middle">Policy and</text>
+  <text class="fx-tb" x="315" y="108" text-anchor="middle">documents</text>
+  <rect class="fx-box k3" x="384" y="60" width="200" height="70" rx="6"/>
+  <text class="fx-tb" x="484" y="90" text-anchor="middle">Conversation and</text>
+  <text class="fx-tb" x="484" y="108" text-anchor="middle">tool results</text>
+  <rect class="fx-box fx-hi" x="588" y="60" width="120" height="70" rx="6"/>
+  <text class="fx-tb" x="648" y="90" text-anchor="middle">Room for</text>
+  <text class="fx-tb" x="648" y="108" text-anchor="middle">the answer</text>
+  <path class="fx-ln" d="M12 150 L708 150"/>
+  <text class="fx-ts" x="12" y="172">Stable on every call: cache it, it is the same each time</text>
+  <path class="fx-ar" d="M384 190 L584 190"/>
+  <text class="fx-ts" x="384" y="212">Grows with every tool call in the loop</text>
+  <text class="fx-ts" x="12" y="236">Everything here is billed as input tokens, on every single model call.</text>
+</svg>
+<figcaption>The left half is identical for every request; the right half grows as the agent works. That growth is why a five-step agent costs far more than five times a single short question.</figcaption>
+</figure>
+
+<p>As of 2026, frontier models commonly offer context windows in the hundreds of thousands of tokens, and several, including Anthropic's current Claude models, go up to one million. That is a lot of desk. But a bigger window is not a licence to dump everything in. Models attend less reliably to details buried in the middle of very long inputs, latency grows with input size, and you pay for every token every time. Good agents put the right things on the desk, not everything.</p>
+
+<h3>Training versus inference</h3>
+
+<p>Two very different activities share the word "AI". <b>Training</b> is when the model learns: months of computation, huge datasets, done by the model vendor. <b>Inference</b> is when the trained model is used: your prompt goes in, text comes out, in seconds. When your agent runs, it is doing inference. It does not learn from your conversations unless someone deliberately trains a new version on them.</p>
+
+<p>This trips up a lot of managers. "The agent will get better as it handles more requests" is false by default. It gets better when your team improves the instructions, tools, knowledge and examples, or when you switch to a better model.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 280" role="img" aria-label="Training pipeline from pretraining to fine-tuning to preference training, producing a model used at inference time">
+  <text class="fx-tb" x="12" y="28">Training (done by the vendor, before you ever use it)</text>
+  <rect class="fx-box k1" x="12" y="44" width="200" height="74" rx="6"/>
+  <text class="fx-tb" x="112" y="70" text-anchor="middle">1. Pretraining</text>
+  <text class="fx-ts" x="112" y="90" text-anchor="middle">predict the next token</text>
+  <text class="fx-ts" x="112" y="106" text-anchor="middle">over a huge text corpus</text>
+  <rect class="fx-box k2" x="260" y="44" width="200" height="74" rx="6"/>
+  <text class="fx-tb" x="360" y="70" text-anchor="middle">2. Fine-tuning</text>
+  <text class="fx-ts" x="360" y="90" text-anchor="middle">learn from examples of</text>
+  <text class="fx-ts" x="360" y="106" text-anchor="middle">good instructions and replies</text>
+  <rect class="fx-box k3" x="508" y="44" width="200" height="74" rx="6"/>
+  <text class="fx-tb" x="608" y="70" text-anchor="middle">3. Preference training</text>
+  <text class="fx-ts" x="608" y="90" text-anchor="middle">RLHF and similar: reward</text>
+  <text class="fx-ts" x="608" y="106" text-anchor="middle">answers people prefer</text>
+  <path class="fx-ar" d="M212 81 L260 81"/>
+  <path class="fx-ar" d="M460 81 L508 81"/>
+  <path class="fx-ar" d="M608 118 L400 170"/>
+  <text class="fx-tb" x="12" y="150">Inference (every time your agent runs)</text>
+  <rect class="fx-box" x="12" y="170" width="200" height="60" rx="6"/>
+  <text class="fx-t" x="112" y="205" text-anchor="middle">Your prompt + context</text>
+  <rect class="fx-box fx-hi" x="260" y="170" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="360" y="205" text-anchor="middle">Released model</text>
+  <rect class="fx-box" x="508" y="170" width="200" height="60" rx="6"/>
+  <text class="fx-t" x="608" y="205" text-anchor="middle">Answer or tool call</text>
+  <path class="fx-ar" d="M212 200 L260 200"/>
+  <path class="fx-ar" d="M460 200 L508 200"/>
+  <text class="fx-ts" x="360" y="262" text-anchor="middle">At inference the weights are frozen. Nothing is learned from your request.</text>
+</svg>
+<figcaption>Three training stages turn a text predictor into a helpful assistant. Your agent only ever does the bottom row.</figcaption>
+</figure>
+
+<h3>Pretraining, fine-tuning and RLHF in one page</h3>
+
+<p><b>Pretraining</b> is the expensive part. The model reads a very large collection of text (web pages, books, code, other sources the vendor has rights to) and learns to predict the next token. The result is knowledgeable but not helpful. Ask it a question and it may continue with three more questions, because that is what text often does.</p>
+
+<p><b>Fine-tuning</b> teaches it to behave like an assistant, using many examples of instructions paired with good responses. After this stage it answers questions, follows formats and takes on a role.</p>
+
+<p><b>Preference training</b> polishes behaviour. The best-known method is reinforcement learning from human feedback (RLHF): people compare pairs of answers, a reward model learns their preferences, and the main model is tuned to produce answers that score well. OpenAI's 2022 InstructGPT paper made this approach famous. Vendors now use several variants, including feedback from other AI models and training against written principles.</p>
+
+<p>Can you fine-tune a model yourself? Often, yes, through vendor services or on open-weight models. Should you? Usually not first. For most business agents, better instructions, examples and retrieval get you further, faster, and are much easier to change when your policy changes next quarter. Fine-tuning earns its place for narrow, high-volume tasks with a stable format.</p>
+
+<h3>Why hallucinations happen</h3>
+
+<p>A hallucination is a confident answer that is not true. It is not a bug someone forgot to fix. It falls straight out of next-token prediction: the model is rewarded for plausible continuations, and a plausible-sounding margin figure is easier to produce than "I don't have that number".</p>
+
+<p>Hallucinations get worse when the model is asked about specifics it was never given (a customer's late payments), about recent events after its training cutoff, about rare names and numbers, and when instructions push it to always give an answer. They get better when you put the facts in front of it through tools and retrieval, allow and reward "I don't know", ask for sources, and check outputs with code. For the Deal Desk that means one hard rule: the agent must never state a tier, cap or margin it did not get from a tool in this conversation. Here is what that looks like when the salesperson's own message invites a guess.</p>
+
+<div class="trace">
+  <div class="t-user">Quick one: Orchid Schools wants 8%. They're fine on payments, right? Just confirm.</div>
+  <div class="t-think">The rep says payments are fine, but I have not seen Orchid's record in this conversation. If I simply agree, I am repeating an unverified claim. Look it up.</div>
+  <div class="t-act">find_customer(name="Orchid Schools")</div>
+  <div class="t-obs">{"id":"C-103","name":"Orchid Schools Trust","tier":"Gold","late_payments":0,"margin_pct":25}</div>
+  <div class="t-act">margin_after_discount(current_margin_pct=25, discount_pct=8)</div>
+  <div class="t-obs">17.0</div>
+  <div class="t-final">Confirmed from the record: Orchid Schools Trust (C-103) is Gold with 0 late payments this year. 8% is within the 12% Gold cap and leaves a 17% margin, above our 12% floor. Approved; draft reply below.</div>
+</div>
+
+<p>The answer happened to match what the rep said. That is not the point. The point is that the agent's "0 late payments" came from the system of record, not from the rep's message or from a plausible guess, and the trace proves it. A model left to predict would have said "yes, they're fine" whether or not it was true.</p>
+
+<h3>Reasoning models</h3>
+
+<p>Since late 2024 a class of <b>reasoning models</b> has spread across vendors: OpenAI's o-series, DeepSeek-R1, Claude with extended thinking, and Gemini's thinking models. They generate a long internal working-out before giving the final answer. On multi-step problems such as planning, maths and policy checks with several interacting rules, this usually helps a lot.</p>
+
+<p>The trade-off is cost and time. Thinking tokens are typically billed, and a reasoning run can take many seconds. Many APIs now let you set how much thinking effort to spend. For the Deal Desk, the arithmetic is trivial, so modest thinking is plenty. For an agent comparing three supplier contracts clause by clause, more thinking pays for itself.</p>
+
+<h3>Multimodality</h3>
+
+<p>Most frontier models now accept images and PDFs as well as text, and some handle audio and video. For managers that opens practical doors: reading a scanned purchase order, checking a photo of a damaged delivery, pulling numbers from a chart in a PDF. Accuracy on messy scans, handwriting and Indian-language documents varies, so test on your real documents, not the vendor's demo.</p>
+
+<h3>Open versus closed models</h3>
+
+<div class="table-wrap"><table>
+<thead><tr><th></th><th>Closed (API) models</th><th>Open-weight models</th></tr></thead>
+<tbody>
+<tr><td>Examples</td><td>Anthropic Claude, OpenAI GPT, Google Gemini</td><td>Meta Llama, Mistral's open models, Alibaba's Qwen, DeepSeek</td></tr>
+<tr><td>How you use them</td><td>Call the vendor's API or a cloud marketplace (AWS, Azure, Google Cloud)</td><td>Download the weights and run them on your servers or a hosting provider</td></tr>
+<tr><td>Strengths</td><td>Usually the strongest quality; no infrastructure; fast access to new features</td><td>Data can stay entirely in-house; can be fine-tuned freely; no per-token vendor bill</td></tr>
+<tr><td>Watch-outs</td><td>Data leaves your network (under contract); vendor pricing and model retirements</td><td>You run the GPUs, security and updates; licences vary and some carry restrictions</td></tr>
+</tbody>
+</table></div>
+
+<p>The line is blurrier than the table suggests. OpenAI released open-weight gpt-oss models in 2025, Google publishes the open Gemma family, and you can rent open models by the token from cloud providers. "Open" also means different things: some licences (Apache 2.0, MIT) are permissive, while Llama uses Meta's own community licence with conditions. Have legal read the licence before you build on any of them.</p>
+
+<h3>Choosing a model: the trade-offs</h3>
+
+<p>There is no best model. There is the best model for a task at a price. The questions to ask, roughly in order:</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Question</th><th>Why it matters</th><th>Deal Desk answer</th></tr></thead>
+<tbody>
+<tr><td>Can we send this data to it?</td><td>Contract, data residency, DPDP Act obligations</td><td>Customer financials: enterprise API terms only, no consumer apps</td></tr>
+<tr><td>Does it handle our languages?</td><td>Quality and token cost vary by language</td><td>English and Hinglish; reps often mix the two</td></tr>
+<tr><td>Is it good enough on our task?</td><td>Measured on your test cases, not leaderboards</td><td>Must match the rules function on 100% of clear cases</td></tr>
+<tr><td>How fast must it be?</td><td>Latency per call times calls per request</td><td>Under 15 seconds end to end is acceptable for a rep</td></tr>
+<tr><td>What does it cost at volume?</td><td>Price per million input and output tokens</td><td>See the worked estimate below</td></tr>
+</tbody>
+</table></div>
+
+<p>A very common pattern is <b>routing</b>: send easy requests to a small, cheap, fast model and hard ones to a larger model. Another is using a strong model to design and test the agent, then checking whether a cheaper one passes the same tests.</p>
+
+<h3>Data privacy</h3>
+
+<p>This is where managers most often get it wrong, in both directions. Some ban all AI because "it trains on our data". Others paste customer contracts into a personal chatbot account.</p>
+
+<p>The facts as of 2026: the major vendors distinguish their consumer apps from their business and API offerings. Anthropic's privacy centre says that, by default, it does not use inputs or outputs from its commercial products, including the API, to train its models. OpenAI's enterprise privacy page says that, by default, it does not use business data for training.</p>
+
+<p>Google's Gemini API terms say prompts and responses on paid services are not used to improve its products, while the free tier's can be, and reviewed by people. That last contrast is the whole lesson in miniature: the same model, under two different account types, with two different data terms. Defaults can also change if you opt in, for example by sending feedback.</p>
+
+<p>Do not take this page's word for your situation. Read your actual contract and data processing terms, check retention periods, ask where data is processed and stored, and ask whether the vendor offers zero-retention or regional processing options. Then map it to your obligations under India's Digital Personal Data Protection Act 2023 and any sector rules (RBI for banks, SEBI for market intermediaries, health data norms for hospitals). Consumer chat apps, including free tiers, have different settings, so a policy that says "approved tools only, on company accounts" does a lot of work.</p>
+
+<h3>Indian language support</h3>
+
+<p>Frontier models handle major Indian languages far better than they did a few years ago, including Hindi, Bengali, Marathi, Tamil, Telugu, Kannada, Gujarati and Malayalam, and they cope reasonably with code-mixed Hinglish. Quality still varies by language, by task and by script versus romanised text, and token costs run higher, as noted above.</p>
+
+<p>India also has its own model efforts. Sarvam AI was selected under the government's IndiaAI Mission to build a sovereign foundation model, and AI4Bharat, a research lab at IIT Madras, publishes open datasets and models for Indian languages. These are worth testing alongside the global models, especially for voice and for languages with less online text.</p>
+
+<div class="callout tip"><b>Tip</b><p>Never sign off a multilingual agent on an English demo. Build a test set of 30 to 50 real messages in each language you serve, including the messy, mixed-script ones, and have native speakers grade the outputs.</p></div>
+</section>
+
+<section id="m02-build">
+<h2>Hands-on</h2>
+
+<h3>Estimate the Deal Desk's monthly cost</h3>
+
+<p>Here is the method. You can do it in any spreadsheet, and you should, before any pilot gets approved. The prices below are <b>assumed for illustration</b>. They are not quotes for any real model. Plug in your vendor's current price sheet when you do this for real.</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Line</th><th>Assumption or formula</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Salespeople using it</td><td>Assumed</td><td>60</td></tr>
+<tr><td>Requests per person per working day</td><td>Assumed</td><td>8</td></tr>
+<tr><td>Working days per month</td><td>Assumed</td><td>22</td></tr>
+<tr><td><b>Requests per month</b></td><td>60 × 8 × 22</td><td><b>10,560</b></td></tr>
+<tr><td>Model calls per request</td><td>Lookup, policy, margin, final answer</td><td>4</td></tr>
+<tr><td>Average input tokens per call</td><td>System prompt, tools, policy, growing history</td><td>3,000</td></tr>
+<tr><td>Average output tokens per call</td><td>Tool requests are short; final reply is longer</td><td>150</td></tr>
+<tr><td><b>Input tokens per month</b></td><td>10,560 × 4 × 3,000</td><td><b>126.72 million</b></td></tr>
+<tr><td><b>Output tokens per month</b></td><td>10,560 × 4 × 150</td><td><b>6.336 million</b></td></tr>
+</tbody>
+</table></div>
+
+<p>Now price it with two hypothetical models. Exchange rate assumed at ₹88 per US dollar.</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th></th><th>Model A (larger, assumed prices)</th><th>Model B (smaller, assumed prices)</th></tr></thead>
+<tbody>
+<tr><td>Assumed price per million input tokens</td><td>$3.00</td><td>$0.80</td></tr>
+<tr><td>Assumed price per million output tokens</td><td>$15.00</td><td>$4.00</td></tr>
+<tr><td>Input cost: 126.72 × price</td><td>$380.16</td><td>$101.38</td></tr>
+<tr><td>Output cost: 6.336 × price</td><td>$95.04</td><td>$25.34</td></tr>
+<tr><td><b>Monthly total</b></td><td><b>$475.20 ≈ ₹41,818</b></td><td><b>$126.72 ≈ ₹11,151</b></td></tr>
+<tr><td>Per request</td><td>about ₹3.96</td><td>about ₹1.06</td></tr>
+</tbody>
+</table></div>
+
+<p>Three lessons hide in that table. First, input tokens dominate, because the same instructions, tool definitions and policy are resent on every call. That is exactly what <b>prompt caching</b> attacks: most vendors charge much less for a repeated prefix they have seen recently.</p>
+
+<p>Second, the gap between models is about four times here, so it is worth testing whether the smaller one passes your evaluations. Third, even on Model A the bill works out to about ₹4 per request, which is small next to the minutes of rep and manager time a routine approval takes today. The model bill is rarely what sinks a business case. Integration, evaluation and change management usually cost far more, which <a href="{{root}}modules/m13-business-case-and-governance.html">M13</a> covers.</p>
+
+<div class="callout warn"><b>Watch out</b><p>Agents have a long tail. A request that loops ten times, or pulls a 40-page contract into context, can cost twenty times the average. Always set a per-request step limit and a monthly spending cap in the vendor console, and watch the 95th-percentile cost, not only the average.</p></div>
+
+<div class="tabs">
+<div class="tab" data-label="No-code">
+
+<ol class="steps">
+<li><b>Build the calculator</b><p>In a spreadsheet, put each assumption in its own cell: users, requests per day, days, calls per request, input tokens per call, output tokens per call, price in, price out, exchange rate. Compute monthly tokens and cost with simple formulas, exactly as in the tables above.</p></li>
+<li><b>Measure real token counts</b><p>Most vendor consoles show token counts for each request in their playground or usage logs. Paste your actual system prompt and a typical request, run it, and replace the 3,000 and 150 assumptions with what you observe.</p></li>
+<li><b>Add a stress case</b><p>Make a second column where usage triples and calls per request double. If that number would cause a problem, set your spending cap below it.</p></li>
+</ol>
+
+</div>
+<div class="tab" data-label="Python">
+
+<p>This script counts the tokens in a Deal Desk prompt and then makes your first real API call. You need an Anthropic API key in an environment variable; never paste keys into code.</p>
+
+<pre class="code"><code class="language-bash">pip install anthropic==1.13.0
+export ANTHROPIC_API_KEY="your-key-here"     # on Windows: set ANTHROPIC_API_KEY=...
+export MODEL="claude-sonnet-5-5"             # check the models page for current IDs</code></pre>
+
+<pre class="code"><code class="language-python">import os
+import anthropic
+
+MODEL = os.getenv("MODEL", "claude-sonnet-5-5")
+client = anthropic.Anthropic()          # reads ANTHROPIC_API_KEY from the environment
+
+SYSTEM = ("You are the Deal Desk assistant for Meridian Supplies. "
+          "Answer in at most three sentences and show the numbers you used.")
+QUESTION = ("Sahyadri Hospitals (Gold tier, current margin 22%) wants 10% off. "
+            "Policy: Gold cap 12%, margin after discount must stay at or above 12%. "
+            "Can we do it?")
+messages = [{"role": "user", "content": QUESTION}]
+
+# 1. Count input tokens before spending anything (the counting endpoint is free)
+count = client.messages.count_tokens(model=MODEL, system=SYSTEM, messages=messages)
+print("Input tokens for this prompt:", count.input_tokens)
+
+# 2. Make the real call
+reply = client.messages.create(model=MODEL, max_tokens=300,
+                               system=SYSTEM, messages=messages)
+answer = "".join(block.text for block in reply.content if block.type == "text")
+print(answer)
+
+# 3. See what you were billed for
+print("Billed input tokens:", reply.usage.input_tokens)
+print("Billed output tokens:", reply.usage.output_tokens)</code></pre>
+
+<p><b>What this does.</b> The install line pins the SDK version so the code keeps working when a new release comes out. <code>MODEL</code> comes from an environment variable so you can switch models without editing code. <code>anthropic.Anthropic()</code> creates a client and picks up your key from the environment.</p>
+
+<p><code>SYSTEM</code> is the instruction that frames the model's role; <code>messages</code> holds the user's question. Step 1 calls <code>count_tokens</code>, which tells you how many input tokens the prompt uses without generating anything.</p>
+
+<p>Step 2 sends the real request; <code>max_tokens</code> caps the length of the answer, which also caps its cost. The answer comes back as a list of content blocks, so we join the text ones. Step 3 prints the token usage from the response, which is what your bill is based on.</p>
+
+<p>Notice that the code sets no temperature. As explained above, the newest Claude models manage sampling themselves, and passing a custom value returns an error. If you use another vendor, check its docs.</p>
+
+<p>Run it two or three times. Is the wording identical each time? Is the decision? Write down what you see; it is your first evaluation.</p>
+
+</div>
+</div>
+
+<div class="callout mgr"><b>Manager's lens</b><p>Ask for the cost model before you ask for the demo. A team that cannot tell you tokens per request, calls per request and expected volume has not thought about production yet.</p></div>
+</section>
+
+<section id="m02-business">
+<h2>In the business</h2>
+
+<p>Composite, anonymised scenarios showing where these concepts change real decisions.</p>
+
+<div class="case"><span class="case-tag">Case · Marketing</span><h4>Regional campaign copy for a consumer brand</h4><p>A marketing team wants product descriptions in Hindi, Marathi, Tamil and Bengali. The first model produces fluent Hindi and awkward Tamil. The team builds a language-by-language test set, has native speakers grade fifty outputs per language, and ends up using one model for three languages and a human translator plus a different model for the fourth. Their cost estimate also had to be redone once they saw Tamil token counts.</p></div>
+
+<div class="case"><span class="case-tag">Case · Finance</span><h4>Choosing a model for invoice extraction</h4><p>An accounts team extracts twenty fields from vendor invoices. The largest model scores best, but a model costing a fraction as much is just as accurate on clean PDFs. They route: the small model handles everything, and only invoices where a code check fails (totals do not add up, GSTIN format wrong) go to the large model and then a human.</p></div>
+
+<div class="case"><span class="case-tag">Case · HR</span><h4>CV screening and personal data</h4><p>An HR team pastes CVs into a free personal chatbot account to summarise them. Legal stops it, correctly: CVs are personal data under the DPDP Act and the consumer account's terms were never reviewed. The team moves to the company's enterprise account with a signed data processing agreement, deletes the earlier uploads where possible, and writes a one-page "approved AI tools" note for all managers.</p></div>
+
+<div class="case"><span class="case-tag">Case · Customer service</span><h4>Latency in a voice bot</h4><p>A service team builds a phone agent on a reasoning model. Answers are excellent, but callers wait several seconds of silence and hang up. The fix: a faster model for conversational turns and the reasoning model only when the caller's issue needs a multi-step check, with a spoken "let me check that" while it works. Latency, not quality, was the binding constraint. See <a href="{{root}}methods/voice-agents.html">voice agents</a>.</p></div>
+</section>
+
+<section id="m02-pitfalls">
+<h2>Pitfalls</h2>
+
+<p><b>Choosing by leaderboard.</b> Public benchmarks measure general skills. Your agent has a specific job. A model that ranks fifth on a leaderboard can be first on your fifty test cases, and cheaper.</p>
+
+<p><b>Assuming the model learns from use.</b> It does not, by default. If a team says "it will improve over time", ask what process makes that happen: who reviews errors, who updates the prompt, who runs the tests.</p>
+
+<p><b>Budgeting on single-call prices.</b> An agent makes several calls per request with a growing context. Teams that price one call and multiply by volume underestimate by a large factor.</p>
+
+<p><b>Treating the context window as free storage.</b> Stuffing the full product catalogue into every call is slow, expensive and can make answers worse. Retrieve what is relevant instead (see <a href="{{root}}modules/m05-knowledge-and-rag.html">M05</a>).</p>
+
+<p><b>Hard-coding a model ID and forgetting it.</b> Vendors retire models on published schedules. Keep the model ID in configuration, subscribe to the deprecation notices, and re-run your tests before switching.</p>
+
+<p><b>Privacy by assumption.</b> "The vendor doesn't train on our data" may be true for the API and false for the free app your team is actually using. Check which product, which account, which terms.</p>
+
+<ul class="checklist">
+<li>We have measured token counts on our real prompts, in every language we serve.</li>
+<li>We have a monthly cost estimate with a stress case, and a spending cap set below it.</li>
+<li>We tested at least two models on our own test cases.</li>
+<li>Legal has read the data processing terms for the exact product and account we use.</li>
+<li>The model ID lives in configuration, and someone owns tracking its retirement date.</li>
+</ul>
+</section>
+
+<section id="m02-practice">
+<h2>Practice</h2>
+
+<ol class="exercises">
+<li><b>Re-run the cost estimate</b><p>Meridian expands the Deal Desk to 150 users at 6 requests a day, 22 days a month. Using the same per-call token assumptions and Model B's assumed prices, what is the monthly cost in dollars and rupees?</p><details><summary>Hint / model answer</summary><p>Requests: 150 × 6 × 22 = 19,800. Input tokens: 19,800 × 4 × 3,000 = 237.6 million; cost 237.6 × $0.80 = $190.08. Output tokens: 19,800 × 4 × 150 = 11.88 million; cost 11.88 × $4 = $47.52. Total $237.60, about ₹20,909 at the assumed ₹88 per dollar.</p></details></li>
+<li><b>Explain a hallucination</b><p>The agent told a rep that Orchid Schools Trust had "one late payment this year". The record shows zero. Write three sentences for the Sales Head explaining why this can happen and what you will change.</p><details><summary>Hint / model answer</summary><p>The model produces plausible text; if the late-payment figure was not retrieved by a tool in that conversation, it filled the gap with a likely-sounding number. We will require the agent to call get_customer before stating any customer figure, and add a code check that every number in the reply matches a tool result. We will also add this case to our test set so the fix is verified.</p></details></li>
+<li><b>Pick a model set-up</b><p>A hospital chain wants an agent that summarises discharge notes for patients in Hindi and English. List the three filters you apply first and the one you would test hardest.</p><details><summary>Hint / model answer</summary><p>Filters: data protection (health data, DPDP Act, contract terms, where data is processed); language quality in Hindi on real notes; whether a clinician reviews before release. Test hardest: factual accuracy against the source note, since a fluent but wrong medication instruction is a patient-safety risk. Latency and cost matter less here.</p></details></li>
+<li><b>Open or closed?</b><p>A mid-sized Indian private bank's compliance team insists no customer data may leave its own data centre. What does this mean for model choice, and what new costs appear?</p><details><summary>Hint / model answer</summary><p>It points to open-weight models running on the bank's own infrastructure, or a private deployment option if a vendor offers one that satisfies compliance. New costs: GPUs or hosting, an ML operations team, security patching, model updates and evaluation. Quality may be lower than the best closed models, so test on real tasks before committing.</p></details></li>
+<li><b>Token audit</b><p>Take one paragraph of your own writing in English and the same paragraph translated into an Indian language you know. Count tokens for both using a vendor's token counter or the Python script above. What is the ratio, and what does it mean for budget?</p><details><summary>Hint / model answer</summary><p>Expect the Indian-language version to use noticeably more tokens; the exact ratio depends on the language, script and tokenizer. Multiply your English cost estimate by that ratio for the share of traffic in that language.</p></details></li>
+</ol>
+</section>
+
+<section id="m02-quiz">
+<h2>Quiz</h2>
+
+<div class="quiz">
+  <div class="q" data-answer="b">
+    <p class="q-text">Why does an agent that makes four model calls per request usually cost more than four times one simple question?</p>
+    <ol class="q-opts"><li data-k="a">Vendors charge a premium for agents</li><li data-k="b">Each call resends the instructions, tool definitions and the growing history as input tokens</li><li data-k="c">Tool calls are billed per second</li><li data-k="d">Output tokens are free but input tokens are not</li></ol>
+    <p class="q-why">The context is resent on every call and grows as tool results pile up, so input tokens dominate. Vendors price tokens, not "agents".</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Your Deal Desk agent handled 5,000 requests last month. What has it learned from them, by default?</p>
+    <ol class="q-opts"><li data-k="a">Each customer's negotiation style</li><li data-k="b">Meridian's policy, permanently</li><li data-k="c">Which reps make the most requests</li><li data-k="d">Nothing; inference does not change the model's weights</li></ol>
+    <p class="q-why">Using a model is inference, and weights are frozen. Improvements come from your team changing instructions, tools, knowledge or the model, or from memory features you deliberately build.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">Which change most directly reduces hallucinated customer figures?</p>
+    <ol class="q-opts"><li data-k="a">Make the agent fetch figures through a tool and check reply numbers against tool results</li><li data-k="b">Use a model with a bigger context window</li><li data-k="c">Ask the model to be more confident</li><li data-k="d">Switch to a larger model and change nothing else</li></ol>
+    <p class="q-why">Hallucinations fill gaps in what the model was given. Supplying the facts and verifying them in code closes the gap; a bigger model may hallucinate less but still can.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">A sentence in Tamil uses three times as many tokens as its English version. What follows?</p>
+    <ol class="q-opts"><li data-k="a">The model will refuse Tamil input</li><li data-k="b">The Tamil answer will be three times more accurate</li><li data-k="c">Tamil conversations cost more and fill the context window faster</li><li data-k="d">Nothing; billing is per word</li></ol>
+    <p class="q-why">Billing and context limits are in tokens. More tokens for the same meaning means higher cost and less room, with no inherent gain in accuracy.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">Which statement about vendor data use is the most responsible for a manager to make?</p>
+    <ol class="q-opts"><li data-k="a">"No AI vendor ever trains on customer data."</li><li data-k="b">"Major vendors say business and API data is not used for training by default; we have checked our own contract and account type."</li><li data-k="c">"All AI tools train on everything you type."</li><li data-k="d">"Privacy is the vendor's problem, not ours."</li></ol>
+    <p class="q-why">Defaults differ between consumer and business products and can change with opt-ins. The responsible position states the default and confirms it against your actual terms. Under the DPDP Act, your organisation keeps its own obligations.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">When is a reasoning model most worth its extra cost and latency?</p>
+    <ol class="q-opts"><li data-k="a">Greeting customers in a chat widget</li><li data-k="b">Translating a single product name</li><li data-k="c">Comparing three supplier contracts against a policy with interacting rules</li><li data-k="d">Classifying emails as spam or not spam</li></ol>
+    <p class="q-why">Reasoning models help most on multi-step problems where several rules interact. Simple, short tasks gain little and pay the extra time and tokens.</p>
+  </div>
+</div>
+</section>
+
+<section id="m02-learn">
+<h2>Watch and read</h2>
+
+<div class="videos" data-topic="llm-basics"></div>
+
+<div class="res-list">
+  <a class="res" href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Attention Is All You Need</span><span class="res-by">Vaswani et al. · the 2017 transformer paper behind today's LLMs; skim the introduction</span></a>
+  <a class="res" href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Training language models to follow instructions with human feedback</span><span class="res-by">Ouyang et al. (InstructGPT) · where RLHF went mainstream</span></a>
+  <a class="res" href="https://arxiv.org/abs/2305.15425" target="_blank" rel="noopener"><span class="res-kind">Paper</span><span class="res-title">Language Model Tokenizers Introduce Unfairness Between Languages</span><span class="res-by">Petrov et al. · why non-English text costs more tokens</span></a>
+  <a class="res" href="https://platform.claude.com/docs/en/build-with-claude/token-counting" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Token counting</span><span class="res-by">Anthropic · count tokens before you send, free of charge</span></a>
+  <a class="res" href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Claude API pricing</span><span class="res-by">Anthropic · a real price sheet to plug into your calculator, including caching and batch discounts</span></a>
+  <a class="res" href="https://huggingface.co/learn/llm-course" target="_blank" rel="noopener"><span class="res-kind">Course</span><span class="res-title">Hugging Face LLM Course</span><span class="res-by">Hugging Face · free and hands-on, for when you want to go under the bonnet</span></a>
+  <a class="res" href="https://ai4bharat.iitm.ac.in/" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">AI4Bharat</span><span class="res-by">IIT Madras · open datasets and models for Indian languages</span></a>
+</div>
+
+<div class="takeaways"><h3>Key takeaways</h3><ul>
+<li>An LLM predicts the next token from everything in its context window. Facts it was not given, it will guess.</li>
+<li>You pay per token, input and output. Agents resend a growing context on every call, so input tokens dominate the bill.</li>
+<li>Using a model does not teach it. Improvement comes from better instructions, tools, knowledge, tests or models.</li>
+<li>Choose models on your own test cases, filtered first by data terms and language support, then traded on quality, latency and cost.</li>
+<li>Estimate monthly cost before the pilot, with labelled assumptions, a stress case and a spending cap.</li>
+</ul></div>
+</section>

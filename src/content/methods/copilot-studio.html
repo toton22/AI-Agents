@@ -1,0 +1,213 @@
+<!--META {"title":"Copilot Studio","h1":"Build with Microsoft <em>Copilot Studio</em>","eyebrow":"Method · Low-code","lede":"Build the Meridian Deal Desk agent in Copilot Studio with a SharePoint customer table, a deterministic discount check and a Power Automate-style approval, publish it to Teams, and know what IT will ask before it goes live.","minutes":45} -->
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Beginner to intermediate</dd></div><div><dt>Time to first agent</dt><dd>1–2 hours</dd></div><div><dt>Typical cost</dt><dd>Copilot Credits (prepaid or pay-as-you-go); some use included with Microsoft 365 Copilot licences</dd></div><div><dt>Best for</dt><dd>Microsoft 365 companies that want agents in Teams, on SharePoint data, with IT governance</dd></div><div><dt>Runs where</dt><dd>Microsoft cloud, inside your Power Platform environments</dd></div><div><dt>Lock-in risk</dt><dd>High: agents, flows and connectors are Microsoft-specific</dd></div></dl>
+<p>Copilot Studio is Microsoft's low-code tool for building agents. You describe the agent in plain language, connect knowledge (SharePoint, files, websites), give it tools (connectors, flows, MCP servers), test it in a side pane, and publish it to Teams, Microsoft 365 Copilot, a website and other channels. It sits inside the Power Platform, next to Power Automate and Power Apps, so your IT team already knows how to govern it.</p>
+<p>If your company runs on Microsoft 365, this is usually the shortest path from "we should have an agent for that" to an agent your staff can actually open. The customer table is already in Excel on SharePoint. The approver is already in Teams. Identity is already Entra ID. That's the whole pitch, and it's a strong one.</p>
+<h3>What changed recently (as of October 2026)</h3>
+<p>The big change is the arrival of <b>harnesses</b>, the engine that runs what you build. Microsoft's documentation now describes three:</p>
+<ul>
+<li><b>Standard harness</b>: the established Copilot Studio model. Agents use <em>topics</em> (designed conversation paths), tools, knowledge and <em>agent flows</em>. New agents use <b>generative orchestration</b> by default, where an LLM planner picks topics, tools and knowledge based on their descriptions. Billing starts after you publish.</li>
+<li><b>GitHub Copilot harness</b>: generally available since August 2026, built for reasoning-heavy, multi-step work. You give it a goal; it plans, calls tools (connectors, knowledge, MCP servers, other agents), can create Word, Excel, PowerPoint and PDF files, and uses Markdown <em>skills</em> in place of topics. It runs tasks in a sandbox and bills Copilot Credits from the moment you start building, including tests.</li>
+<li><b>Copilot chat harness</b>: extends Microsoft 365 Copilot Chat with your organisation's knowledge.</li>
+</ul>
+<p>You choose the harness when you create the agent, and Microsoft says you can't convert between the standard and GitHub Copilot harnesses later. So the choice matters. We build the Deal Desk on the standard harness, because a discount policy is exactly the kind of rule you want executed the same way every time.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>Copilot Studio wins on distribution and governance, and loses on portability. If the agent will live in Teams and touch SharePoint, Dataverse or Dynamics data, the time saved on security reviews alone usually justifies it. If you might move off Microsoft in three years, keep the business rules in a place you can carry with you, such as a documented policy and a small API.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Pick Copilot Studio when three things are true: your users live in Teams or Microsoft 365 Copilot, your data sits in SharePoint, Excel, Dataverse or a system with a Power Platform connector, and your IT team wants agents inside the same admin centre and data policies they use for Power Automate. Most large Indian companies on Microsoft 365 tick all three.</p>
+<p>It is also a good choice when the process needs a proper approval step. Power Automate approvals have been in production use for years, and an agent can hand off to one cleanly.</p>
+<p>Think twice when your stack is Google Workspace or Salesforce-centred (see <a href="{{root}}methods/enterprise-platforms.html">enterprise platforms</a>), when you need fine control over the reasoning loop (go to code: <a href="{{root}}methods/microsoft-agent-framework.html">Microsoft Agent Framework</a> or <a href="{{root}}methods/langgraph.html">LangGraph</a>), or when usage will be heavy and external-facing, because consumption billing can surprise you if nobody models it first.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>Publishes straight to Teams and Microsoft 365 Copilot with Entra ID sign-in.</li><li>Hundreds of prebuilt connectors plus custom connectors and MCP servers.</li><li>Agent flows give deterministic steps and human approvals next to LLM reasoning.</li><li>Central governance: environments, data policies, analytics, evaluations.</li><li>Makers who know Power Automate are productive on day one.</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Strong Microsoft lock-in; agents don't export to other platforms.</li><li>Billing in Copilot Credits takes effort to forecast.</li><li>Harness choice is permanent per agent.</li><li>Generative orchestration depends on good descriptions; vague ones cause wrong tool picks.</li><li>Connection identity (whose account a flow runs as) is easy to get wrong.</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>On the standard harness, a user message arrives through a channel such as Teams. The orchestrator reads the agent's instructions and the <em>descriptions</em> of every topic, tool, child agent and knowledge source. With generative orchestration on, it plans: maybe search knowledge, maybe call a tool, maybe call two in sequence. If a tool needs an input the user hasn't given, it asks for it automatically. Microsoft's own guidance is blunt that descriptions are "the most important factor" in what gets chosen.</p>
+<p>Tools come in several kinds. A <b>connector action</b> calls one operation in a system (for example, list rows in an Excel table). An <b>agent flow</b> is a Power Automate-style flow with the trigger "When an agent calls the flow"; it runs fixed steps and returns outputs to the agent. An <b>MCP server</b> exposes a set of tools from any system that speaks the Model Context Protocol. Copilot Studio's billing documentation also lists computer-using agents, for screen-level automation of apps without APIs; see <a href="{{root}}methods/computer-use.html">computer use</a> for that pattern.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 360" role="img" aria-label="Copilot Studio architecture: a Teams user talks to an agent; the orchestrator uses SharePoint knowledge and two agent flows, one reading Excel and one requesting approval; the Power Platform admin centre governs it all">
+  <rect class="fx-box" x="12" y="60" width="118" height="60" rx="6"/>
+  <text class="fx-tb" x="71" y="85" text-anchor="middle">Teams / M365</text>
+  <text class="fx-ts" x="71" y="104" text-anchor="middle">Copilot user</text>
+  <rect class="fx-box fx-hi" x="166" y="40" width="190" height="100" rx="6"/>
+  <text class="fx-tb" x="261" y="68" text-anchor="middle">Deal Desk agent</text>
+  <text class="fx-ts" x="261" y="90" text-anchor="middle">instructions +</text>
+  <text class="fx-ts" x="261" y="108" text-anchor="middle">generative orchestration</text>
+  <rect class="fx-box k2" x="400" y="20" width="150" height="50" rx="6"/>
+  <text class="fx-tb" x="475" y="42" text-anchor="middle">Knowledge</text>
+  <text class="fx-ts" x="475" y="59" text-anchor="middle">policy on SharePoint</text>
+  <rect class="fx-box k3" x="400" y="90" width="150" height="50" rx="6"/>
+  <text class="fx-tb" x="475" y="112" text-anchor="middle">Flow: evaluate</text>
+  <text class="fx-ts" x="475" y="129" text-anchor="middle">cap + margin rules</text>
+  <rect class="fx-box k3" x="400" y="160" width="150" height="50" rx="6"/>
+  <text class="fx-tb" x="475" y="182" text-anchor="middle">Flow: approval</text>
+  <text class="fx-ts" x="475" y="199" text-anchor="middle">request_approval</text>
+  <rect class="fx-box k4" x="586" y="90" width="122" height="50" rx="6"/>
+  <text class="fx-tb" x="647" y="112" text-anchor="middle">Excel table</text>
+  <text class="fx-ts" x="647" y="129" text-anchor="middle">customers</text>
+  <rect class="fx-box k4" x="586" y="160" width="122" height="50" rx="6"/>
+  <text class="fx-tb" x="647" y="182" text-anchor="middle">Sales Manager</text>
+  <text class="fx-ts" x="647" y="199" text-anchor="middle">approves in Teams</text>
+  <path class="fx-ar" d="M130 90 L164 90"/>
+  <path class="fx-ar" d="M356 70 L398 48"/>
+  <path class="fx-ar" d="M356 100 L398 112"/>
+  <path class="fx-ar" d="M356 125 L398 180"/>
+  <path class="fx-ar" d="M550 115 L584 115"/>
+  <path class="fx-ar" d="M550 185 L584 185"/>
+  <rect class="fx-box k6" x="12" y="250" width="696" height="90" rx="6"/>
+  <text class="fx-th" x="360" y="278" text-anchor="middle">Power Platform admin centre</text>
+  <text class="fx-ts" x="360" y="302" text-anchor="middle">environments · data policies (DLP) · who can publish · Copilot Credits allocation</text>
+  <text class="fx-ts" x="360" y="322" text-anchor="middle">analytics and audit across every agent in the tenant</text>
+  <path class="fx-ln fx-dash" d="M261 140 L261 248"/>
+  <path class="fx-ln fx-dash" d="M475 210 L475 248"/>
+</svg>
+<figcaption>The LLM decides <em>which</em> tool to use; the agent flows decide <em>how</em> the rules are applied. The admin centre band underneath is what makes IT comfortable saying yes.</figcaption>
+</figure>
+<p>That split is the design idea to take away. Let the model handle language: working out that "Sahyadri" means C-101 and that "ten percent" is 10. Put the policy arithmetic in a flow, where the same input always gives the same output. Microsoft describes agent flows as deterministic for exactly this reason.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk agent</h2>
+<p>You need a Microsoft 365 work account with Copilot Studio access (a trial works for learning) and a SharePoint site you can edit. Screens change often, so the click-paths below name the feature rather than every button.</p>
+<ol class="steps">
+<li><b>Put the data and policy on SharePoint</b><p>Create an Excel workbook <code>Meridian-Customers.xlsx</code> in a SharePoint document library. Enter the five customers and format the range as a table named <code>Customers</code> with columns <code>id, name, tier, revenue_lakh, late_payments, margin_pct</code>. Upload the discount policy as a Word or PDF document to the same site. A SharePoint list works as well as Excel; pick whichever your team will actually keep current.</p></li>
+<li><b>Create the agent</b><p>In Copilot Studio, create a new agent on the <b>standard harness</b>. Name it "Meridian Deal Desk". Give it a description that says who it serves and what it does, because other agents and Microsoft 365 Copilot use that description to decide when to route to it. Paste instructions along these lines:</p>
+<pre class="code"><code class="language-plaintext">You help Meridian Supplies salespeople decide on customer discount requests.
+Always use the "Evaluate discount request" tool to check a request. Never do
+the policy arithmetic yourself and never approve a discount the tool marks
+ESCALATE. If the tool says ESCALATE, offer to raise an approval with the
+"Request discount approval" tool and tell the salesperson not to confirm
+anything to the customer until it is approved. Use the discount policy
+document to explain the rules in plain words when asked. Keep replies short:
+decision, the two numbers (cap, margin after), next step.</code></pre>
+<p>What this does: it tells the orchestrator which tool owns the decision and forbids the model from overriding it. That one sentence ("never approve a discount the tool marks ESCALATE") is your human-in-the-loop rule in writing.</p></li>
+<li><b>Add the policy as knowledge</b><p>In the agent's Knowledge section, add the SharePoint site or the policy file. Knowledge from SharePoint respects the user's own permissions, so salespeople only get answers from documents they can open.</p></li>
+<li><b>Build the "Evaluate discount request" agent flow</b><p>From the agent's Tools section, add a new agent flow. Trigger: <b>When an agent calls the flow</b>, with inputs <code>CustomerName</code> (text) and <code>DiscountPct</code> (number). Then add these actions:</p>
+<ul>
+<li>Excel Online (Business) <b>List rows present in a table</b> on <code>Customers</code>, with a filter query <code>name eq '@{triggerBody()?['text']}'</code> (use the dynamic content picker; the field name depends on your input).</li>
+<li>Four <b>Compose</b> actions with the expressions below.</li>
+<li><b>Respond to the agent</b> with outputs: customer id, tier, cap, margin after, decision, approver.</li>
+</ul>
+<pre class="code"><code class="language-plaintext">Row      = first(body('List_rows_present_in_a_table')?['value'])
+
+Cap      = if(greaterOrEquals(int(outputs('Row')?['late_payments']), 2), 3,
+             if(equals(outputs('Row')?['tier'], 'Gold'), 12,
+               if(equals(outputs('Row')?['tier'], 'Silver'), 8, 5)))
+
+MarginAfter = sub(float(outputs('Row')?['margin_pct']), DiscountPct)
+
+Decision = if(and(lessOrEquals(DiscountPct, outputs('Cap')),
+                  greaterOrEquals(outputs('MarginAfter'), 12)),
+              'APPROVE', 'ESCALATE')
+
+Approver = if(greater(DiscountPct, 15), 'Regional Head', 'Sales Manager')</code></pre>
+<p>What this does, in plain English. <b>Row</b> takes the first matching customer from the Excel table. <b>Cap</b> applies the late-payment rule first (two or more late payments means 3%), then the tier caps. <b>MarginAfter</b> subtracts the discount from current margin. <b>Decision</b> approves only if the discount is within the cap <em>and</em> the margin stays at 12% or more. <b>Approver</b> picks the Regional Head above 15%, otherwise the Sales Manager. In the real designer, <code>DiscountPct</code> is a reference to the trigger input, which you insert from dynamic content. Add a condition for "no row found" that responds with an error message, so the agent asks the user to check the name.</p></li>
+<li><b>Build the "Request discount approval" agent flow</b><p>Second agent flow, same trigger, inputs matching our standard signature: <code>customer_id</code>, <code>discount_pct</code>, <code>approver</code>, <code>reason</code>. Actions in this order:</p>
+<ol>
+<li><b>Respond to the agent</b> straight away with "Approval requested from &lt;approver&gt;".</li>
+<li>Approvals <b>Start and wait for an approval</b> (Approve/Reject, first to respond), assigned to the Sales Manager's or Regional Head's mailbox depending on <code>approver</code>, with the reason and numbers in the details.</li>
+<li>Post the outcome to the salesperson in Teams, and write a row to a "Discount decisions" SharePoint list as the audit record.</li>
+</ol>
+<p>What this does: the agent gets an answer in seconds while the human takes as long as humans take. The decision lands in Teams and in a list your auditors can read, so the chat transcript is not the system of record. Agent flows also offer built-in human-in-the-loop actions (approvals and requests for information) if you prefer to stay entirely inside Copilot Studio.</p></li>
+<li><b>Name and describe the tools well</b><p>For each flow, write a description the orchestrator can act on. "Checks a discount request against Meridian's tier caps, late-payment rule and 12% margin floor. Returns APPROVE or ESCALATE." is good. "Discount flow" is not.</p></li>
+<li><b>Test in the test pane</b><p>Run the three reference cases and watch the activity map to see which tool was chosen and with what inputs. Then publish, and add the <b>Teams and Microsoft 365 Copilot</b> channel so salespeople can find it.</p></li>
+</ol>
+<div class="trace">
+  <div class="t-user">Kite Fintech wants 5% off. OK to give?</div>
+  <div class="t-think">Discount request. The instructions say use Evaluate discount request; I have both inputs.</div>
+  <div class="t-act">Evaluate discount request(CustomerName="Kite Fintech", DiscountPct=5)</div>
+  <div class="t-obs">{"id":"C-104","tier":"Bronze","cap":5,"margin_after":11,"decision":"ESCALATE","approver":"Sales Manager"}</div>
+  <div class="t-think">Within the Bronze cap, but margin after is 11%, under the 12% floor. Offer the approval request.</div>
+  <div class="t-final">Not within policy yet. 5% is inside Kite's Bronze cap, but it would take gross margin to 11% (floor is 12%). Shall I ask the Sales Manager to approve?</div>
+  <div class="t-user">Yes, they're a new fintech logo we want.</div>
+  <div class="t-act">Request discount approval(customer_id="C-104", discount_pct=5, approver="Sales Manager", reason="Margin after 11% below 12% floor. Rep: strategic new logo.")</div>
+  <div class="t-obs">"Approval requested from Sales Manager"</div>
+  <div class="t-human">Sales Manager approved 5% in Teams with comment: "One order only, review at renewal."</div>
+  <div class="t-final">Approved by the Sales Manager for this order only. The decision is logged in Discount decisions. Here's a draft reply to Kite…</div>
+</div>
+<h3>Variation: make it autonomous</h3>
+<p>Some sales teams prefer a form. Add a SharePoint list "Discount requests" and give the agent an event trigger so it runs whenever a new item is created: it evaluates the request, files approvals where needed and writes the result back to the item. No one chats at all. Be careful with this pattern. An autonomous agent acts under the connection identity you configure, so decide deliberately whose account it uses and what that account can touch.</p>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<p>This is where Copilot Studio earns its keep, because most of the controls already exist. Your job is to switch them on in the right order.</p>
+<h3>Environments and lifecycle</h3>
+<p>Build in a development environment, move to test and production as a <em>solution</em> through your normal application lifecycle process. Use connection references so the production flows use production connections. Never let the pilot that started in someone's default environment quietly become the production agent; it happens more often than anyone admits.</p>
+<h3>Identity and data access</h3>
+<p>Set the agent to authenticate users with Microsoft Entra ID. Then decide, per tool, whether it runs with the <em>user's</em> credentials or a fixed service connection. For the customer table, user credentials mean salespeople only see what SharePoint already lets them see. For the approval flow, a service connection is usually right, so approvals don't depend on the salesperson's own mailbox permissions.</p>
+<h3>Data policies</h3>
+<p>Power Platform data policies (DLP) control which connectors can be used together and which knowledge sources and channels agents may use. A sensible baseline for Meridian: business connectors (SharePoint, Excel, Approvals, Teams) allowed, consumer connectors blocked, public website knowledge reviewed case by case, and publishing to external channels restricted to a named group.</p>
+<h3>Cost control</h3>
+<p>Consumption is measured in Copilot Credits. Microsoft's billing documentation (checked September 2026) lists rates such as 1 credit for a classic answer, 2 for a generative answer, 5 for an agent action, 10 for tenant graph grounding and 13 per 100 agent flow actions; a single complex reply can therefore use several credits. Credits are bought as prepaid capacity pooled across the tenant, with pay-as-you-go through an Azure subscription as the overflow. Usage by employees who hold Microsoft 365 Copilot licences can be included under conditions Microsoft spells out (for example, the flow must be triggered by the agent and the agent must act as the signed-in user). Rates and rules change, so model a month of Deal Desk usage with your Microsoft partner before rollout, and set environment-level allocations so one runaway agent can't drain the tenant.</p>
+<div class="callout warn"><b>Watch out</b><p>If an environment runs out of credits, agents stop answering. Put credit consumption on the same monthly report as Power Automate capacity, and assign a named owner who gets the alert.</p></div>
+<h3>Monitoring and approvals</h3>
+<p>Use the built-in analytics for sessions, outcomes and tool usage, and the evaluation features (test sets with graders) before every republish. Keep the approval record in the SharePoint list, and review it monthly: how many escalations, how many approved, how long approvals took. If the Sales Manager approves 95% of escalations without comment, your policy, not your agent, may need changing. That's a useful finding.</p>
+<ul class="checklist"><li>Agent built in dev, promoted as a solution to test and prod</li><li>Entra ID authentication on; tool credentials chosen deliberately</li><li>DLP policy reviewed for connectors, knowledge sources and channels</li><li>Credit allocation set per environment; owner gets alerts</li><li>Evaluation test set with the three reference cases plus edge cases</li><li>Approval outcomes stored in a list, reviewed monthly</li></ul>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales</td><td>Deal Desk in Teams</td><td>Evaluates discount requests with a deterministic flow; files approvals</td><td>Sales Manager or Regional Head approves anything outside policy</td></tr>
+<tr><td>HR</td><td>Employee helpdesk</td><td>Answers policy questions from SharePoint; opens an HR case when it can't</td><td>HR team owns every case raised</td></tr>
+<tr><td>Finance</td><td>Vendor invoice status</td><td>Looks up invoice and payment status through an ERP connector for vendors' queries</td><td>Accounts payable handles disputes and payment changes</td></tr>
+<tr><td>IT</td><td>Access requests</td><td>Collects details, checks the role catalogue, starts an approval flow</td><td>Line manager and system owner approve access</td></tr>
+<tr><td>Supply chain</td><td>Stock-out alerts</td><td>Autonomous trigger on low stock; drafts a purchase requisition</td><td>Buyer reviews and releases the requisition</td></tr>
+<tr><td>Customer service</td><td>Website support agent</td><td>Answers delivery questions from public FAQ and order lookup</td><td>Hand-off to a live agent for complaints and refunds</td></tr>
+</tbody></table></div>
+<div class="case"><span class="case-tag">Case · HR</span><h4>An HR helpdesk at a mid-sized Indian manufacturer</h4><p>A typical first Copilot Studio project: an HR agent in Teams that answers leave, travel and reimbursement questions from SharePoint policies. The early win is volume, since routine questions stop reaching HR inboxes. The early problem is old documents: three versions of the travel policy sit on SharePoint and the agent quotes the wrong one. The fix is housekeeping, not AI. Archive superseded files and point knowledge at a single curated library.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice and quiz</h2>
+<ol class="exercises">
+<li><b>Descriptions experiment</b><p>Build the agent with the evaluate flow described only as "Discount flow". Ask five discount questions and note how often it is called. Then rewrite the description properly and repeat.</p><details><summary>Hint / model answer</summary><p>With a vague description the orchestrator may answer from the policy document instead, doing the arithmetic itself, and sometimes getting Kite wrong. A specific description that names the rules and the outputs gets the tool called consistently. Of all the fixes in Copilot Studio, this one pays back fastest.</p></details></li>
+<li><b>Choose the harness</b><p>Meridian's CFO wants a second agent that reads the month's discount decisions list and produces a PowerPoint summary for the regional review. Which harness, and why? What does it cost to try?</p><details><summary>Hint / model answer</summary><p>The GitHub Copilot harness suits a goal-based, multi-step task that creates Office files. Note that it bills credits from the start of building, including preview and tests, so budget for experimentation. The Deal Desk itself stays on the standard harness because its rules must be deterministic, and agents can't switch harness later.</p></details></li>
+<li><b>Write the DLP brief</b><p>Draft a half-page note to the Power Platform admin listing which connectors and channels the Deal Desk needs, and which should be blocked.</p><details><summary>Hint / model answer</summary><p>Needed: SharePoint, Excel Online (Business), Approvals, Microsoft Teams; channel Teams and Microsoft 365 Copilot; authentication via Entra ID. Block: consumer storage and social connectors, anonymous web channels, public website knowledge. Ask for a separate production environment and a credit allocation with alerting.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="b">
+    <p class="q-text">Under generative orchestration, what most influences which tool the agent picks?</p>
+    <ol class="q-opts"><li data-k="a">The order in which tools were added</li><li data-k="b">The descriptions of the tools, topics and knowledge sources</li><li data-k="c">Trigger phrases on each topic</li><li data-k="d">The number of inputs each tool has</li></ol>
+    <p class="q-why">Microsoft's documentation calls descriptions the most important factor. Trigger phrases (c) drive classic orchestration, not generative.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">Why does the build put the cap and margin calculation in an agent flow instead of the instructions?</p>
+    <ol class="q-opts"><li data-k="a">Agent flows are cheaper than generative answers in every case</li><li data-k="b">The model can't read Excel</li><li data-k="c">Flows are deterministic: the same inputs always give the same decision</li><li data-k="d">Instructions can't mention numbers</li></ol>
+    <p class="q-why">Policy rules should be applied identically every time. The model handles language; the flow handles rules.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">In the approval flow, why respond to the agent before starting the approval?</p>
+    <ol class="q-opts"><li data-k="a">So the conversation isn't left waiting while a human takes hours to decide</li><li data-k="b">Because approvals can't run inside agent flows</li><li data-k="c">To save credits on the approval action</li><li data-k="d">So the agent can approve on the manager's behalf</li></ol>
+    <p class="q-why">Humans are slow and chats are not. Reply quickly, wait for the approver separately, and send the outcome to Teams when it arrives.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Which statement about Copilot Studio harnesses is correct as of 2026?</p>
+    <ol class="q-opts"><li data-k="a">You can switch an agent between harnesses any time</li><li data-k="b">The standard harness bills from the first minute of building</li><li data-k="c">The GitHub Copilot harness needs a GitHub Copilot licence</li><li data-k="d">The GitHub Copilot harness bills credits during building and testing</li></ol>
+    <p class="q-why">Building, preview and evaluations on the GitHub Copilot harness consume credits. The standard harness bills after publish, harnesses can't be converted, and no GitHub Copilot licence is required.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">Bluewave Logistics asks for 6%. What does the evaluate flow return?</p>
+    <ol class="q-opts"><li data-k="a">APPROVE: Silver cap is 8%</li><li data-k="b">ESCALATE to Sales Manager: 2 late payments cap it at 3%</li><li data-k="c">ESCALATE to Regional Head</li><li data-k="d">APPROVE: margin after is exactly 12%</li></ol>
+    <p class="q-why">The late-payment rule overrides the Silver cap. Margin after (12%) passes, but the cap fails, so it goes to the Sales Manager. Regional Head is only for discounts above 15%.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="copilot-studio"></div>
+<div class="res-list">
+  <a class="res" href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-what-is-copilot-studio" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">What is Copilot Studio?</span><span class="res-by">Microsoft Learn · harnesses, agents, workflows, channels</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/advanced-generative-actions" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Generative orchestration</span><span class="res-by">Microsoft Learn · how the planner picks topics, tools and knowledge</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/flows-overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Agent flows overview</span><span class="res-by">Microsoft Learn · deterministic flows, triggers, human-in-the-loop actions</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-messages-management" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Billing rates and management</span><span class="res-by">Microsoft Learn · Copilot Credits and what consumes them</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/power-platform/admin/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Power Platform administration</span><span class="res-by">Microsoft Learn · environments, data policies, governance</span></a>
+</div>
+<div class="cards"><a class="card" href="{{root}}methods/workflow-automation.html"><span class="card-kicker">Method · Low-code</span><b>Workflow automation</b><span>n8n, Zapier, Make and Power Automate compared.</span></a><a class="card" href="{{root}}methods/microsoft-agent-framework.html"><span class="card-kicker">Method · Code</span><b>Microsoft Agent Framework</b><span>When you need code-level control on Microsoft's stack.</span></a></div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>Copilot Studio is the default agent builder for Microsoft 365 companies: Teams distribution, Entra identity and Power Platform governance come built in.</li><li>Choose the harness carefully; it can't be changed later. Use the standard harness for rule-bound processes like discounts.</li><li>Let the LLM handle language and put policy arithmetic in agent flows.</li><li>Model Copilot Credit usage before rollout and keep approval records outside the chat.</li></ul></div>
+</section>

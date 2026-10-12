@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>M12 Deployment and LLMOps · AI Agents for Management</title>
+<meta name="description" content="Take the Meridian Deal Desk agent from a script on a laptop to a service your sales team can rely on: pick a hosting option, wire in identity, secrets and tracing, model the monthly cost in rupees, and run a 30-60-90 day pilot-to-scale plan.">
+<meta property="og:title" content="M12 Deployment and LLMOps · AI Agents for Management">
+<meta property="og:description" content="Take the Meridian Deal Desk agent from a script on a laptop to a service your sales team can rely on: pick a hosting option, wire in identity, secrets and tracing, model the monthly cost in rupees, and run a 30-60-90 day pilot-to-scale plan.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23151826'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6'%3E%3Ccircle cx='12' cy='6' r='2.2'/%3E%3Ccircle cx='6' cy='17' r='2.2'/%3E%3Ccircle cx='18' cy='17' r='2.2'/%3E%3Cpath d='M11 8 7 15M13 8l4 7M8.2 17h7.6'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('aiam.theme');if(t)document.documentElement.setAttribute('data-theme',JSON.parse(t));}catch(e){}</script>
+</head>
+<body data-root="../" data-page="m12" data-track="m01,m02,m03,m04,m05,m06,m07,m08,m09,m10,m11,m12,m13,x-nocode,x-copilot,x-workflow,x-enterprise,x-voice,x-computer,x-api,x-langgraph,x-crewai,x-maf,x-openai,x-claude,x-adk,x-llamaindex,x-mcp,chatbots,lab">
+<a class="skip-link" href="#content">Skip to content</a>
+<svg id="fx-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="fx-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fx-head" d="M0,0 L10,5 L0,10 z"/></marker></defs></svg>
+<div class="shell">
+  <aside class="rail" aria-label="Course contents">
+    <div class="rail-head">
+      <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M11 7.2 6.2 15.8M13 7.2l4.8 8.6M7.4 18h9.2"/></svg></span><span><span class="brand-name">AI Agents for Management</span><span class="brand-sub">Concept to corporate deployment</span></span></a>
+      <div class="rail-tools">
+        <button class="searchbtn" type="button" data-search-open><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg><span>Search</span><kbd>/</kbd></button>
+        <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+    </div>
+    <div class="rail-progress"><div class="rail-progress-top"><span>Pages completed</span><b id="pcount">0 / 30</b></div><div class="meter"><i id="pbar"></i></div></div>
+    <nav class="nav" aria-label="Course pages">
+<div class="nav-group"><p>Orientation</p>
+<a href="../index.html"><span class="num"></span><span>Start here</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../mindmap.html"><span class="num"></span><span>Concept map: ways to build agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../roadmap.html"><span class="num"></span><span>Learning roadmap</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 1 · Foundations</p>
+<a href="../modules/m01-what-is-an-agent.html" data-id="m01"><span class="num">01</span><span>M01 What an AI agent is</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m02-llms-for-managers.html" data-id="m02"><span class="num">02</span><span>M02 How LLMs work</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m03-instructions-and-prompts.html" data-id="m03"><span class="num">03</span><span>M03 Instructions and prompts</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m04-tools-and-function-calling.html" data-id="m04"><span class="num">04</span><span>M04 Tools and function calling</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 2 · Building</p>
+<a href="../modules/m05-knowledge-and-rag.html" data-id="m05"><span class="num">05</span><span>M05 Knowledge and RAG</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m06-memory-and-state.html" data-id="m06"><span class="num">06</span><span>M06 Memory and state</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m07-design-patterns.html" data-id="m07"><span class="num">07</span><span>M07 Agent design patterns</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m08-multi-agent-systems.html" data-id="m08"><span class="num">08</span><span>M08 Multi-agent systems</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m09-protocols-mcp-a2a.html" data-id="m09"><span class="num">09</span><span>M09 Protocols: MCP and A2A</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 3 · Corporate</p>
+<a href="../modules/m10-evaluation.html" data-id="m10"><span class="num">10</span><span>M10 Evaluation and testing</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m11-guardrails-and-responsible-ai.html" data-id="m11"><span class="num">11</span><span>M11 Guardrails and security</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m12-deployment-and-llmops.html" data-id="m12" aria-current="page"><span class="num">12</span><span>M12 Deployment and LLMOps</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m13-business-case-and-governance.html" data-id="m13"><span class="num">13</span><span>M13 Business case and governance</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · No-code &amp; low-code</p>
+<a href="../methods/index.html"><span class="num"></span><span>Choose your method</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/no-code-assistants.html" data-id="x-nocode"><span class="num">A</span><span>No-code assistants</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/copilot-studio.html" data-id="x-copilot"><span class="num">B</span><span>Copilot Studio</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/workflow-automation.html" data-id="x-workflow"><span class="num">C</span><span>Workflow automation</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/enterprise-platforms.html" data-id="x-enterprise"><span class="num">D</span><span>Enterprise platforms</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/voice-agents.html" data-id="x-voice"><span class="num">E</span><span>Voice agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/computer-use.html" data-id="x-computer"><span class="num">F</span><span>Computer use agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · Code</p>
+<a href="../methods/api-tool-use.html" data-id="x-api"><span class="num">G</span><span>Raw API tool use</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/langgraph.html" data-id="x-langgraph"><span class="num">H</span><span>LangChain + LangGraph</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/crewai.html" data-id="x-crewai"><span class="num">I</span><span>CrewAI</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/microsoft-agent-framework.html" data-id="x-maf"><span class="num">J</span><span>Microsoft Agent Framework</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/openai-agents-sdk.html" data-id="x-openai"><span class="num">K</span><span>OpenAI Agents SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/claude-agent-sdk.html" data-id="x-claude"><span class="num">L</span><span>Claude Agent SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/google-adk.html" data-id="x-adk"><span class="num">M</span><span>Google ADK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/llamaindex.html" data-id="x-llamaindex"><span class="num">N</span><span>LlamaIndex</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/mcp.html" data-id="x-mcp"><span class="num">O</span><span>Build an MCP server</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Practice</p>
+<a href="../chatbots.html" data-id="chatbots"><span class="num"></span><span>Chatbots + live bot</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../lab.html" data-id="lab"><span class="num"></span><span>Agent Lab</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../capstones.html"><span class="num"></span><span>Capstone projects</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Library</p>
+<a href="../media.html"><span class="num"></span><span>Videos &amp; infographics</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../glossary.html"><span class="num"></span><span>Glossary</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../resources.html"><span class="num"></span><span>Books, courses, papers</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="iconbtn" type="button" id="menu-btn" aria-label="Open contents"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+      <span class="brand-name">AI Agents for Management</span>
+      <button class="iconbtn" type="button" data-search-open aria-label="Search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></button>
+      <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+    </div>
+    <div class="page-wrap">
+      <main class="article" id="content">
+<header class="page-head"><p class="eyebrow">Module 12 · Level 3 · Corporate</p><h1>Deployment and LLMOps: from notebook to <em>production</em></h1><p class="lede">Take the Meridian Deal Desk agent from a script on a laptop to a service your sales team can rely on: pick a hosting option, wire in identity, secrets and tracing, model the monthly cost in rupees, and run a 30-60-90 day pilot-to-scale plan.</p><div class="page-meta"><span>60 min read</span><span>Tracked in your progress</span></div></header>
+
+<section id="m12-idea">
+<h2>The big idea</h2>
+<p>The Deal Desk agent works on your laptop. Congratulations: you are about 20% of the way there.</p>
+<p>The other 80% is everything a laptop hides. Who is allowed to use it, and how do they sign in? Where does the API key live? What happens at 11 a.m. on the last day of the quarter, when 40 salespeople hit it at once and the model provider is having a slow day? How much will it cost by month-end? When a Sales Manager says "it told Asha she could give 10% to Bluewave", can you find that exact conversation, see which tools ran, and prove what the agent knew? And when Tuesday's prompt change makes things worse, how fast can you put Monday's version back?</p>
+<p><b>LLMOps</b> is the name for the discipline that answers those questions. It borrows from DevOps and MLOps, then adds the parts that are special to agents: versioning prompts and model choices as carefully as code, running evals before every release, tracing multi-step tool use, and keeping token spend under control.</p>
+<p>None of this is glamorous. It is also where most agent pilots quietly die. The demo impressed the leadership team, then the project hit IT security review, procurement, identity integration and a cost question nobody could answer, and six months later it was still a pilot.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>A pilot that five enthusiasts use is not a product. "In production" means five things exist: a named owner, a support route for users, a budget line with alerts, an incident and rollback plan, and evidence (evals, logs) that you could show an auditor. Ask for those five before you call anything live, and budget real time for them; they usually take longer than building the agent.</p></div>
+</section>
+
+<section id="m12-how">
+<h2>How it works</h2>
+<h3>A reference architecture</h3>
+<p>Every production agent, whether built in Copilot Studio or in Python, ends up with roughly the same parts. Naming them helps you ask the right questions of any vendor or internal team.</p>
+<figure class="fig" data-dl="m12-deployment-and-llmops-figure-1">
+<svg viewBox="0 0 720 400" role="img" aria-label="Reference architecture: channels, gateway, orchestrator with policy engine, model router, tools and MCP, knowledge, memory, and observability underneath">
+  <rect class="fx-box k1" x="16" y="150" width="120" height="80" rx="6"/>
+  <text class="fx-tb" x="76" y="178" text-anchor="middle">Channels</text>
+  <text class="fx-ts" x="76" y="198" text-anchor="middle">Teams, Slack,</text>
+  <text class="fx-ts" x="76" y="214" text-anchor="middle">web, WhatsApp</text>
+  <rect class="fx-box k2" x="158" y="150" width="116" height="80" rx="6"/>
+  <text class="fx-tb" x="216" y="182" text-anchor="middle">Gateway</text>
+  <text class="fx-ts" x="216" y="202" text-anchor="middle">SSO, rate limits</text>
+  <rect class="fx-box fx-hi" x="300" y="150" width="130" height="80" rx="6"/>
+  <text class="fx-tb" x="365" y="182" text-anchor="middle">Orchestrator</text>
+  <text class="fx-ts" x="365" y="202" text-anchor="middle">the agent loop</text>
+  <rect class="fx-box k5" x="300" y="40" width="130" height="56" rx="6"/>
+  <text class="fx-tb" x="365" y="64" text-anchor="middle">Policy engine</text>
+  <text class="fx-ts" x="365" y="83" text-anchor="middle">rules, approvals</text>
+  <rect class="fx-box k3" x="470" y="40" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="550" y="64" text-anchor="middle">Model router</text>
+  <text class="fx-ts" x="550" y="83" text-anchor="middle">small or large model</text>
+  <rect class="fx-box k3" x="470" y="112" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="550" y="136" text-anchor="middle">Tools / MCP</text>
+  <text class="fx-ts" x="550" y="155" text-anchor="middle">ERP, CRM, approvals</text>
+  <rect class="fx-box k3" x="470" y="184" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="550" y="208" text-anchor="middle">Knowledge</text>
+  <text class="fx-ts" x="550" y="227" text-anchor="middle">policies, RAG index</text>
+  <rect class="fx-box k3" x="470" y="256" width="160" height="56" rx="6"/>
+  <text class="fx-tb" x="550" y="280" text-anchor="middle">Memory</text>
+  <text class="fx-ts" x="550" y="299" text-anchor="middle">sessions, history</text>
+  <rect class="fx-box k4" x="158" y="332" width="472" height="52" rx="6"/>
+  <text class="fx-tb" x="394" y="354" text-anchor="middle">Observability</text>
+  <text class="fx-ts" x="394" y="373" text-anchor="middle">traces, cost, evals, audit logs</text>
+  <path class="fx-ar" d="M136 190 H154"/>
+  <path class="fx-ar" d="M274 190 H296"/>
+  <path class="fx-ar" d="M365 150 V100"/>
+  <path class="fx-ar" d="M430 180 L466 70"/>
+  <path class="fx-ar" d="M430 186 L466 142"/>
+  <path class="fx-ar" d="M430 194 L466 212"/>
+  <path class="fx-ar" d="M430 202 L466 282"/>
+  <path class="fx-ln fx-dash" d="M216 230 V332"/>
+  <path class="fx-ln fx-dash" d="M365 230 V332"/>
+</svg>
+<figcaption>Requests come in through a channel and a gateway; the orchestrator runs the loop, consults the policy engine, and calls models, tools, knowledge and memory. Everything reports to observability.</figcaption>
+</figure>
+<p>In plain words, for the Deal Desk:</p>
+<ul>
+<li><b>Channels</b> are where people meet the agent: a Teams app for salespeople, perhaps a panel inside the CRM later. WhatsApp matters more for customer-facing agents in India than for internal ones.</li>
+<li>The <b>gateway</b> is the front door. It checks who you are (single sign-on), applies rate limits, and rejects junk before it costs money.</li>
+<li>The <b>orchestrator</b> runs the agent loop you built in <a href="../modules/m04-tools-and-function-calling.html">M04</a>: call the model, run tools, repeat.</li>
+<li>The <b>policy engine</b> holds rules that must never depend on the model's mood: discount caps, approval thresholds, who may see what. In <a href="../modules/m11-guardrails-and-responsible-ai.html">M11</a> that was the <code>policy_check()</code> function.</li>
+<li>The <b>model router</b> sends each call to a suitable model: a small, fast one for simple lookups, a stronger one for the decision and the reply.</li>
+<li><b>Tools and MCP servers</b> connect to the ERP, CRM and approval workflow (see <a href="../modules/m09-protocols-mcp-a2a.html">M09</a>). <b>Knowledge</b> is the policy library and any retrieval index (<a href="../modules/m05-knowledge-and-rag.html">M05</a>). <b>Memory</b> keeps session history (<a href="../modules/m06-memory-and-state.html">M06</a>).</li>
+<li><b>Observability</b> records every step: traces, latency, token cost, eval scores and the audit log.</li>
+</ul>
+
+<h3>Where to host it</h3>
+<p>There are three broad options, and the right one depends far more on your company's existing cloud and skills than on the agent itself.</p>
+<div class="table-wrap"><table><thead><tr><th>Option</th><th>Examples (as of 2026)</th><th>You manage</th><th>Good for</th><th>Watch-outs</th></tr></thead><tbody>
+<tr><td><b>SaaS agent platforms</b></td><td>Microsoft Copilot Studio, Salesforce Agentforce, ServiceNow, other suite-embedded agents</td><td>Configuration, connectors, policies</td><td>Fast start inside a suite you already own; built-in identity</td><td>Platform limits, per-message pricing, lock-in</td></tr>
+<tr><td><b>Cloud agent runtimes</b></td><td>AWS Bedrock AgentCore; Google Vertex AI Agent Engine (now part of the Gemini Enterprise Agent Platform); Microsoft Foundry Agent Service</td><td>Agent code; the cloud runs, scales and secures it</td><td>Code-built agents with enterprise identity, memory, observability as managed services</td><td>Cloud-specific APIs; check which models and features exist in Indian regions</td></tr>
+<tr><td><b>Self-hosted containers</b></td><td>Docker on Kubernetes, Azure Container Apps, Cloud Run, ECS, or on-premises</td><td>Everything: runtime, scaling, patching, monitoring</td><td>Maximum control, strict data rules, multi-cloud</td><td>Needs a platform team; you own every outage</td></tr>
+</tbody></table></div>
+<p>AWS describes AgentCore as a set of managed services (runtime, gateway, identity, memory, observability, policy and more) that work with open-source frameworks and any model. Google and Microsoft offer comparable managed runtimes. For a company like Meridian, already on Microsoft 365, the realistic shortlist is Copilot Studio for a no-code build or Foundry Agent Service for a code build, with a self-hosted container as the portable fallback. See <a href="../methods/enterprise-platforms.html">enterprise platforms</a> for a fuller comparison.</p>
+
+<h3>Identity, secrets and data residency</h3>
+<p><b>Identity.</b> Users sign in with their company account (Microsoft Entra ID, Okta, Google Workspace) through single sign-on. No shared passwords, no "everyone uses the same API key". Then decide whose permissions the agent uses when it calls a tool. Either it acts <i>on behalf of the user</i>, so a salesperson in Pune only sees Pune accounts, or it uses its own <i>service identity</i> with tightly scoped rights. On-behalf-of is better for anything involving personal or confidential data, because existing access controls keep working.</p>
+<p><b>Secrets.</b> API keys and database passwords live in a secrets manager (Azure Key Vault, AWS Secrets Manager, Google Secret Manager or similar), are injected at runtime, and are rotated on a schedule. Never in code, never in the container image, never in a prompt.</p>
+<p><b>Data residency in India.</b> Map where each kind of data sits: prompts and replies in transit to the model, conversation memory, audit logs, traces in your observability tool, and any vector index. All the major clouds run regions in India, but a given model or agent feature is not always available in every region, so check before you commit. The DPDP Act permits transfers abroad except to countries the government restricts, but sector rules can be stricter (the RBI's payment-data storage directive is the classic example), and many enterprise customers write in-country processing into contracts anyway. The practical rule: decide residency up front and choose the hosting option that satisfies it, rather than discovering the problem in a security review.</p>
+
+<h3>Observability and tracing</h3>
+<p>When something goes wrong with an agent, the question is always "what exactly happened on that request?" A <b>trace</b> answers it: one record per request, broken into <b>spans</b> for each model call and tool call, with timings, token counts, inputs and outputs. Here is what a trace for one Deal Desk request might look like, with the timings an operations dashboard would show.</p>
+<div class="trace">
+  <div class="t-user">Bluewave Logistics wants 6% off. (request 9f2c41d07a3b · user asha.k · agent v1.4.0)</div>
+  <div class="t-think">Model call 1 · 1.6 s · 2,940 tokens in / 48 out. Need the customer record.</div>
+  <div class="t-act">find_customer(name="Bluewave Logistics") · 140 ms</div>
+  <div class="t-obs">{"id":"C-102","tier":"Silver","late":2,"margin":18}</div>
+  <div class="t-think">Model call 2 · 1.4 s · 3,080 in / 61 out. Two late payments: cap is 3%. Check policy to be sure.</div>
+  <div class="t-act">get_discount_policy() · 35 ms</div>
+  <div class="t-obs">"Max discount by tier: ... 2 or more late payments this FY are capped at 3% ..."</div>
+  <div class="t-think">Model call 3 · 1.9 s · 3,310 in / 92 out. 6% is above the 3% cap. Escalate to Sales Manager.</div>
+  <div class="t-act">request_approval(customer_id="C-102", discount_pct=6, approver="Sales Manager", reason="2 late payments; cap 3%") · 410 ms</div>
+  <div class="t-obs">"APR-3B81E0 created and PENDING with Sales Manager."</div>
+  <div class="t-final">Model call 4 · 1.3 s. DECISION: ESCALATE, ticket APR-3B81E0. Total 6.8 s · 4 model calls · 13,100 tokens · policy check passed.</div>
+</div>
+<p>Notice where the time goes: about 6.2 of the 6.8 seconds are model calls. That is typical, and it tells you where to look when users complain about speed.</p>
+<p>Tools for this, as of 2026, include Langfuse (open source, self-hostable), LangSmith, Arize Phoenix, and the observability services built into the cloud agent runtimes. Many now speak <b>OpenTelemetry</b>, the open standard for traces, which has a set of generative-AI conventions that are still evolving. Using OpenTelemetry means you can switch observability vendors without re-instrumenting your code, a lock-in question worth asking early.</p>
+<div class="callout warn"><b>Watch out</b><p>Traces contain everything the agent saw, including personal data. Redact before you send them to a third-party tool, restrict who can view them, and set a retention period. Your observability platform is now part of your DPDP footprint.</p></div>
+
+<h3>Cost: a worked rupee model</h3>
+<p>Agent costs surprise people because each user request triggers several model calls, and each call resends the growing conversation plus all the tool definitions. Here is a monthly model for the Deal Desk. Every number below is an assumption, labelled so you can swap in your own. Prices in particular are placeholders, not any vendor's real rate card.</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Assumption</th><th>Value</th></tr></thead><tbody>
+<tr><td>A1</td><td>Users × requests per day × working days</td><td>40 × 3 × 22 = 2,640 requests a month</td></tr>
+<tr><td>A2</td><td>Model calls per request (loop turns)</td><td>4</td></tr>
+<tr><td>A3</td><td>Tokens per call</td><td>3,000 in (of which 2,000 are the fixed system prompt and tool definitions), 250 out</td></tr>
+<tr><td>A4</td><td>Main model price (placeholder)</td><td>₹250 per million input tokens, ₹1,250 per million output tokens</td></tr>
+<tr><td>A5</td><td>Small model price (placeholder)</td><td>One-fifth of the main model</td></tr>
+<tr><td>A6</td><td>Cached input price (placeholder)</td><td>10% of normal input price; cache-write premiums ignored for simplicity</td></tr>
+<tr><td>A7</td><td>Eval runs</td><td>12 cases × 3 repeats × 20 runs a month = 720 agent runs</td></tr>
+<tr><td>A8</td><td>Hosting, tracing, log storage (placeholders)</td><td>₹12,000 + ₹8,000 + ₹2,000 a month</td></tr>
+</tbody></table></div>
+<p>Per request at baseline: 12,000 input tokens × ₹250 per million = ₹3.00, plus 1,000 output tokens × ₹1,250 per million = ₹1.25. So ₹4.25 a request, ₹11,220 a month for production traffic. Now apply two standard optimisations.</p>
+<div class="table-wrap"><table><thead><tr><th>Line item (₹ a month)</th><th>Baseline</th><th>+ Prompt caching</th><th>+ Caching and model routing</th></tr></thead><tbody>
+<tr><td>Model cost per request</td><td>₹4.25</td><td>₹2.45</td><td>₹1.47</td></tr>
+<tr><td>Production traffic (2,640 requests)</td><td>₹11,220</td><td>₹6,468</td><td>₹3,881</td></tr>
+<tr><td>Eval runs (720)</td><td>₹3,060</td><td>₹1,764</td><td>₹1,058</td></tr>
+<tr><td>Hosting, tracing, logs</td><td>₹22,000</td><td>₹22,000</td><td>₹22,000</td></tr>
+<tr><td><b>Total</b></td><td><b>₹36,280</b></td><td><b>₹30,232</b></td><td><b>₹26,939</b></td></tr>
+<tr><td>All-in cost per request</td><td>₹13.74</td><td>₹11.45</td><td>₹10.20</td></tr>
+</tbody></table></div>
+<p><b>Prompt caching</b> reuses the fixed 2,000-token prefix (system prompt and tool definitions) across calls at a discount; the arithmetic is 4 calls × (1,000 × ₹250 + 2,000 × ₹25) per million, plus output. <b>Model routing</b> sends two of the four calls (the simple lookups) to a small model at one-fifth of the price. Together they cut model cost by about two-thirds.</p>
+<p>Here's the thing, though. At Meridian's scale, after optimisation, the fixed platform costs are most of the bill. Token cost only dominates at much higher volumes, say a customer-facing agent handling lakhs of conversations a month. So the cost levers differ by stage: for an internal pilot, keep the platform lean; for a high-volume agent, caching, routing and <b>token budgets</b> (a hard cap on tokens per request and per user per day, enforced at the gateway) matter a great deal. Either way, set a monthly budget alert at 80% of plan.</p>
+
+<h3>Latency</h3>
+<p>Users of a chat tool start to notice delays after a few seconds and give up somewhere past 15 to 20. Since model calls dominate, the main fixes are: fewer turns (one good tool that returns customer, policy cap and margin together beats three small ones), parallel tool calls where the model supports them, a smaller model for simple steps, <b>streaming</b> the reply so the first words appear quickly, and timeouts with a graceful fallback ("I've passed this to the deal desk") instead of a spinner. Track latency at the median and at p95, the slowest 5%, because complaints come from the slow tail.</p>
+
+<h3>Versioning, rollback and incidents</h3>
+<p>An agent's behaviour depends on more than its code. The real unit of release is a <b>bundle</b>: code, system prompt, tool definitions, model ID and version, policy rules and a snapshot reference to the knowledge base. Give the bundle one version number (Deal Desk 1.4.0), store it in source control, and log that number on every trace. Then "what changed?" always has an answer.</p>
+<figure class="fig" data-dl="m12-deployment-and-llmops-figure-2">
+<svg viewBox="0 0 720 210" role="img" aria-label="Release pipeline: new version, eval gate, shadow, canary, full rollout, with a rollback path to the previous version">
+  <rect class="fx-box k1" x="16" y="60" width="120" height="60" rx="6"/>
+  <text class="fx-tb" x="76" y="85" text-anchor="middle">New version</text>
+  <text class="fx-ts" x="76" y="104" text-anchor="middle">bundle v1.4.0</text>
+  <rect class="fx-box k2" x="158" y="60" width="120" height="60" rx="6"/>
+  <text class="fx-tb" x="218" y="85" text-anchor="middle">Eval gate</text>
+  <text class="fx-ts" x="218" y="104" text-anchor="middle">golden set in CI</text>
+  <rect class="fx-box k3" x="300" y="60" width="120" height="60" rx="6"/>
+  <text class="fx-tb" x="360" y="85" text-anchor="middle">Shadow</text>
+  <text class="fx-ts" x="360" y="104" text-anchor="middle">real inputs</text>
+  <rect class="fx-box k4" x="442" y="60" width="120" height="60" rx="6"/>
+  <text class="fx-tb" x="502" y="85" text-anchor="middle">Canary</text>
+  <text class="fx-ts" x="502" y="104" text-anchor="middle">10% of users</text>
+  <rect class="fx-box fx-hi" x="584" y="60" width="120" height="60" rx="6"/>
+  <text class="fx-tb" x="644" y="85" text-anchor="middle">Full rollout</text>
+  <text class="fx-ts" x="644" y="104" text-anchor="middle">online evals</text>
+  <path class="fx-ar" d="M136 90 H154"/>
+  <path class="fx-ar" d="M278 90 H296"/>
+  <path class="fx-ar" d="M420 90 H438"/>
+  <path class="fx-ar" d="M562 90 H580"/>
+  <path class="fx-ar fx-dash" d="M644 120 V160 H76 V124"/>
+  <text class="fx-ts" x="360" y="184" text-anchor="middle">rollback: redeploy the previous bundle (v1.3.2) in minutes, not days</text>
+  <text class="fx-ts" x="16" y="36">Every change to prompt, tools, model or policy creates a new bundle</text>
+</svg>
+<figcaption>The same ladder you met in M10, now as a pipeline. The dashed path is the one you should rehearse before you need it.</figcaption>
+</figure>
+<p><b>Rollback</b> should be a button, not a project: redeploy the previous bundle, or flip a feature flag that routes traffic back to it. Rehearse it once during the pilot. Pin model versions where your provider allows it, so a provider-side change does not arrive unannounced.</p>
+<p><b>Incident response</b> for agents follows the usual pattern with a few additions. Define severities up front (a wrong discount promised to a customer is high severity; a slow reply is low). Keep a <b>kill switch</b> that turns the agent off and shows users a fallback message. Then the runbook: contain (kill switch or rollback), find the affected requests in the traces, notify the people affected and, if personal data was involved, your DPO for DPDP breach obligations, fix the cause, and add the failing case to the golden set so it can never silently return.</p>
+
+<h3>Deployment checklist</h3>
+<ul class="checklist">
+<li>Named business owner and technical owner; support route published to users</li>
+<li>Single sign-on for users; agent's tool permissions scoped (on-behalf-of where possible)</li>
+<li>All secrets in a vault, rotated; nothing sensitive in prompts or images</li>
+<li>Data residency decided for prompts, memory, logs, traces and indexes; vendor DPA signed</li>
+<li>Golden set passing in CI; release blocked on regression</li>
+<li>Guardrails from M11 in place: allow-list, policy check in code, approval gate, PII redaction</li>
+<li>Tracing on every request with agent version, user, tokens, latency and cost</li>
+<li>Rate limits, token budgets and a monthly spend alert</li>
+<li>Model version pinned; bundle versioned in source control</li>
+<li>Rollback rehearsed; kill switch tested; incident runbook written</li>
+<li>Log and trace retention periods set and documented</li>
+<li>Users told what the agent can and cannot do, and how to reach a human</li>
+</ul>
+
+<h3>Pilot to scale: a 30-60-90 day plan</h3>
+<figure class="fig" data-dl="m12-deployment-and-llmops-figure-3">
+<svg viewBox="0 0 720 210" role="img" aria-label="Thirty-sixty-ninety day plan: pilot, harden, scale">
+  <rect class="fx-box k1" x="16" y="30" width="220" height="160" rx="6"/>
+  <text class="fx-tb" x="30" y="58">Days 1–30: Pilot</text>
+  <text class="fx-ts" x="30" y="90">20 named reps, one region</text>
+  <text class="fx-ts" x="30" y="114">golden set + shadow mode</text>
+  <text class="fx-ts" x="30" y="138">weekly review with sales ops</text>
+  <text class="fx-ts" x="30" y="162">baseline: minutes per request</text>
+  <rect class="fx-box k2" x="250" y="30" width="220" height="160" rx="6"/>
+  <text class="fx-tb" x="264" y="58">Days 31–60: Harden</text>
+  <text class="fx-ts" x="264" y="90">SSO, secrets vault, audit logs</text>
+  <text class="fx-ts" x="264" y="114">tracing and cost dashboards</text>
+  <text class="fx-ts" x="264" y="138">canary to 25% of sales team</text>
+  <text class="fx-ts" x="264" y="162">rollback and kill switch tested</text>
+  <rect class="fx-box fx-hi" x="484" y="30" width="220" height="160" rx="6"/>
+  <text class="fx-tb" x="498" y="58">Days 61–90: Scale</text>
+  <text class="fx-ts" x="498" y="90">all regions, Teams app</text>
+  <text class="fx-ts" x="498" y="114">budgets and alerts per team</text>
+  <text class="fx-ts" x="498" y="138">monthly regression, red team</text>
+  <text class="fx-ts" x="498" y="162">go/no-go on value metrics</text>
+  <path class="fx-ar" d="M236 110 H246"/>
+  <path class="fx-ar" d="M470 110 H480"/>
+</svg>
+<figcaption>Each phase ends with a go/no-go decision against criteria agreed on day 1. Scaling is earned, not scheduled.</figcaption>
+</figure>
+<p>Two rules make this plan work. First, agree the exit criteria for each phase before day 1: for example, "zero unapproved above-policy discounts in shadow mode" and "median request time down from 25 minutes to under 5". Second, measure the baseline during the pilot, because without "before" numbers you cannot prove "after" (that is the whole subject of <a href="../modules/m13-business-case-and-governance.html">M13</a>).</p>
+</section>
+
+<section id="m12-build">
+<h2>Hands-on: ship the Deal Desk</h2>
+<div class="tabs">
+<div class="tab" data-label="Python (FastAPI + Docker)">
+<p>You will wrap the guarded agent from <a href="../modules/m11-guardrails-and-responsible-ai.html">M11</a> in a small web service, package it as a container, and call it the way Teams or the CRM would. Put these files next to <code>deal_desk_agent.py</code>.</p>
+<p><b>1. app.py</b>: the HTTP front door.</p>
+<pre class="code"><code class="language-python">"""HTTP front door for the Deal Desk agent. Run: fastapi run app.py --port 8000"""
+import logging
+import os
+import time
+import uuid
+
+from fastapi import FastAPI, Header, HTTPException
+from pydantic import BaseModel, Field
+
+from deal_desk_agent import run
+
+AGENT_VERSION = os.getenv("AGENT_VERSION", "dev")
+API_KEYS = {k for k in os.getenv("DEAL_DESK_API_KEYS", "").split(",") if k}
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("deal_desk")
+app = FastAPI(title="Meridian Deal Desk", version=AGENT_VERSION)
+
+
+class DealRequest(BaseModel):
+    message: str = Field(min_length=5, max_length=2000)
+    user: str = Field(min_length=3, max_length=120)
+
+
+class DealResponse(BaseModel):
+    request_id: str
+    decision: str
+    approver: str | None
+    reply: str
+    agent_version: str
+    seconds: float
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "agent_version": AGENT_VERSION}
+
+
+@app.post("/v1/deal-desk", response_model=DealResponse)
+def deal_desk(req: DealRequest, x_api_key: str = Header(default="")):
+    if x_api_key not in API_KEYS:                 # empty key list = nobody gets in
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")
+    request_id = uuid.uuid4().hex[:12]
+    start = time.perf_counter()
+    try:
+        result = run(req.message, user=req.user)
+    except Exception:
+        log.exception("agent_error request_id=%s", request_id)
+        raise HTTPException(status_code=502, detail=f"Agent error. Quote ref {request_id}")
+    seconds = round(time.perf_counter() - start, 2)
+    log.info("request_id=%s user=%s decision=%s seconds=%s version=%s",
+             request_id, req.user, result["decision"], seconds, AGENT_VERSION)
+    return DealResponse(request_id=request_id, decision=result["decision"],
+                        approver=result.get("approver"), reply=result["reply"],
+                        agent_version=AGENT_VERSION, seconds=seconds)</code></pre>
+<p>What this does, in plain English:</p>
+<ul>
+<li><code>DealRequest</code> and <code>DealResponse</code> define exactly what callers may send and what they get back. FastAPI rejects anything else automatically: an empty or 10,000-character message gets a 422 error before it costs a rupee.</li>
+<li><code>/health</code> is what the hosting platform pings to check the service is alive. It also reports the agent version.</li>
+<li><code>/v1/deal-desk</code> checks an API key sent in the <code>x-api-key</code> header. If no keys are configured, nobody gets in; the service fails closed. In a real deployment the gateway would handle SSO and pass the verified user identity; the key here stands in for that.</li>
+<li>Each request gets a <code>request_id</code>, is timed, and is logged with user, decision, latency and agent version, so you can find it later.</li>
+<li>If the agent throws an error, the user gets a polite 502 with a reference number, and the full error goes to the log, not to the user.</li>
+</ul>
+<p><b>2. requirements.txt</b>: pinned versions, so the container you test is the container you ship.</p>
+<pre class="code"><code class="language-plaintext">fastapi[standard]==0.143.0
+anthropic==1.13.0</code></pre>
+<p><b>3. Dockerfile</b>: the recipe for the container image.</p>
+<pre class="code"><code class="language-plaintext">FROM python:3.12-slim
+WORKDIR /code
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app.py deal_desk_agent.py ./
+RUN useradd --create-home appuser &amp;&amp; chown -R appuser /code
+USER appuser
+ENV AGENT_VERSION=1.4.0
+EXPOSE 8000
+CMD ["fastapi", "run", "app.py", "--port", "8000"]</code></pre>
+<p>What this does: starts from a slim official Python image, installs the pinned packages, copies in the two Python files, creates a non-root user (so a compromised process has fewer rights), stamps the agent version, and starts the app with <code>fastapi run</code>, which uses the Uvicorn server underneath. Note what is missing: no API keys. Secrets are passed in at run time.</p>
+<p><b>4. Build, run and call it.</b></p>
+<pre class="code"><code class="language-bash"># 1. Build an image tagged with the agent version
+docker build -t meridian/deal-desk:1.4.0 .
+
+# 2. Run it locally; secrets come from your shell, never from the image
+docker run --rm -p 8000:8000 \
+  -e ANTHROPIC_API_KEY \
+  -e DEAL_DESK_API_KEYS \
+  meridian/deal-desk:1.4.0
+
+# 3. In another terminal, call it the way Teams or the CRM would
+curl -s http://localhost:8000/v1/deal-desk \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $MY_KEY" \
+  -d '{"message": "Bluewave Logistics wants 6% off", "user": "asha.k"}'</code></pre>
+<p>Set <code>DEAL_DESK_API_KEYS</code> to a comma-separated list of keys and <code>MY_KEY</code> to one of them before running. You should get something like:</p>
+<pre class="code"><code class="language-json">{
+  "request_id": "9f2c41d07a3b",
+  "decision": "escalate",
+  "approver": "Sales Manager",
+  "reply": "DECISION: ESCALATE\nBluewave has 2 late payments this year, so the cap is 3%. I have raised APR-3B81E0 with the Sales Manager for 6%.",
+  "agent_version": "1.4.0",
+  "seconds": 6.84
+}</code></pre>
+<p>From here, the same image runs on any container platform: Azure Container Apps, Cloud Run, ECS, Kubernetes, or a cloud agent runtime that accepts containers. In production you would add the pieces from the checklist: secrets from a vault rather than shell variables, the audit log shipped to central logging rather than a local file, and a tracing library sending spans to your observability tool.</p>
+</div>
+<div class="tab" data-label="No-code (Copilot Studio to Teams)">
+<p>If you built the Deal Desk in Copilot Studio (see <a href="../methods/copilot-studio.html">the Copilot Studio method page</a>), publishing it to Teams takes minutes. Getting it approved for the whole company takes your Teams admin. Labels below follow Microsoft's documentation as of 2026; screens change, so check the linked docs.</p>
+<ol class="steps">
+<li><b>Set authentication first</b><p>In the agent's security settings, choose Microsoft authentication so only signed-in Meridian employees can use it. Microsoft advises not changing this after the agent is added to Teams, since users may then hit permission errors.</p></li>
+<li><b>Publish the agent</b><p>Select <b>Publish</b>. An agent must be published at least once before channels can use it, and again after every change you want users to see.</p></li>
+<li><b>Add the Teams channel</b><p>Go to <b>Channels</b> and open the <b>Teams and Microsoft 365 Copilot</b> tile. Keep "make agent available in Microsoft 365 Copilot" ticked if you want it there too, then select <b>Add channel</b>.</p></li>
+<li><b>Test it yourself</b><p>Select <b>See agent in Teams</b>, then <b>Add</b>. Run the M10 golden set and the M11 red-team list in Teams, not only in the test pane; channel behaviour can differ.</p></li>
+<li><b>Pilot with named users</b><p>Under <b>Availability options</b>, choose <b>Show to my teammates and shared users</b> and share the agent with your 20 pilot salespeople. It appears for them in the Teams app store's "Built with Power Platform" section.</p></li>
+<li><b>Request organisation-wide rollout</b><p>When the pilot passes, choose <b>Show to everyone in my org</b> and <b>Submit for admin approval</b>. Your Teams admin reviews and approves it in the admin centre, after which it appears under "Built for your org". Changes to the agent's details need a fresh submission; content-only updates do not.</p></li>
+<li><b>Watch it</b><p>Use Copilot Studio's analytics for sessions, escalations and abandonment, and agree with IT where conversation transcripts are stored and for how long.</p></li>
+</ol>
+<div class="callout tip"><b>Tip</b><p>Ask your admin about environments early. Building in a separate development environment and moving finished versions to production gives you the same versioning and rollback discipline as the Python path, without code.</p></div>
+</div>
+</div>
+</section>
+
+<section id="m12-business">
+<h2>In the business</h2>
+<div class="case"><span class="case-tag">Case · Supply chain</span><h4>The loop that ate the budget</h4><p>A logistics company's shipment-status agent called a tracking API that sometimes returned "try again". The agent dutifully tried again, and again, inside a single conversation. Nobody noticed until the monthly model bill arrived at several times the forecast. The fixes were textbook LLMOps: a step limit per request, a daily token budget per channel at the gateway, a cost-per-conversation panel on the operations dashboard, and an alert at 80% of the monthly budget.</p></div>
+<div class="case"><span class="case-tag">Case · HR</span><h4>A helpdesk agent with the wrong keys</h4><p>An HR helpdesk agent on Teams answered leave and payroll questions. In the pilot it read the HR system through a service account with broad access, which meant a cleverly worded question could surface a colleague's data. Before scaling, the team switched to on-behalf-of access: the agent now calls HR systems with the signed-in employee's own permissions, so it can never see more than the person asking.</p></div>
+<div class="case"><span class="case-tag">Case · Finance</span><h4>Residency decided on day one</h4><p>A mid-sized Indian private bank wanted an agent to help relationship managers prepare credit notes. Its risk team required that customer data stay in India and that every interaction be auditable for years. The architecture was chosen to fit: a cloud agent runtime in an Indian region with a model available there, self-hosted tracing inside the bank's own network, and redaction before anything reached a log. Choosing this up front avoided the common fate of a pilot rebuilt from scratch after the security review.</p></div>
+<div class="case"><span class="case-tag">Case · Customer service</span><h4>When the model provider had a bad hour</h4><p>A consumer brand's WhatsApp support agent depended on a single model provider. During a provider outage, customers saw nothing at all. The post-incident changes: a fallback model behind the router, a timeout after which customers get "we've passed this to our team, reference number…", a status check on the provider in the dashboard, and an incident runbook that names who decides to switch providers.</p></div>
+</section>
+
+<section id="m12-pitfalls">
+<h2>Pitfalls</h2>
+<p><b>The pilot that never ends.</b> No exit criteria, no baseline, no decision date. Set go/no-go criteria for each phase before day 1, and put a date on the decision.</p>
+<p><b>Unversioned prompts.</b> The system prompt lives in a web console and gets edited in place. When behaviour changes, nobody can say what changed or roll it back. Prompts belong in version control, inside the release bundle.</p>
+<p><b>Floating model versions.</b> Pointing at "the latest model" means the provider can change your agent's behaviour without a release on your side. Pin versions and upgrade deliberately, after evals.</p>
+<p><b>Costs measured per token, not per outcome.</b> Token price per million tells you little. Cost per completed request, and cost per request that actually saved someone time, tell you whether the agent pays.</p>
+<p><b>Observability that leaks.</b> Full prompts and replies, with personal data, sent to a third-party tool with default retention. Redact, restrict access and set retention.</p>
+<p><b>No owner after go-live.</b> The project team moves on, the agent keeps running, the policy changes and nobody updates the agent or its golden set. Every production agent needs a named owner with time in their week for it; see <a href="../modules/m13-business-case-and-governance.html">M13</a>.</p>
+<p><b>Shadow IT agents.</b> Teams build agents on personal accounts or unapproved platforms because the official route is slow. Make the paved road (approved platform, templates, checklist) faster than the shortcut.</p>
+</section>
+
+<section id="m12-practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Draw your architecture</b><p>Redraw the reference architecture for a customer-facing WhatsApp agent that answers order-status questions for Meridian's school customers. Which boxes change, and what new risks appear?</p><details><summary>Hint / model answer</summary><p>Channels become WhatsApp via a Business API provider; the gateway must handle unauthenticated users, so you need customer verification (an OTP or a registered number) before any order data is shown. Transparency duties apply: tell users they are talking to an AI. The tools must be scoped to the verified customer only. Data residency now covers the messaging provider too.</p></details></li>
+<li><b>Re-run the cost model</b><p>Meridian decides to open the Deal Desk to its 120-person inside-sales team, each making 5 requests a day. Recompute monthly cost at baseline and with caching plus routing, using the same assumptions. At what point do token costs exceed the fixed platform costs?</p><details><summary>Hint / model answer</summary><p>120 × 5 × 22 = 13,200 requests. Baseline model cost 13,200 × ₹4.25 = ₹56,100; with caching and routing 13,200 × ₹1.47 = ₹19,404. With ₹22,000 fixed costs, baseline tokens already exceed platform costs; with optimisation they roughly match. Optimisation now saves about ₹36,700 a month, which is worth an engineer's attention.</p></details></li>
+<li><b>Write a rollback runbook</b><p>Version 1.5.0 of the Deal Desk goes live on a Monday. By Tuesday noon, three Sales Managers report that it is escalating every Gold-tier request. Write the runbook steps from first report to closure.</p><details><summary>Hint / model answer</summary><p>Acknowledge and assign an incident lead; check the traces for Gold requests since the release; roll back to 1.4.x via the feature flag; confirm escalations return to normal; tell users what happened; find the cause (often a prompt or policy-rule edit); add Gold boundary cases to the golden set; re-release through the full pipeline.</p></details></li>
+<li><b>Choose a hosting option</b><p>For each company, pick SaaS platform, cloud runtime or self-hosted container, and justify in two sentences: (a) a 300-person firm on Microsoft 365 with no developers; (b) a bank with strict residency and a platform team; (c) a SaaS startup building agents into its product.</p><details><summary>Hint / model answer</summary><p>(a) SaaS, Copilot Studio: identity and Teams are already there and nobody needs to run servers. (b) A cloud runtime in an Indian region or self-hosted containers in its own network, chosen by where approved models are available. (c) A cloud runtime or containers, since the agent is part of the product and needs portability and control.</p></details></li>
+<li><b>Design the ops dashboard</b><p>Sketch the one-screen dashboard the Deal Desk agent owner looks at every morning. Name at most eight tiles and say what would trigger action on each.</p><details><summary>Hint / model answer</summary><p>Requests yesterday; success rate from online checks; escalation rate versus last week; p95 latency; cost per request and month-to-date spend versus budget; error rate; guardrail blocks (policy-check overrides, refused tools); user feedback (thumbs down). Each needs a threshold, for example policy-check overrides above zero triggers a review of the prompt.</p></details></li>
+</ol>
+</section>
+
+<section id="m12-quiz">
+<h2>Quiz</h2>
+<div class="quiz">
+  <div class="q" data-answer="c">
+    <p class="q-text">In the reference architecture, which component should enforce the discount caps and approval thresholds?</p>
+    <ol class="q-opts"><li data-k="a">The model router</li><li data-k="b">The memory store</li><li data-k="c">The policy engine (deterministic code)</li><li data-k="d">The channel (Teams)</li></ol>
+    <p class="q-why">Rules involving money and authority belong in deterministic code the orchestrator consults, not in the model or the user interface.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">Why is "on-behalf-of" identity often better than a broad service account for an HR agent?</p>
+    <ol class="q-opts"><li data-k="a">The agent can only see what the signed-in user is already allowed to see</li><li data-k="b">It makes the model faster</li><li data-k="c">It removes the need for audit logs</li><li data-k="d">It is required by the EU AI Act</li></ol>
+    <p class="q-why">Existing access controls keep working, so a clever question cannot surface a colleague's data. It does not replace logging (c), and (d) overstates the law.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">In the worked cost model, why does optimisation barely change the total bill at Meridian's pilot scale?</p>
+    <ol class="q-opts"><li data-k="a">Caching does not work for agents</li><li data-k="b">Small models are more expensive</li><li data-k="c">Evals cost more than production</li><li data-k="d">Fixed platform costs (hosting, tracing, logs) dominate at low volume</li></ol>
+    <p class="q-why">Model cost drops by about two-thirds, but ₹22,000 of fixed costs remain. At higher volume, token costs dominate and the same optimisations matter far more.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">What is the right "unit of release" for an agent?</p>
+    <ol class="q-opts"><li data-k="a">The Python code only</li><li data-k="b">A versioned bundle of code, prompt, tool definitions, model version, policy rules and knowledge snapshot</li><li data-k="c">Whatever the model provider currently serves</li><li data-k="d">The system prompt only</li></ol>
+    <p class="q-why">Behaviour depends on all of these. Versioning them together is what makes "what changed?" answerable and rollback possible.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">The trace shows 6.2 of 6.8 seconds spent in model calls. Which fix is most likely to help?</p>
+    <ol class="q-opts"><li data-k="a">A faster database</li><li data-k="b">More logging</li><li data-k="c">Fewer model turns, for example one tool that returns customer, cap and margin together, plus streaming the reply</li><li data-k="d">Moving the gateway to a different region</li></ol>
+    <p class="q-why">Time goes where the trace says it goes. Cutting turns and streaming attack the model time; the database (a) is already fast.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">In Copilot Studio, what is needed before a Deal Desk agent shows up for everyone in the company's Teams?</p>
+    <ol class="q-opts"><li data-k="a">Nothing; adding the Teams channel makes it visible to all</li><li data-k="b">Submitting it for admin approval and having a Teams admin approve it</li><li data-k="c">Rewriting it in Python</li><li data-k="d">A Microsoft support ticket</li></ol>
+    <p class="q-why">Adding the channel lets you and shared users install it. Organisation-wide availability goes through "Show to everyone in my org" and admin approval.</p>
+  </div>
+</div>
+</section>
+
+<section id="m12-learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="deployment"><div class="vid"><button class="vid-thumb" type="button" data-yt="j1wfE0SOBbE" aria-label="Play: 5 Tips for Deploying AI Agents to Production"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/j1wfE0SOBbE/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>5 Tips for Deploying AI Agents to Production</b><span class="ch">AWS Developers</span><span class="nt">Concise, practical checklist for moving from prototype to production.</span><a href="https://www.youtube.com/watch?v=j1wfE0SOBbE" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="-gLH_okCcBA" aria-label="Play: AI Agents in Production: Lessons from Rippling and LangChain"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/-gLH_okCcBA/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>AI Agents in Production: Lessons from Rippling and LangChain</b><span class="ch">LangChain</span><span class="nt">Real-world case study of running agents at a SaaS company.</span><a href="https://www.youtube.com/watch?v=-gLH_okCcBA" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="oDjESsByBmM" aria-label="Play: AWS re:Invent 2025 - Bridging from POC to production: An intro to Amazon Bedrock AgentCore (AIM2204)"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/oDjESsByBmM/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>AWS re:Invent 2025 - Bridging from POC to production: An intro to Amazon Bedrock AgentCore (AIM2204)</b><span class="ch">AWS Events</span><span class="nt">The runtime, identity, memory and observability pieces a production agent needs.</span><a href="https://www.youtube.com/watch?v=oDjESsByBmM" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="NrgoZLcY3Kk" aria-label="Play: Introduction to Vertex AI Agent Engine"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/NrgoZLcY3Kk/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Introduction to Vertex AI Agent Engine</b><span class="ch">Google Cloud Tech</span><span class="nt">Google&#x27;s managed runtime for deploying and scaling agents.</span><a href="https://www.youtube.com/watch?v=NrgoZLcY3Kk" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div></div>
+<div class="res-list">
+  <a class="res" href="https://fastapi.tiangolo.com/deployment/docker/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">FastAPI in Containers: Docker</span><span class="res-by">FastAPI · the official guide behind this page's Dockerfile</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/publication-add-bot-to-microsoft-teams" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Publish an agent to Teams and Microsoft 365 Copilot</span><span class="res-by">Microsoft Learn · availability options and admin approval</span></a>
+  <a class="res" href="https://aws.amazon.com/bedrock/agentcore/faqs/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Amazon Bedrock AgentCore FAQs</span><span class="res-by">AWS · what a managed agent runtime includes</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Foundry Agent Service overview</span><span class="res-by">Microsoft Learn · Microsoft's managed agent hosting</span></a>
+  <a class="res" href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Gemini Enterprise Agent Platform release notes</span><span class="res-by">Google Cloud · where Vertex AI's agent services now live</span></a>
+  <a class="res" href="https://langfuse.com/docs" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Langfuse documentation</span><span class="res-by">Langfuse · open-source tracing on OpenTelemetry, self-hostable</span></a>
+  <a class="res" href="https://opentelemetry.io/docs/specs/semconv/gen-ai/" target="_blank" rel="noopener"><span class="res-kind">Standard</span><span class="res-title">OpenTelemetry semantic conventions for generative AI</span><span class="res-by">OpenTelemetry · the vendor-neutral way to trace model and agent calls</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul>
+<li>The laptop demo is a fraction of the work. Production means an owner, support, a budget, a rollback plan and audit evidence.</li>
+<li>Know the reference architecture: channels, gateway, orchestrator, policy engine, model router, tools, knowledge, memory and observability.</li>
+<li>Pick hosting by your existing cloud, skills and data rules: SaaS platform, cloud agent runtime or self-hosted container.</li>
+<li>Use SSO, on-behalf-of access where possible, a secrets vault, and a residency decision made on day one.</li>
+<li>Trace every request; model cost per request and per month with labelled assumptions; cache, route and budget tokens.</li>
+<li>Release versioned bundles through eval gate, shadow and canary; rehearse rollback; run a 30-60-90 plan with agreed exit criteria.</li>
+</ul></div>
+</section>
+
+<div class="endcap"><button class="donebtn" type="button">Mark this page complete</button><nav class="pager" aria-label="Previous and next"><a class="prev" href="../modules/m11-guardrails-and-responsible-ai.html"><small>Previous</small>M11 Guardrails and security</a><a class="next" href="../modules/m13-business-case-and-governance.html"><small>Next</small>M13 Business case and governance</a></nav></div>
+      </main>
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+    <footer class="site-foot"><span>AI Agents for Management · an open course for business students and managers</span><span>Product names, features and prices change fast: check vendor docs before you rely on a detail. Last reviewed October 2026.</span></footer>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="../assets/app.js" defer></script>
+
+</body>
+</html>

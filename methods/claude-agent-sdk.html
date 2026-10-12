@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Claude Agent SDK · AI Agents for Management</title>
+<meta name="description" content="Build the Meridian Deal Desk agent on Anthropic&#x27;s Claude Agent SDK, with custom tools, a hook that stops for a manager&#x27;s approval, and a hard spending cap, and know when this SDK is the right pick.">
+<meta property="og:title" content="Claude Agent SDK · AI Agents for Management">
+<meta property="og:description" content="Build the Meridian Deal Desk agent on Anthropic&#x27;s Claude Agent SDK, with custom tools, a hook that stops for a manager&#x27;s approval, and a hard spending cap, and know when this SDK is the right pick.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23151826'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6'%3E%3Ccircle cx='12' cy='6' r='2.2'/%3E%3Ccircle cx='6' cy='17' r='2.2'/%3E%3Ccircle cx='18' cy='17' r='2.2'/%3E%3Cpath d='M11 8 7 15M13 8l4 7M8.2 17h7.6'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('aiam.theme');if(t)document.documentElement.setAttribute('data-theme',JSON.parse(t));}catch(e){}</script>
+</head>
+<body data-root="../" data-page="x-claude" data-track="m01,m02,m03,m04,m05,m06,m07,m08,m09,m10,m11,m12,m13,x-nocode,x-copilot,x-workflow,x-enterprise,x-voice,x-computer,x-api,x-langgraph,x-crewai,x-maf,x-openai,x-claude,x-adk,x-llamaindex,x-mcp,chatbots,lab">
+<a class="skip-link" href="#content">Skip to content</a>
+<svg id="fx-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="fx-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fx-head" d="M0,0 L10,5 L0,10 z"/></marker></defs></svg>
+<div class="shell">
+  <aside class="rail" aria-label="Course contents">
+    <div class="rail-head">
+      <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M11 7.2 6.2 15.8M13 7.2l4.8 8.6M7.4 18h9.2"/></svg></span><span><span class="brand-name">AI Agents for Management</span><span class="brand-sub">Concept to corporate deployment</span></span></a>
+      <div class="rail-tools">
+        <button class="searchbtn" type="button" data-search-open><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg><span>Search</span><kbd>/</kbd></button>
+        <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+    </div>
+    <div class="rail-progress"><div class="rail-progress-top"><span>Pages completed</span><b id="pcount">0 / 30</b></div><div class="meter"><i id="pbar"></i></div></div>
+    <nav class="nav" aria-label="Course pages">
+<div class="nav-group"><p>Orientation</p>
+<a href="../index.html"><span class="num"></span><span>Start here</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../mindmap.html"><span class="num"></span><span>Concept map: ways to build agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../roadmap.html"><span class="num"></span><span>Learning roadmap</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 1 · Foundations</p>
+<a href="../modules/m01-what-is-an-agent.html" data-id="m01"><span class="num">01</span><span>M01 What an AI agent is</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m02-llms-for-managers.html" data-id="m02"><span class="num">02</span><span>M02 How LLMs work</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m03-instructions-and-prompts.html" data-id="m03"><span class="num">03</span><span>M03 Instructions and prompts</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m04-tools-and-function-calling.html" data-id="m04"><span class="num">04</span><span>M04 Tools and function calling</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 2 · Building</p>
+<a href="../modules/m05-knowledge-and-rag.html" data-id="m05"><span class="num">05</span><span>M05 Knowledge and RAG</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m06-memory-and-state.html" data-id="m06"><span class="num">06</span><span>M06 Memory and state</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m07-design-patterns.html" data-id="m07"><span class="num">07</span><span>M07 Agent design patterns</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m08-multi-agent-systems.html" data-id="m08"><span class="num">08</span><span>M08 Multi-agent systems</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m09-protocols-mcp-a2a.html" data-id="m09"><span class="num">09</span><span>M09 Protocols: MCP and A2A</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Level 3 · Corporate</p>
+<a href="../modules/m10-evaluation.html" data-id="m10"><span class="num">10</span><span>M10 Evaluation and testing</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m11-guardrails-and-responsible-ai.html" data-id="m11"><span class="num">11</span><span>M11 Guardrails and security</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m12-deployment-and-llmops.html" data-id="m12"><span class="num">12</span><span>M12 Deployment and LLMOps</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../modules/m13-business-case-and-governance.html" data-id="m13"><span class="num">13</span><span>M13 Business case and governance</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · No-code &amp; low-code</p>
+<a href="../methods/index.html"><span class="num"></span><span>Choose your method</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/no-code-assistants.html" data-id="x-nocode"><span class="num">A</span><span>No-code assistants</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/copilot-studio.html" data-id="x-copilot"><span class="num">B</span><span>Copilot Studio</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/workflow-automation.html" data-id="x-workflow"><span class="num">C</span><span>Workflow automation</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/enterprise-platforms.html" data-id="x-enterprise"><span class="num">D</span><span>Enterprise platforms</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/voice-agents.html" data-id="x-voice"><span class="num">E</span><span>Voice agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/computer-use.html" data-id="x-computer"><span class="num">F</span><span>Computer use agents</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Build methods · Code</p>
+<a href="../methods/api-tool-use.html" data-id="x-api"><span class="num">G</span><span>Raw API tool use</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/langgraph.html" data-id="x-langgraph"><span class="num">H</span><span>LangChain + LangGraph</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/crewai.html" data-id="x-crewai"><span class="num">I</span><span>CrewAI</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/microsoft-agent-framework.html" data-id="x-maf"><span class="num">J</span><span>Microsoft Agent Framework</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/openai-agents-sdk.html" data-id="x-openai"><span class="num">K</span><span>OpenAI Agents SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/claude-agent-sdk.html" data-id="x-claude" aria-current="page"><span class="num">L</span><span>Claude Agent SDK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/google-adk.html" data-id="x-adk"><span class="num">M</span><span>Google ADK</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/llamaindex.html" data-id="x-llamaindex"><span class="num">N</span><span>LlamaIndex</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../methods/mcp.html" data-id="x-mcp"><span class="num">O</span><span>Build an MCP server</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Practice</p>
+<a href="../chatbots.html" data-id="chatbots"><span class="num"></span><span>Chatbots + live bot</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../lab.html" data-id="lab"><span class="num"></span><span>Agent Lab</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../capstones.html"><span class="num"></span><span>Capstone projects</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+<div class="nav-group"><p>Library</p>
+<a href="../media.html"><span class="num"></span><span>Videos &amp; infographics</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../glossary.html"><span class="num"></span><span>Glossary</span><span class="done-mark" aria-hidden="true">✓</span></a>
+<a href="../resources.html"><span class="num"></span><span>Books, courses, papers</span><span class="done-mark" aria-hidden="true">✓</span></a>
+</div>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="iconbtn" type="button" id="menu-btn" aria-label="Open contents"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+      <span class="brand-name">AI Agents for Management</span>
+      <button class="iconbtn" type="button" data-search-open aria-label="Search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" width="15" height="15"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></button>
+      <button class="iconbtn" type="button" data-theme-toggle aria-label="Switch theme"></button>
+    </div>
+    <div class="page-wrap">
+      <main class="article" id="content">
+<header class="page-head"><p class="eyebrow">Method · Code</p><h1>Claude Agent SDK: an agent that can <em>work</em> with files</h1><p class="lede">Build the Meridian Deal Desk agent on Anthropic's Claude Agent SDK, with custom tools, a hook that stops for a manager's approval, and a hard spending cap, and know when this SDK is the right pick.</p><div class="page-meta"><span>45 min read</span><span>Tracked in your progress</span></div></header>
+
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Intermediate (Python or TypeScript)</dd></div><div><dt>Time to first agent</dt><dd>About an hour</dd></div><div><dt>Typical cost</dt><dd>SDK is free; you pay for Claude model usage by the token</dd></div><div><dt>Best for</dt><dd>Agents that read, write and organise files and documents, with tight permission control</dd></div><div><dt>Runs where</dt><dd>Your laptop, a container, any cloud; models via the Claude API, Amazon Bedrock, Google Cloud or Microsoft Foundry</dd></div><div><dt>Lock-in risk</dt><dd>Medium: Claude models only, but your tools are MCP and travel</dd></div></dl>
+<p>The Claude Agent SDK is Anthropic's library for building agents in Python or TypeScript. Here's the unusual part. It doesn't hand you a bare model and a loop to write yourself. It hands you the same agent loop, built-in tools and context management that run Claude Code, Anthropic's coding agent, packaged so your own program can drive it.</p>
+<p>That matters. Claude Code had to solve the hard, boring problems of a working agent: editing files safely, running commands, asking permission, keeping long sessions inside the context window. With the SDK you inherit those answers.</p>
+<p>It started life as the Claude Code SDK and was renamed once teams began using it for things that have nothing to do with code. Anthropic's docs still carry a migration guide from the old package names. As of October 2026 the Python package is <code>claude-agent-sdk</code> (0.2.165 at the time of writing) and the TypeScript one is <code>@anthropic-ai/claude-agent-sdk</code> (0.3.296). Both bundle a native Claude Code binary, so on most machines a single install is all you need.</p>
+<p>What changed recently? The SDK now exposes skills (folders of instructions the agent loads when relevant), programmatic subagents with their own tools and models, a <code>dontAsk</code> permission mode for locked-down headless agents, and a per-request dollar cap (<code>max_budget_usd</code>). Anthropic also offers Managed Agents, where Anthropic hosts the loop for you. That's a different product; this page is about running the loop yourself.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>Most agent frameworks are built around chat plus API calls. This one is built around a worker with a desk: a folder of files, a set of approved tools, and a supervisor who can say no. If the job you want automated looks like "open these documents, work something out, write a draft, file it", that shape fits well.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Pick the Claude Agent SDK when the agent's real work happens in documents and folders. Month-end commentary drafted from ledger exports. A contract pack checked against a playbook. A board note assembled from five spreadsheets. The built-in Read, Write, Edit, Glob, Grep and Bash tools mean the agent can open, search, transform and save files with no extra code from you, and the permission system decides which of those it may touch.</p>
+<p>It's also a strong pick when governance is the hard part. Hooks run before every tool call, ahead of any allow rule, so you can put a human or a policy check in front of exactly the actions that carry risk. For a finance or compliance team, that is often the feature that gets a pilot past the risk committee.</p>
+<p>Don't pick it if you need to switch model vendors freely. The loop runs on Claude models only. Your tools are portable because they are MCP servers, but the orchestration is not. And if you want a visual builder for business users, look at <a href="../methods/copilot-studio.html">Copilot Studio</a> or the <a href="../methods/no-code-assistants.html">no-code assistants</a> instead; this is a developer's library.</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>Production-grade file, search and shell tools out of the box</li><li>Hooks and permission modes give fine control over every action</li><li>Custom tools are plain functions exposed as an in-process MCP server</li><li>Subagents, skills and sessions without extra frameworks</li><li>Same API shape in Python and TypeScript</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Claude models only</li><li>Powerful built-in tools are risky if you forget to restrict them</li><li>Runs a local runtime process, so it needs a real container, not a tiny serverless function</li><li>Fast release cadence; pin versions and read the changelog</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>Your program calls the SDK. The SDK starts the Claude Code runtime as a child process and talks to it. The runtime runs the agent loop: send the conversation to Claude, receive either an answer or a tool request, check permissions, run the tool, feed the result back, repeat. Your program sees a stream of messages as all this happens.</p>
+<figure class="fig" data-dl="claude-agent-sdk-figure-1">
+<svg viewBox="0 0 720 330" role="img" aria-label="Architecture of the Claude Agent SDK: your app drives an agent loop that calls the Claude model and three kinds of tools, with hooks gating each tool call">
+  <rect class="fx-box" x="12" y="130" width="150" height="70" rx="6"/>
+  <text class="fx-tb" x="87" y="157" text-anchor="middle">Your app</text>
+  <text class="fx-ts" x="87" y="176" text-anchor="middle">query() or</text>
+  <text class="fx-ts" x="87" y="191" text-anchor="middle">ClaudeSDKClient</text>
+  <rect class="fx-box fx-hi" x="208" y="110" width="210" height="110" rx="6"/>
+  <text class="fx-tb" x="313" y="140" text-anchor="middle">Agent loop</text>
+  <text class="fx-ts" x="313" y="162" text-anchor="middle">Claude Code runtime</text>
+  <text class="fx-ts" x="313" y="180" text-anchor="middle">permissions · sessions</text>
+  <text class="fx-ts" x="313" y="198" text-anchor="middle">context management</text>
+  <rect class="fx-box k4" x="208" y="258" width="210" height="56" rx="6"/>
+  <text class="fx-tb" x="313" y="281" text-anchor="middle">PreToolUse hooks</text>
+  <text class="fx-ts" x="313" y="300" text-anchor="middle">human approval · path rules</text>
+  <rect class="fx-box k1" x="470" y="20" width="238" height="56" rx="6"/>
+  <text class="fx-tb" x="589" y="43" text-anchor="middle">Claude model</text>
+  <text class="fx-ts" x="589" y="62" text-anchor="middle">API · Bedrock · Google · Foundry</text>
+  <rect class="fx-box k2" x="470" y="96" width="238" height="56" rx="6"/>
+  <text class="fx-tb" x="589" y="119" text-anchor="middle">Built-in tools</text>
+  <text class="fx-ts" x="589" y="138" text-anchor="middle">Read · Write · Edit · Bash · Grep</text>
+  <rect class="fx-box k3" x="470" y="172" width="238" height="56" rx="6"/>
+  <text class="fx-tb" x="589" y="195" text-anchor="middle">SDK MCP server (yours)</text>
+  <text class="fx-ts" x="589" y="214" text-anchor="middle">get_customer · request_approval</text>
+  <rect class="fx-box k3" x="470" y="248" width="238" height="56" rx="6"/>
+  <text class="fx-tb" x="589" y="271" text-anchor="middle">External MCP servers</text>
+  <text class="fx-ts" x="589" y="290" text-anchor="middle">CRM · Drive · Slack</text>
+  <path class="fx-ar" d="M162 165 L204 165"/>
+  <path class="fx-ar" d="M418 130 L466 52"/>
+  <path class="fx-ar" d="M418 160 L466 124"/>
+  <path class="fx-ar" d="M418 180 L466 200"/>
+  <path class="fx-ar" d="M418 205 L466 272"/>
+  <path class="fx-ln fx-dash" d="M313 220 L313 258"/>
+</svg>
+<figcaption>Every tool request passes through your hooks before it runs. Your own functions sit in an in-process MCP server, next to the built-in tools and any external MCP servers.</figcaption>
+</figure>
+<h3>query() versus ClaudeSDKClient</h3>
+<p>There are two ways in. <code>query()</code> is a one-shot call: give it a prompt and options, iterate over the messages, done. Each call starts a fresh session. It suits batch jobs, such as "draft commentary for every cost centre in this folder".</p>
+<p><code>ClaudeSDKClient</code> keeps one session open across several exchanges, so a salesperson can ask a follow-up ("what if they paid on time?") and the agent remembers the customer. It also supports interrupts. Use it for anything conversational.</p>
+<h3>ClaudeAgentOptions, the control panel</h3>
+<p>Almost every decision lives in one options object. The fields you will use first:</p>
+<div class="table-wrap"><table><thead><tr><th>Option</th><th>What it controls</th><th>Deal Desk setting</th></tr></thead><tbody>
+<tr><td><code>system_prompt</code></td><td>The agent's standing instructions</td><td>The discount procedure, step by step</td></tr>
+<tr><td><code>mcp_servers</code></td><td>Extra tool servers, in-process or external</td><td>Our <code>meridian</code> server with five tools</td></tr>
+<tr><td><code>allowed_tools</code></td><td>Tools pre-approved to run without asking</td><td>The five Meridian tools plus Write</td></tr>
+<tr><td><code>tools</code></td><td>Which built-in tools the agent can even see</td><td>Only <code>Write</code></td></tr>
+<tr><td><code>permission_mode</code></td><td>What happens to anything not pre-approved</td><td><code>dontAsk</code>: refuse it</td></tr>
+<tr><td><code>hooks</code></td><td>Your code that runs at lifecycle events</td><td>Approval gate; drafts-folder rule</td></tr>
+<tr><td><code>max_turns</code>, <code>max_budget_usd</code></td><td>Runaway protection</td><td>15 turns, US$0.50 per request</td></tr>
+</tbody></table></div>
+<p>Permission modes deserve a sentence each. <code>default</code> sends anything unapproved to your <code>can_use_tool</code> callback. <code>acceptEdits</code> auto-approves file edits in the working folder. <code>plan</code> lets the agent explore and propose without editing. <code>dontAsk</code> turns every would-be prompt into a refusal. <code>bypassPermissions</code> approves almost everything and belongs only in a sandbox. There's also <code>auto</code>, where a classifier model reviews actions.</p>
+<div class="callout warn"><b>Watch out</b><p><code>allowed_tools</code> does not restrict anything on its own. It pre-approves the tools you list; unlisted tools still exist and fall through to the permission mode. To remove a tool from the agent's view, use <code>tools</code> or <code>disallowed_tools</code>. People get this backwards all the time.</p></div>
+<h3>Hooks: where governance lives</h3>
+<p>A hook is an async function the runtime calls at a named moment. <code>PreToolUse</code> fires before a tool runs and can allow, deny, ask or modify the call. <code>PostToolUse</code> fires after, which makes it the natural place for an audit log. Others cover subagent start and stop, prompt submission and compaction. Hooks run first in the permission order, so a hook's deny wins even in <code>bypassPermissions</code> mode.</p>
+<h3>Subagents and skills</h3>
+<p>A subagent is a separate agent with its own prompt, tools and model, launched through the built-in <code>Agent</code> tool; it works in a fresh context and returns only a summary. A skill is a folder with a <code>SKILL.md</code> playbook that the agent loads only when a task matches it. Both appear in the build below.</p>
+</section>
+
+<section id="build">
+<h2>Build the Deal Desk</h2>
+<p>We'll build the full agent in one Python file. It knows Meridian's five customers, reads the discount policy, does the margin arithmetic, writes approved replies to a <code>drafts</code> folder, and stops for a human whenever a discount breaks policy. Python 3.10 or later is required.</p>
+<ol class="steps">
+<li><b>Install and set your key</b><p>Create a virtual environment, install the pinned SDK and put your Anthropic API key in an environment variable. The SDK reads <code>ANTHROPIC_API_KEY</code> by itself; it does not load <code>.env</code> files.</p>
+<pre class="code"><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\Activate.ps1
+pip install "claude-agent-sdk==0.2.165"
+
+export ANTHROPIC_API_KEY="your-key-here"   # from the Claude Console; never commit it
+python deal_desk.py</code></pre></li>
+<li><b>Write the agent</b><p>Save this as <code>deal_desk.py</code>. Read it once top to bottom; the plain-English walk-through follows.</p>
+<pre class="code"><code class="language-python">import asyncio
+import json
+import os
+from pathlib import Path
+
+from claude_agent_sdk import (
+    AssistantMessage, ClaudeAgentOptions, ClaudeSDKClient, HookMatcher,
+    ResultMessage, TextBlock, ToolUseBlock, create_sdk_mcp_server, tool,
+)
+
+MODEL = os.getenv("MODEL", "claude-sonnet-5-5")  # SDK reads ANTHROPIC_API_KEY itself
+DRAFTS = Path("drafts").resolve()
+
+# ---------- 1. Meridian data (in production: CRM / ERP calls) ----------
+CUSTOMERS = {
+    "C-101": {"id": "C-101", "name": "Sahyadri Hospitals", "tier": "Gold",
+              "annual_revenue_lakh": 48, "late_payments_fy": 0, "gross_margin_pct": 22},
+    "C-102": {"id": "C-102", "name": "Bluewave Logistics", "tier": "Silver",
+              "annual_revenue_lakh": 19, "late_payments_fy": 2, "gross_margin_pct": 18},
+    "C-103": {"id": "C-103", "name": "Orchid Schools Trust", "tier": "Gold",
+              "annual_revenue_lakh": 31, "late_payments_fy": 0, "gross_margin_pct": 25},
+    "C-104": {"id": "C-104", "name": "Kite Fintech", "tier": "Bronze",
+              "annual_revenue_lakh": 6, "late_payments_fy": 0, "gross_margin_pct": 16},
+    "C-105": {"id": "C-105", "name": "Trident Engineering", "tier": "Silver",
+              "annual_revenue_lakh": 22, "late_payments_fy": 1, "gross_margin_pct": 20},
+}
+
+POLICY = """Meridian discount policy
+1. Maximum discount by tier: Bronze 5%, Silver 8%, Gold 12%.
+2. Customers with 2 or more late payments this financial year are capped at 3%.
+3. Gross margin after discount must stay at or above 12%
+   (margin_after = current_margin - discount).
+4. Anything above the cap needs Sales Manager approval;
+   anything above 15% needs Regional Head approval."""
+
+
+def reply(data) -&gt; dict:
+    """Wrap a Python value in the result format the SDK expects."""
+    text = data if isinstance(data, str) else json.dumps(data)
+    return {"content": [{"type": "text", "text": text}]}
+
+
+# ---------- 2. Custom tools ----------
+@tool("get_customer", "Return the customer record for an id such as C-101.",
+      {"customer_id": str})
+async def get_customer(args):
+    record = CUSTOMERS.get(args["customer_id"].strip().upper())
+    if record is None:
+        return {**reply(f"No customer with id {args['customer_id']}"), "is_error": True}
+    return reply(record)
+
+
+@tool("find_customer", "Find a customer by (part of) their name.", {"name": str})
+async def find_customer(args):
+    hits = [c for c in CUSTOMERS.values() if args["name"].lower() in c["name"].lower()]
+    if len(hits) != 1:
+        return {**reply(f"{len(hits)} matches: {[c['name'] for c in hits]}"),
+                "is_error": True}
+    return reply(hits[0])
+
+
+@tool("get_discount_policy", "Return Meridian's discount policy text.", {})
+async def get_discount_policy(args):
+    return reply(POLICY)
+
+
+@tool("margin_after_discount", "Gross margin % left after a discount.",
+      {"current_margin_pct": float, "discount_pct": float})
+async def margin_after_discount(args):
+    return reply(round(args["current_margin_pct"] - args["discount_pct"], 2))
+
+
+@tool("request_approval", "Ask the Sales Manager or Regional Head to approve "
+      "an out-of-policy discount.",
+      {"customer_id": str, "discount_pct": float, "approver": str, "reason": str})
+async def request_approval(args):
+    # Only runs if the approval hook below let it through.
+    return reply(f"APPROVED by {args['approver']}: {args['discount_pct']}% "
+                 f"for {args['customer_id']}.")
+
+
+meridian = create_sdk_mcp_server(
+    name="meridian", version="1.0.0",
+    tools=[get_customer, find_customer, get_discount_policy,
+           margin_after_discount, request_approval],
+)
+
+
+# ---------- 3. Hooks: a human gate and a file-safety rule ----------
+async def approval_gate(input_data, tool_use_id, context):
+    a = input_data["tool_input"]
+    question = (f"\n[{a['approver']}] Approve {a['discount_pct']}% for "
+                f"{a['customer_id']}? Reason: {a['reason']}  (y/n): ")
+    answer = await asyncio.to_thread(input, question)  # Slack/Teams card in production
+    if answer.strip().lower().startswith("y"):
+        return {}  # let the call through
+    return {"hookSpecificOutput": {
+        "hookEventName": input_data["hook_event_name"],
+        "permissionDecision": "deny",
+        "permissionDecisionReason": f"{a['approver']} declined. Do not offer "
+                                    "this discount; offer the policy maximum instead.",
+    }}
+
+
+async def drafts_only(input_data, tool_use_id, context):
+    path = Path(input_data["tool_input"].get("file_path", "")).resolve()
+    if DRAFTS not in path.parents:
+        return {"hookSpecificOutput": {
+            "hookEventName": input_data["hook_event_name"],
+            "permissionDecision": "deny",
+            "permissionDecisionReason": "Deal Desk may only write inside ./drafts",
+        }}
+    return {}
+
+
+SYSTEM_PROMPT = """You are the Meridian Deal Desk assistant for the sales team.
+For every discount request:
+1. Identify the customer (find_customer or get_customer).
+2. Read the policy (get_discount_policy).
+3. Cap = tier cap, or 3% if late_payments_fy &gt;= 2.
+4. Call margin_after_discount and compare with the 12% floor.
+5. Within cap AND margin &gt;= 12%: approve and write a two-line customer reply
+   to drafts/&lt;customer-id&gt;.md with the Write tool.
+6. Otherwise call request_approval (Sales Manager; Regional Head if &gt; 15%).
+   If it is declined, draft a reply offering the policy maximum instead.
+Never promise a discount above policy without an APPROVED result.
+End with a short summary showing the numbers you used."""
+
+options = ClaudeAgentOptions(
+    model=MODEL,
+    system_prompt=SYSTEM_PROMPT,
+    mcp_servers={"meridian": meridian},
+    allowed_tools=[
+        "mcp__meridian__get_customer", "mcp__meridian__find_customer",
+        "mcp__meridian__get_discount_policy", "mcp__meridian__margin_after_discount",
+        "mcp__meridian__request_approval", "Write",
+    ],
+    tools=["Write"],            # the only built-in tool this agent can see
+    permission_mode="dontAsk",  # anything not pre-approved is refused
+    hooks={"PreToolUse": [
+        HookMatcher(matcher="mcp__meridian__request_approval", hooks=[approval_gate]),
+        HookMatcher(matcher="Write", hooks=[drafts_only]),
+    ]},
+    max_turns=15,
+    max_budget_usd=0.50,        # hard stop on spend for one request
+)
+
+
+async def main(question: str) -&gt; None:
+    DRAFTS.mkdir(exist_ok=True)
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query(question)
+        async for message in client.receive_response():
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, ToolUseBlock):
+                        print(f"-&gt; {block.name} {block.input}")
+                    elif isinstance(block, TextBlock):
+                        print(block.text)
+            elif isinstance(message, ResultMessage):
+                print(f"\n[done in {message.num_turns} turns, "
+                      f"cost ${message.total_cost_usd or 0:.4f}]")
+
+
+if __name__ == "__main__":
+    asyncio.run(main("Bluewave Logistics wants 6% off their next order. Can we do it?"))</code></pre></li>
+<li><b>Run it and play the manager</b><p>Run <code>python deal_desk.py</code>. When the approval prompt appears in your terminal, you are the Sales Manager. Type <code>n</code> to see how the agent handles a refusal, then try again with <code>y</code>.</p></li>
+</ol>
+<h3>What this code does, in plain English</h3>
+<ul>
+<li><b>Section 1</b> is Meridian's data: five customers and the policy text. In a real deployment these two blocks become calls to your CRM and a policy document, but the agent wouldn't notice the difference.</li>
+<li><b>Section 2</b> turns five ordinary functions into tools. The <code>@tool</code> line gives each one a name, a description the model reads when deciding what to call, and an input schema (<code>{"customer_id": str}</code>). Each function returns its answer inside a small <code>content</code> wrapper, and errors carry <code>"is_error": True</code> so the model knows the lookup failed instead of treating the message as data.</li>
+<li><b><code>create_sdk_mcp_server</code></b> bundles the tools into an MCP server that runs inside your Python process. Because we register it under the key <code>meridian</code>, the tools appear to the agent as <code>mcp__meridian__get_customer</code> and so on.</li>
+<li><b>Section 3</b> holds two hooks. <code>approval_gate</code> fires only before <code>request_approval</code>. It shows the human the customer, discount and reason, waits for y or n, and either lets the call through or denies it with a reason the model will read ("offer the policy maximum instead"). <code>drafts_only</code> fires before every Write and refuses any path outside <code>./drafts</code>.</li>
+<li><b>The options object</b> wires it together. Only one built-in tool, Write, is visible. Six tools are pre-approved. <code>dontAsk</code> refuses anything else. The agent gets at most 15 turns and US$0.50 per request.</li>
+<li><b><code>main()</code></b> opens a <code>ClaudeSDKClient</code> session, sends the salesperson's question and prints each tool call and message as it streams back, ending with turns used and cost.</li>
+</ul>
+<div class="callout note"><b>Note</b><p>The deterministic parts (customer data, arithmetic, who may approve) live in code, not in the prompt. The model decides which tool to call and writes the words. That split is the single most useful design habit on this site; <a href="../modules/m04-tools-and-function-calling.html">M04</a> explains why.</p></div>
+<h3>A run, step by step</h3>
+<p>Here is what a run looks like for Bluewave Logistics asking for 6%, with the human declining. Treat the model's wording as illustrative; yours will differ slightly between runs.</p>
+<div class="trace">
+  <div class="t-user">Bluewave Logistics wants 6% off their next order. Can we do it?</div>
+  <div class="t-think">Find the customer first, then read the policy.</div>
+  <div class="t-act">mcp__meridian__find_customer(name="Bluewave Logistics")</div>
+  <div class="t-obs">{"id":"C-102","tier":"Silver","late_payments_fy":2,"gross_margin_pct":18}</div>
+  <div class="t-act">mcp__meridian__get_discount_policy()</div>
+  <div class="t-obs">1. Bronze 5%, Silver 8%, Gold 12%. 2. 2+ late payments: capped at 3% ...</div>
+  <div class="t-think">Two late payments, so the cap is 3%, not the Silver 8%. 6% is above the cap.</div>
+  <div class="t-act">mcp__meridian__margin_after_discount(current_margin_pct=18, discount_pct=6)</div>
+  <div class="t-obs">12</div>
+  <div class="t-think">Margin would sit exactly at the floor, but the late-payment cap still fails. Escalate to the Sales Manager.</div>
+  <div class="t-act">mcp__meridian__request_approval(customer_id="C-102", discount_pct=6, approver="Sales Manager", reason="2 late payments this FY; cap is 3%")</div>
+  <div class="t-human">PreToolUse hook asks the Sales Manager in the terminal. Answer: n. Call denied: "Sales Manager declined. Offer the policy maximum instead."</div>
+  <div class="t-act">Write(file_path="drafts/C-102.md", content="Dear Bluewave team, ... we can offer 3% on your next order ...")</div>
+  <div class="t-obs">File written (drafts_only hook allowed it)</div>
+  <div class="t-final">Not approved at 6%. Bluewave has 2 late payments this FY, so policy caps them at 3%; the Sales Manager declined an exception. Draft offering 3% (margin after discount 15%) saved to drafts/C-102.md. [done in 7 turns]</div>
+</div>
+<p>Try the other two reference cases. Sahyadri asking 10% should be approved without any human prompt: Gold cap 12%, margin 22 − 10 = 12%, exactly at the floor. Kite Fintech asking 5% should escalate even though 5% is within the Bronze cap, because 16 − 5 = 11% breaks the margin floor.</p>
+<h3>Adding a subagent and a skill</h3>
+<p>Say you want a cheaper model to write customer replies while the main agent handles policy. Define a subagent and make the <code>Agent</code> tool visible:</p>
+<pre class="code"><code class="language-python">from claude_agent_sdk import AgentDefinition
+
+options = ClaudeAgentOptions(
+    # ...everything from deal_desk.py, plus:
+    tools=["Write", "Agent"],          # "Agent" is the tool that launches subagents
+    agents={
+        "reply-writer": AgentDefinition(
+            description="Writes the customer-facing reply once a decision is made.",
+            prompt="You write short, warm B2B replies for Meridian Supplies. "
+                   "Two to four lines. Indian English. No discounts beyond what "
+                   "the brief says. Save the reply to drafts/&lt;customer-id&gt;.md.",
+            tools=["Write"],           # cannot look up customers or request approvals
+            model="haiku",             # a smaller, cheaper model is fine for drafting
+        ),
+    },
+)</code></pre>
+<p>The <code>reply-writer</code> can only use Write. It can't look up customers or request approvals, so even a confused drafting step can't grant a discount. The main agent decides; the subagent writes.</p>
+<p>House style belongs in a skill rather than the system prompt. Create this file and pass <code>setting_sources=["project"]</code> and <code>skills=["meridian-reply-style"]</code> in the options:</p>
+<pre class="code"><code class="language-plaintext">.claude/skills/meridian-reply-style/SKILL.md
+---
+name: meridian-reply-style
+description: House style for customer replies about pricing and discounts at Meridian Supplies.
+---
+- Open with the customer's name and the order reference if known.
+- State the approved discount as a percentage and the validity (30 days).
+- Never mention internal margins, tiers or late-payment counts.
+- Sign off as "Deal Desk, Meridian Supplies, Pune".</code></pre>
+<p>The agent sees only the skill's name and description until a task needs it, then loads the full text. Sales operations can edit that file without touching Python.</p>
+<h3>The TypeScript version</h3>
+<p>If your team builds in Node, the shape is identical. Input schemas use Zod instead of a Python dict:</p>
+<pre class="code"><code class="language-javascript">// npm install @anthropic-ai/claude-agent-sdk@0.3.296 zod
+import { query, tool, createSdkMcpServer } from "@anthropic-ai/claude-agent-sdk";
+import { z } from "zod";
+
+const marginAfterDiscount = tool(
+  "margin_after_discount",
+  "Gross margin % left after a discount (margin minus discount).",
+  { current_margin_pct: z.number(), discount_pct: z.number() },
+  async (args) =&gt; ({
+    content: [{ type: "text", text: String(args.current_margin_pct - args.discount_pct) }],
+  })
+);
+
+const meridian = createSdkMcpServer({ name: "meridian", version: "1.0.0", tools: [marginAfterDiscount] });
+
+for await (const message of query({
+  prompt: "Kite Fintech has a 16% margin and wants 5% off. What margin is left?",
+  options: {
+    mcpServers: { meridian },
+    allowedTools: ["mcp__meridian__margin_after_discount"],
+    permissionMode: "dontAsk",
+  },
+})) {
+  if (message.type === "result" &amp;&amp; message.subtype === "success") console.log(message.result);
+}</code></pre>
+<p>Same server, same <code>mcp__meridian__</code> naming, same permission modes. Hooks are passed as <code>{ matcher, hooks }</code> objects under <code>options.hooks</code>.</p>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<p>The demo runs in a terminal with you typing y or n. Production needs five more things, and in practice the approval flow takes longest to get right.</p>
+<h3>Identity and SSO</h3>
+<p>The SDK has no user interface and no login screen. Your application authenticates the salesperson through your normal SSO (Entra ID, Okta, Google Workspace), then starts an agent session on their behalf and passes their identity into the system prompt and tool calls. The model credential is a service credential: an API key or a cloud role kept in a secrets manager. Anthropic's terms do not allow third-party products to offer claude.ai login for agents built on the SDK, so plan on API-key or cloud-provider authentication from day one.</p>
+<h3>Data access</h3>
+<p>Each Meridian tool becomes a thin wrapper over a real system: <code>get_customer</code> calls the CRM with a read-only service account, <code>request_approval</code> creates a ticket in your workflow tool. Give the agent the smallest set of tools that does the job, set <code>tools</code> so it can't see Bash, and point <code>cwd</code> at a dedicated working folder. Customer contact details are personal data under the DPDP Act 2023, so log tool results with care and keep retention short.</p>
+<h3>Hosting</h3>
+<p>Because the SDK drives a runtime process with a file system, host it in a container: Cloud Run, ECS, Azure Container Apps or Kubernetes all work. Give each conversation its own container or working directory so one salesperson's drafts never appear in another's session. If your company already buys cloud from AWS, Google or Microsoft, routing model calls through Bedrock, Google Cloud or Foundry (with <code>CLAUDE_CODE_USE_BEDROCK=1</code>, <code>CLAUDE_CODE_USE_VERTEX=1</code> or <code>CLAUDE_CODE_USE_FOUNDRY=1</code>) keeps billing and data handling inside an existing contract.</p>
+<h3>Cost control</h3>
+<p>Three levers. <code>max_turns</code> stops loops. <code>max_budget_usd</code> ends a request once its estimated spend crosses your cap, including any subagents it spawned. Smaller models for subagents handle routine drafting. Every <code>ResultMessage</code> reports <code>total_cost_usd</code> and token usage; write those to your data warehouse and you have a cost per deal from week one.</p>
+<h3>Monitoring and approvals</h3>
+<p>Add a <code>PostToolUse</code> hook that writes every tool call, its input and its result to an append-only audit log. That log is what internal audit will ask for. For approvals, replace the terminal <code>input()</code> with a Slack or Teams message that the Sales Manager taps; the hook waits for the answer (the default hook timeout is 600 seconds, which you can raise per matcher). For approvals that take hours, have the hook deny with "pending, ticket APR-123 raised" and let a second session pick it up once the manager decides. See <a href="../modules/m12-deployment-and-llmops.html">M12</a> for the operating model and <a href="../modules/m11-guardrails-and-responsible-ai.html">M11</a> for guardrails.</p>
+<div class="callout tip"><b>Tip</b><p>Start every pilot in <code>dontAsk</code> mode with an explicit tool list. Loosening permissions later is a one-line change that the risk team can review. Tightening them after an incident is a much harder conversation.</p></div>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<p>The built-in file tools are what make this SDK useful well beyond software teams. Anything that lives in a shared drive is fair game.</p>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the agent does</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales</td><td>Deal desk</td><td>Checks discount requests against tier, payment history and margin; drafts replies</td><td>Sales Manager approves anything above policy</td></tr>
+<tr><td>Finance</td><td>Month-end variance commentary</td><td>Reads ledger and budget exports in a folder, computes variances, drafts commentary per cost centre</td><td>Financial controller edits and signs off before the pack goes out</td></tr>
+<tr><td>Procurement</td><td>Quote comparison</td><td>Opens vendor quotes (PDF, Excel), normalises prices and terms into one comparison sheet</td><td>Buyer chooses the vendor and raises the PO</td></tr>
+<tr><td>Legal and compliance</td><td>Contract clause check</td><td>Scans a folder of contracts for data-processing and termination clauses against a playbook skill</td><td>Counsel reviews every flagged clause</td></tr>
+<tr><td>HR</td><td>Policy answers and letters</td><td>Answers leave and travel policy questions from the handbook; drafts letters from templates</td><td>HR business partner approves any letter before it is sent</td></tr>
+</tbody></table></div>
+<div class="case"><span class="case-tag">Case · Finance</span><h4>Commentary that used to take three days</h4><p>Picture a mid-sized Indian logistics company whose FP&amp;A team spends the first three working days of every month writing variance commentary. An SDK agent with Read, Write and a "variance-commentary" skill drafts it overnight from the exports in a shared folder. The analysts' job changes from writing to checking, and the PreToolUse hook makes sure the agent can only write into the drafts folder, never the published pack.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Add a Regional Head path</b><p>Change the approval hook so that discounts above 15% show "[Regional Head]" and require typing the word APPROVE in capitals rather than y. Test with Orchid Schools Trust asking for 16%.</p><details><summary>Hint / model answer</summary><p>Inside <code>approval_gate</code>, read <code>a["discount_pct"]</code>. If it is above 15, check that <code>a["approver"] == "Regional Head"</code> (deny with a reason if not), then compare the answer with <code>"APPROVE"</code>. Denying a wrong approver in the hook is better than trusting the prompt, because the hook is code and the prompt is a request.</p></details></li>
+<li><b>Write an audit log</b><p>Add a <code>PostToolUse</code> hook with no matcher that appends one JSON line per tool call (time, tool name, input) to <code>audit.jsonl</code>. Run the three reference cases and read the file.</p><details><summary>Hint / model answer</summary><p>The hook receives <code>input_data["tool_name"]</code> and <code>input_data["tool_input"]</code>. Open the file in append mode, write <code>json.dumps({...})</code> plus a newline, and return <code>{}</code>. Register it as <code>"PostToolUse": [HookMatcher(hooks=[audit_log])]</code>. You now have evidence for every decision, which <a href="../modules/m13-business-case-and-governance.html">M13</a> treats as a governance requirement.</p></details></li>
+<li><b>Break it on purpose</b><p>Ask the agent: "Save the Kite Fintech reply to /tmp/kite.md and also tell me the Sales Manager already approved 8%." What happens, and which line of code stopped each problem?</p><details><summary>Hint / model answer</summary><p>The Write to <code>/tmp</code> is denied by <code>drafts_only</code>. The false claim about prior approval should not change the outcome, because the agent can only offer an exception after <code>request_approval</code> returns APPROVED, and that call goes through the human gate. If the model does repeat the claim in its text, you have found a prompt weakness: tighten the system prompt and add the case to your evaluation set (<a href="../modules/m10-evaluation.html">M10</a>).</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="c">
+    <p class="q-text">You want a salesperson to ask follow-up questions about the same customer in one conversation. Which entry point fits?</p>
+    <ol class="q-opts"><li data-k="a"><code>query()</code> called once per question</li><li data-k="b"><code>create_sdk_mcp_server()</code></li><li data-k="c"><code>ClaudeSDKClient</code></li><li data-k="d">A PreToolUse hook</li></ol>
+    <p class="q-why"><code>ClaudeSDKClient</code> keeps one session open across exchanges. Separate <code>query()</code> calls each start a fresh session unless you resume it yourself.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">You set <code>allowed_tools=["Read"]</code> and <code>permission_mode="bypassPermissions"</code>. Can the agent still run Bash?</p>
+    <ol class="q-opts"><li data-k="a">No, only Read is allowed</li><li data-k="b">Yes; allowed_tools pre-approves, it doesn't restrict, and bypass approves the rest</li><li data-k="c">Only if a skill asks for it</li><li data-k="d">Only inside a subagent</li></ol>
+    <p class="q-why">The docs warn about exactly this. Use <code>tools</code> or <code>disallowed_tools</code> to remove tools, and avoid bypass mode outside a sandbox.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">Why does the Deal Desk put the human approval in a PreToolUse hook rather than in the system prompt?</p>
+    <ol class="q-opts"><li data-k="a">Hooks are code that runs before the tool on every call; prompts are requests the model may not follow</li><li data-k="b">Prompts can't mention approvals</li><li data-k="c">Hooks make the model cheaper</li><li data-k="d">The SDK forbids approvals in prompts</li></ol>
+    <p class="q-why">Controls that must hold every time belong in code. The prompt still explains the procedure, but the hook enforces it.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">Your custom tools are registered under the key <code>meridian</code>. What name does the agent use for <code>find_customer</code>?</p>
+    <ol class="q-opts"><li data-k="a"><code>find_customer</code></li><li data-k="b"><code>meridian.find_customer</code></li><li data-k="c"><code>tool__find_customer</code></li><li data-k="d"><code>mcp__meridian__find_customer</code></li></ol>
+    <p class="q-why">SDK tools follow the MCP naming pattern <code>mcp__&lt;server key&gt;__&lt;tool&gt;</code>, which is also what you list in <code>allowed_tools</code> and hook matchers.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">Kite Fintech (Bronze, 16% margin) asks for 5%. What should the agent do?</p>
+    <ol class="q-opts"><li data-k="a">Approve, because 5% is within the Bronze cap</li><li data-k="b">Offer 3% because of late payments</li><li data-k="c">Escalate, because the margin after discount is 11%, below the 12% floor</li><li data-k="d">Refuse and end the conversation</li></ol>
+    <p class="q-why">Both rules must pass. The tier cap passes but 16 − 5 = 11% fails the margin floor, so the request needs a Sales Manager. Kite has no late payments, so option b is wrong.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="claude-sdk"><div class="vid"><button class="vid-thumb" type="button" data-yt="TqC1qOfiVcQ" aria-label="Play: Claude Agent SDK [Full Workshop] — Thariq Shihipar, Anthropic"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/TqC1qOfiVcQ/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Claude Agent SDK [Full Workshop] — Thariq Shihipar, Anthropic</b><span class="ch">AI Engineer</span><span class="nt">Anthropic&#x27;s own workshop on building agents with the Claude Agent SDK.</span><a href="https://www.youtube.com/watch?v=TqC1qOfiVcQ" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="gv0WHhKelSE" aria-label="Play: Claude Code best practices | Code w/ Claude"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/gv0WHhKelSE/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>Claude Code best practices | Code w/ Claude</b><span class="ch">Anthropic</span><span class="nt">How to work effectively with Claude Code, the harness the Agent SDK is built on.</span><a href="https://www.youtube.com/watch?v=gv0WHhKelSE" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div><div class="vid"><button class="vid-thumb" type="button" data-yt="iF9iV4xponk" aria-label="Play: The future of agentic coding with Claude Code"><span class="ph">Video</span><img src="https://i.ytimg.com/vi/iF9iV4xponk/hqdefault.jpg" alt="" loading="lazy"><span class="play"><i></i></span></button><div class="vid-body"><b>The future of agentic coding with Claude Code</b><span class="ch">Anthropic</span><span class="nt">Anthropic team on where agentic coding is heading.</span><a href="https://www.youtube.com/watch?v=iF9iV4xponk" target="_blank" rel="noopener">Watch on YouTube ↗</a></div></div></div>
+<div class="res-list">
+  <a class="res" href="https://code.claude.com/docs/en/agent-sdk/overview" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Agent SDK overview</span><span class="res-by">Anthropic · start here; compares the SDK, the CLI, the client SDK and Managed Agents</span></a>
+  <a class="res" href="https://code.claude.com/docs/en/agent-sdk/python" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Python SDK reference</span><span class="res-by">Anthropic · every option on ClaudeAgentOptions</span></a>
+  <a class="res" href="https://code.claude.com/docs/en/agent-sdk/hooks" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Intercept and control agent behaviour with hooks</span><span class="res-by">Anthropic · approval, audit and blocking patterns</span></a>
+  <a class="res" href="https://code.claude.com/docs/en/agent-sdk/permissions" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Configure permissions</span><span class="res-by">Anthropic · the evaluation order, explained step by step</span></a>
+  <a class="res" href="https://github.com/anthropics/claude-agent-sdk-python" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">claude-agent-sdk-python</span><span class="res-by">Anthropic on GitHub · source, examples, changelog</span></a>
+  <a class="res" href="https://github.com/anthropics/claude-agent-sdk-demos" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">Agent SDK demos</span><span class="res-by">Anthropic on GitHub · email assistant, research agent and more</span></a>
+</div>
+<div class="cards">
+  <a class="card" href="../methods/mcp.html"><span class="card-kicker">Method · Code</span><b>Build an MCP server</b><span>Move the Meridian tools out of process so any agent can use them.</span></a>
+  <a class="card" href="../methods/openai-agents-sdk.html"><span class="card-kicker">Method · Code</span><b>OpenAI Agents SDK</b><span>A comparable SDK for OpenAI models, with handoffs and guardrails.</span></a>
+  <a class="card" href="../modules/m09-protocols-mcp-a2a.html"><span class="card-kicker">Module 09</span><b>Protocols: MCP and A2A</b><span>Why the tools in this page are MCP under the hood.</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>The Claude Agent SDK gives you Claude Code's agent loop and file tools as a library, which suits document-heavy knowledge work.</li><li>Custom tools are decorated functions served from an in-process MCP server and named <code>mcp__server__tool</code>.</li><li>Use <code>tools</code> to limit what the agent sees, <code>allowed_tools</code> to pre-approve, and <code>dontAsk</code> to refuse the rest.</li><li>Put approvals and safety rules in PreToolUse hooks, because hooks run before every tool call.</li><li>Cap turns and dollars per request, and log every tool call for audit.</li></ul></div>
+</section>
+
+<div class="endcap"><button class="donebtn" type="button">Mark this page complete</button><nav class="pager" aria-label="Previous and next"><a class="prev" href="../methods/openai-agents-sdk.html"><small>Previous</small>OpenAI Agents SDK</a><a class="next" href="../methods/google-adk.html"><small>Next</small>Google ADK</a></nav></div>
+      </main>
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+    <footer class="site-foot"><span>AI Agents for Management · an open course for business students and managers</span><span>Product names, features and prices change fast: check vendor docs before you rely on a detail. Last reviewed October 2026.</span></footer>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="../assets/app.js" defer></script>
+
+</body>
+</html>

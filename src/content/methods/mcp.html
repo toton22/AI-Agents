@@ -1,0 +1,402 @@
+<!--META {"title":"Build an MCP server","h1":"Build an MCP server: give <em>any</em> agent your company's tools","eyebrow":"Method · Code","lede":"Package Meridian's customer lookups, margin maths, approval requests and discount policy as one MCP server, test it, plug it into Claude Desktop, ChatGPT, Copilot Studio, VS Code and Cursor, and know what to check before it goes remote.","minutes":50} -->
+<section id="overview">
+<h2>What it is</h2>
+<dl class="spec"><div><dt>Skill level</dt><dd>Intermediate (Python)</dd></div><div><dt>Time to first agent</dt><dd>About 45 minutes to a working server in Claude Desktop</dd></div><div><dt>Typical cost</dt><dd>Free and open source; you pay only to host remote servers</dd></div><div><dt>Best for</dt><dd>Exposing a company system once so many AI apps and agents can use it</dd></div><div><dt>Runs where</dt><dd>Locally over stdio, or as a web service over Streamable HTTP</dd></div><div><dt>Lock-in risk</dt><dd>Low: an open standard, now stewarded under the Linux Foundation</dd></div></dl>
+<p>Every other method page on this site builds the Deal Desk tools inside one agent. That's fine until the second agent arrives. Then the third. Then someone wants the same customer lookup inside ChatGPT, and the IT team wants it in Copilot Studio. Before long you have five copies of <code>get_customer</code>, each with its own bugs and its own idea of who's allowed to call it.</p>
+<p>The Model Context Protocol fixes that. MCP is an open standard for connecting AI applications to tools and data. You write a <b>server</b> once, describing your tools in a standard way. Any MCP-capable <b>host</b> (Claude Desktop, ChatGPT, Copilot Studio, VS Code, Cursor, your own agent) can connect to it and use those tools. It is often compared to USB-C for AI: one plug shape, many devices.</p>
+<p>Anthropic introduced MCP in November 2024 and donated it to the Agentic AI Foundation, a Linux Foundation project, in December 2025. As of October 2026 the current specification revision is dated 2026-07-28; among other changes, it made MCP stateless at the protocol level, with no protocol sessions to manage. The official Python SDK moved to version 2 the same week. One rename to know: the high-level server class long known as <code>FastMCP</code> is now <code>MCPServer</code>. Code written for version 1 still runs if you pin <code>mcp&lt;2</code>. (A separate community project called FastMCP, the <code>fastmcp</code> package, also exists and has its own API.)</p>
+<p>This page is the hands-on companion to <a href="{{root}}modules/m09-protocols-mcp-a2a.html">M09 Protocols: MCP and A2A</a>, which covers the concepts in more depth.</p>
+<div class="callout mgr"><b>Manager's lens</b><p>MCP turns "integrate system X with AI tool Y" from a project per pair into a project per system. That changes the economics. It also changes the risk: one server now feeds many AI apps, so its security and access rules matter more than any single agent's prompt.</p></div>
+</section>
+
+<section id="when">
+<h2>When to pick it</h2>
+<p>Build an MCP server when a system will be used by more than one AI app or agent, or when you want business users to reach it from tools they already have. A CRM lookup, a policy library, a ticketing system, an ERP report: these are natural servers. Build it once, govern it once, and let the Claude Desktop users in sales, the Copilot Studio agents in service, and the developers in VS Code all share it.</p>
+<p>It's also the cleanest way to keep tool logic out of agent code. Your agent framework can change next year; the MCP server doesn't have to.</p>
+<p>Skip it for a single throwaway prototype where one agent uses one tool; a plain function in your framework is faster. And note that MCP is about tools and data, not about agents talking to each other. For agent-to-agent delegation, look at A2A (also in <a href="{{root}}modules/m09-protocols-mcp-a2a.html">M09</a>).</p>
+<div class="proscons"><div class="pros"><h4>Strengths</h4><ul><li>One integration, many AI apps and frameworks</li><li>Tools, read-only resources and prompt templates in one package</li><li>Standard OAuth-based authorisation for remote servers</li><li>Good test tooling (MCP Inspector)</li><li>Supported by the major AI vendors as of 2026</li></ul></div><div class="cons"><h4>Watch-outs</h4><ul><li>Each host supports a different subset of features</li><li>A server shared by many apps is a juicy target; security work is real</li><li>Tool descriptions and results flow straight into model context</li><li>Spec and SDKs have moved fast; pin versions</li></ul></div></div>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p>Three roles. The <b>host</b> is the AI application the user sees. Inside it, an <b>MCP client</b> holds the connection to one server. The <b>server</b> exposes capabilities. When the user asks a question, the host lists the server's tools, sends their descriptions to the model, and when the model picks a tool, the client calls the server and hands back the result.</p>
+<figure class="fig">
+<svg viewBox="0 0 720 340" role="img" aria-label="MCP architecture: several hosts connect through stdio or Streamable HTTP to one Meridian MCP server that exposes tools, a resource and a prompt, backed by a CRM and an approvals queue">
+  <rect class="fx-box" x="12" y="60" width="180" height="150" rx="6"/>
+  <text class="fx-tb" x="102" y="86" text-anchor="middle">Hosts</text>
+  <text class="fx-ts" x="102" y="112" text-anchor="middle">Claude Desktop</text>
+  <text class="fx-ts" x="102" y="134" text-anchor="middle">ChatGPT · Copilot Studio</text>
+  <text class="fx-ts" x="102" y="156" text-anchor="middle">VS Code · Cursor</text>
+  <text class="fx-ts" x="102" y="178" text-anchor="middle">your own agent</text>
+  <rect class="fx-box k1" x="232" y="60" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="332" y="85" text-anchor="middle">stdio</text>
+  <text class="fx-ts" x="332" y="105" text-anchor="middle">local child process</text>
+  <rect class="fx-box k1" x="232" y="150" width="200" height="60" rx="6"/>
+  <text class="fx-tb" x="332" y="175" text-anchor="middle">Streamable HTTP</text>
+  <text class="fx-ts" x="332" y="195" text-anchor="middle">remote · OAuth bearer</text>
+  <rect class="fx-box fx-hi" x="472" y="40" width="236" height="190" rx="6"/>
+  <text class="fx-tb" x="590" y="66" text-anchor="middle">Meridian MCP server</text>
+  <text class="fx-t" x="590" y="92" text-anchor="middle">5 tools</text>
+  <text class="fx-ts" x="590" y="110" text-anchor="middle">customer lookups, margin,</text>
+  <text class="fx-ts" x="590" y="126" text-anchor="middle">policy, request_approval</text>
+  <text class="fx-t" x="590" y="152" text-anchor="middle">1 resource</text>
+  <text class="fx-ts" x="590" y="170" text-anchor="middle">policy://meridian/discounts</text>
+  <text class="fx-t" x="590" y="196" text-anchor="middle">1 prompt</text>
+  <text class="fx-ts" x="590" y="214" text-anchor="middle">deal_check</text>
+  <rect class="fx-box k2" x="472" y="268" width="112" height="56" rx="6"/>
+  <text class="fx-tb" x="528" y="292" text-anchor="middle">CRM</text>
+  <text class="fx-ts" x="528" y="310" text-anchor="middle">read-only</text>
+  <rect class="fx-box k2" x="596" y="268" width="112" height="56" rx="6"/>
+  <text class="fx-tb" x="652" y="292" text-anchor="middle">Approvals</text>
+  <text class="fx-ts" x="652" y="310" text-anchor="middle">ticket queue</text>
+  <rect class="fx-box k4" x="232" y="262" width="200" height="56" rx="6"/>
+  <text class="fx-tb" x="332" y="286" text-anchor="middle">MCP Inspector</text>
+  <text class="fx-ts" x="332" y="304" text-anchor="middle">test before you ship</text>
+  <path class="fx-ar" d="M192 100 L228 92"/>
+  <path class="fx-ar" d="M192 170 L228 178"/>
+  <path class="fx-ar" d="M432 90 L468 100"/>
+  <path class="fx-ar" d="M432 180 L468 170"/>
+  <path class="fx-ar" d="M528 230 L528 264"/>
+  <path class="fx-ar" d="M652 230 L652 264"/>
+  <path class="fx-ln fx-dash" d="M432 290 L470 222"/>
+</svg>
+<figcaption>One server, many hosts. Local hosts usually launch the server as a child process over stdio; cloud hosts such as ChatGPT and Copilot Studio need it reachable over Streamable HTTP.</figcaption>
+</figure>
+<h3>The three things a server offers</h3>
+<p><b>Tools</b> are actions the model can call: <code>get_customer</code>, <code>request_approval</code>. Most hosts ask the user before running one. <b>Resources</b> are read-only content identified by a URI, such as <code>policy://meridian/discounts</code>; the host or user decides when to attach them. <b>Prompts</b> are reusable templates the user picks from a menu, like a saved "check this deal" request. Not every host shows resources and prompts, so we also expose the policy as a tool.</p>
+<h3>Two transports</h3>
+<p><b>stdio</b>: the host starts your server as a local program and talks through its standard input and output. Simple, private to one machine, no network port. <b>Streamable HTTP</b>: your server is a web service at a URL such as <code>https://mcp.meridian.example/mcp</code>, protected with OAuth bearer tokens. Use it for anything shared or cloud-hosted. The older SSE transport is deprecated; Copilot Studio, for one, has dropped it.</p>
+<div class="callout warn"><b>Watch out</b><p>A stdio server must never print to standard output. Those bytes are the protocol channel, and one stray <code>print()</code> breaks the connection. Log to standard error instead; the code below does.</p></div>
+</section>
+
+<section id="build">
+<h2>Build the Meridian server</h2>
+<ol class="steps">
+<li><b>Create the project</b><p>The MCP docs use <code>uv</code>, a fast Python package manager. Install it, then create a project and add the pinned SDK with its command-line extras:</p>
+<pre class="code"><code class="language-bash">uv init meridian-mcp &amp;&amp; cd meridian-mcp
+uv add "mcp[cli]==2.3.0"
+# save the server below as meridian_server.py, then:
+uv run mcp dev meridian_server.py                      # opens the MCP Inspector
+# or, with Node 22.19+ installed:
+npx @modelcontextprotocol/inspector uv run meridian_server.py</code></pre></li>
+<li><b>Write the server</b><p>Save as <code>meridian_server.py</code>:</p>
+<pre class="code"><code class="language-python">"""Meridian Deal Desk MCP server: customer lookups, margin maths, approvals."""
+import json
+import logging
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+
+from mcp.server import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import ToolAnnotations
+
+logging.basicConfig(level=logging.INFO)  # logs go to stderr, never stdout
+log = logging.getLogger("meridian")
+
+mcp = MCPServer(
+    "meridian-deal-desk",
+    instructions="Meridian Supplies tools for checking discount requests. "
+                 "Read the discount policy before deciding. Never promise a "
+                 "discount above policy without request_approval.",
+)
+
+APPROVALS_FILE = Path(os.getenv("MERIDIAN_APPROVALS_FILE", "approvals.jsonl"))
+
+CUSTOMERS = {
+    "C-101": {"id": "C-101", "name": "Sahyadri Hospitals", "tier": "Gold",
+              "annual_revenue_lakh": 48, "late_payments_fy": 0, "gross_margin_pct": 22},
+    "C-102": {"id": "C-102", "name": "Bluewave Logistics", "tier": "Silver",
+              "annual_revenue_lakh": 19, "late_payments_fy": 2, "gross_margin_pct": 18},
+    "C-103": {"id": "C-103", "name": "Orchid Schools Trust", "tier": "Gold",
+              "annual_revenue_lakh": 31, "late_payments_fy": 0, "gross_margin_pct": 25},
+    "C-104": {"id": "C-104", "name": "Kite Fintech", "tier": "Bronze",
+              "annual_revenue_lakh": 6, "late_payments_fy": 0, "gross_margin_pct": 16},
+    "C-105": {"id": "C-105", "name": "Trident Engineering", "tier": "Silver",
+              "annual_revenue_lakh": 22, "late_payments_fy": 1, "gross_margin_pct": 20},
+}
+
+POLICY = """Meridian discount policy (FY 2026-27)
+1. Maximum discount by tier: Bronze 5%, Silver 8%, Gold 12%.
+2. Customers with 2 or more late payments this financial year are capped at 3%.
+3. Gross margin after discount must stay at or above 12%
+   (margin_after = current_margin - discount).
+4. Anything above the cap needs Sales Manager approval;
+   anything above 15% needs Regional Head approval."""
+
+READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=False)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_customer(customer_id: str) -&gt; dict:
+    """Return the Meridian customer record for an id such as 'C-101'."""
+    record = CUSTOMERS.get(customer_id.strip().upper())
+    if record is None:
+        raise ToolError(f"No customer with id {customer_id}")
+    return record
+
+
+@mcp.tool(annotations=READ_ONLY)
+def find_customer(name: str) -&gt; dict:
+    """Find a Meridian customer by (part of) their name, e.g. 'Sahyadri'."""
+    hits = [c for c in CUSTOMERS.values() if name.lower() in c["name"].lower()]
+    if len(hits) != 1:
+        raise ToolError(f"{len(hits)} matches for '{name}': "
+                         f"{[c['name'] for c in hits]}")
+    return hits[0]
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_discount_policy() -&gt; str:
+    """Return Meridian's discount policy text."""
+    return POLICY
+
+
+@mcp.tool(annotations=READ_ONLY)
+def margin_after_discount(current_margin_pct: float, discount_pct: float) -&gt; float:
+    """Gross margin % left after a discount (simplified: margin minus discount)."""
+    return round(current_margin_pct - discount_pct, 2)
+
+
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False,
+                                      idempotent_hint=False, open_world_hint=False))
+def request_approval(customer_id: str, discount_pct: float, approver: str,
+                     reason: str) -&gt; str:
+    """Raise an approval ticket for an out-of-policy discount.
+    approver must be 'Sales Manager' or 'Regional Head' (above 15%).
+    Returns a PENDING ticket: do not promise the discount to the customer."""
+    if approver not in ("Sales Manager", "Regional Head"):
+        raise ToolError("approver must be 'Sales Manager' or 'Regional Head'")
+    if discount_pct &gt; 15 and approver != "Regional Head":
+        raise ToolError("Discounts above 15% need the Regional Head")
+    ticket = f"APR-{datetime.now(timezone.utc):%Y%m%d%H%M%S}"
+    entry = {"ticket": ticket, "customer_id": customer_id, "discount_pct": discount_pct,
+             "approver": approver, "reason": reason, "status": "PENDING"}
+    with APPROVALS_FILE.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(entry) + "\n")
+    log.info("Approval requested: %s", entry)
+    return f"{ticket} PENDING with {approver}. Tell the salesperson it is under review."
+
+
+@mcp.resource("policy://meridian/discounts", mime_type="text/plain")
+def discount_policy() -&gt; str:
+    """Meridian's current discount policy."""
+    return POLICY
+
+
+@mcp.prompt()
+def deal_check(customer_name: str, discount_pct: float) -&gt; str:
+    """Check a discount request against Meridian policy."""
+    return (f"{customer_name} has asked for {discount_pct}% off their next order. "
+            "Look up the customer, read the discount policy, compute the margin "
+            "after discount, and either approve within policy with a two-line "
+            "reply I can send, or raise request_approval with the right approver. "
+            "Show the numbers you used.")
+
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")</code></pre></li>
+<li><b>Test it in the Inspector</b><p><code>uv run mcp dev meridian_server.py</code> opens the MCP Inspector in your browser. Open the Tools tab, call <code>find_customer</code> with "Kite", call <code>get_customer</code> with "C-999" to see an error, read the resource, and fill in the <code>deal_check</code> prompt. If something fails here, it will fail in every host.</p></li>
+<li><b>Connect Claude Desktop</b><p>Open <code>claude_desktop_config.json</code> (on macOS in <code>~/Library/Application Support/Claude/</code>, on Windows in <code>%APPDATA%\Claude\</code>), add the server and restart Claude Desktop. Use absolute paths; you may need the full path to <code>uv</code>.</p>
+<pre class="code"><code class="language-json">{
+  "mcpServers": {
+    "meridian-deal-desk": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/ABSOLUTE/PATH/TO/meridian-mcp",
+        "run",
+        "meridian_server.py"
+      ],
+      "env": { "MERIDIAN_APPROVALS_FILE": "/ABSOLUTE/PATH/TO/approvals.jsonl" }
+    }
+  }
+}</code></pre></li>
+</ol>
+<h3>What this code does, in plain English</h3>
+<ul>
+<li><b><code>MCPServer("meridian-deal-desk", instructions=...)</code></b> creates the server. The instructions travel to every host that connects, so the house rules go with the tools.</li>
+<li><b><code>logging.basicConfig</code></b> sends logs to standard error, keeping standard output clean for the protocol.</li>
+<li><b><code>@mcp.tool()</code></b> turns a typed Python function into a tool. The SDK reads the name, the type hints and the docstring to build the description the model sees. Whatever the function returns goes back to the host; a dict arrives as JSON text.</li>
+<li><b><code>ToolAnnotations</code></b> label the four lookup tools as read-only and <code>request_approval</code> as a write that isn't destructive. Hosts use these hints to decide what to ask the user about. They are hints, not enforcement: the code is what actually stops bad calls.</li>
+<li><b><code>ToolError</code></b> sends a clear message back to the model ("No customer with id C-999"). In version 2 of the SDK, any other exception is reported only as a generic failure, so internal details such as database errors don't leak to the model or the user.</li>
+<li><b><code>request_approval</code></b> checks the approver is valid, enforces the 15% Regional Head rule in code, writes a PENDING ticket to a file and tells the model not to promise anything. In production this writes to your ticketing system.</li>
+<li><b><code>@mcp.resource</code></b> publishes the policy at a URI. <b><code>@mcp.prompt</code></b> publishes a template that a user can pick and fill with a customer name and discount.</li>
+<li><b><code>mcp.run(transport="stdio")</code></b> starts the server in local mode.</li>
+</ul>
+<h3>A run in Claude Desktop</h3>
+<p>Once connected, the salesperson just asks. Note the two separate human checkpoints: the host asks permission to run a tool, and the business approval goes to the manager. Wording is illustrative.</p>
+<div class="trace">
+  <div class="t-user">Kite Fintech wants 5% off their next order. Can we do it?</div>
+  <div class="t-act">find_customer(name="Kite Fintech")</div>
+  <div class="t-obs">{"id":"C-104","tier":"Bronze","late_payments_fy":0,"gross_margin_pct":16}</div>
+  <div class="t-act">get_discount_policy()</div>
+  <div class="t-obs">1. Maximum discount by tier: Bronze 5% ... 3. Gross margin after discount must stay at or above 12% ...</div>
+  <div class="t-act">margin_after_discount(current_margin_pct=16, discount_pct=5)</div>
+  <div class="t-obs">11.0</div>
+  <div class="t-think">Within the Bronze cap, but 11% breaks the 12% margin floor. Raise it with the Sales Manager.</div>
+  <div class="t-human">Claude Desktop asks: allow meridian-deal-desk to run request_approval? The salesperson clicks Allow.</div>
+  <div class="t-act">request_approval(customer_id="C-104", discount_pct=5, approver="Sales Manager", reason="Margin after discount 11%, below 12% floor")</div>
+  <div class="t-obs">APR-20261012094512 PENDING with Sales Manager. Tell the salesperson it is under review.</div>
+  <div class="t-final">I can't confirm 5% yet. It's within Kite's Bronze cap, but margin would drop to 11%, under the 12% floor, so I've raised ticket APR-20261012094512 with the Sales Manager. Until it's approved, please don't commit to the customer.</div>
+</div>
+<h3>Other hosts</h3>
+<p>The same server works elsewhere with a little configuration. Here's what each host needs as of October 2026; check the linked docs, because these settings change often.</p>
+<div class="table-wrap"><table><thead><tr><th>Host</th><th>How to connect</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Claude (web and Desktop)</td><td>Local: config file above. Remote: Connectors, "Add custom connector", paste the server URL</td><td>Custom connectors are on Pro, Max, Team and Enterprise plans (beta); Team and Enterprise owners add them first. OAuth supported</td></tr>
+<tr><td>ChatGPT</td><td>Developer mode, then create an app pointing at your remote MCP server</td><td>Full MCP (including write actions) is in beta for Business, Enterprise and Edu; Pro is limited to read/fetch. Remote servers only; local servers need OpenAI's Secure MCP Tunnel</td></tr>
+<tr><td>Microsoft Copilot Studio</td><td>Agent's Tools page, Add a tool, New tool, Model Context Protocol; enter name, description, URL and auth</td><td>Streamable HTTP only (no SSE). Auth: none, API key or OAuth 2.0. Runs through Power Platform connectors, so your DLP policies apply</td></tr>
+<tr><td>VS Code</td><td><code>.vscode/mcp.json</code> in the project, top-level key <code>servers</code></td><td>Used by agents in VS Code; keep secrets in input variables or env files, not in the JSON</td></tr>
+<tr><td>Cursor</td><td><code>.cursor/mcp.json</code> (project) or <code>~/.cursor/mcp.json</code> (global), key <code>mcpServers</code></td><td>stdio, SSE and Streamable HTTP; OAuth for remote servers</td></tr>
+</tbody></table></div>
+<p>The VS Code file for our local server, then the Cursor file pointing at the remote version you'll build next:</p>
+<pre class="code"><code class="language-json">{
+  "servers": {
+    "meridian-deal-desk": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["--directory", "/ABSOLUTE/PATH/TO/meridian-mcp", "run", "meridian_server.py"]
+    }
+  }
+}</code></pre>
+<pre class="code"><code class="language-json">{
+  "mcpServers": {
+    "meridian-deal-desk": {
+      "url": "https://mcp.meridian.example/mcp"
+    }
+  }
+}</code></pre>
+<p>Code frameworks can connect too: the Claude Agent SDK takes the same <code>command</code>/<code>args</code> entry in <code>mcp_servers</code>, and Google ADK uses <code>McpToolset</code>. That's the payoff: the Deal Desk pages for each framework could all share this one server.</p>
+</section>
+
+<section id="deploy">
+<h2>Taking it to production</h2>
+<h3>Going remote over Streamable HTTP</h3>
+<p>Cloud hosts can't launch a program on your laptop, so a shared server must run as a web service. Three changes: attach a token verifier and auth settings to the server, switch the transport, and put it behind HTTPS. This version rejects any request without a valid bearer token (HTTP 401) and publishes the metadata that tells MCP clients where to get a token:</p>
+<pre class="code"><code class="language-python">import hmac
+import os
+
+from mcp.server import MCPServer
+from mcp.server.auth.provider import AccessToken
+from mcp.server.auth.settings import AuthSettings
+
+
+class SharedSecretVerifier:
+    """Pilot only: accepts one bearer token kept in a secrets manager.
+    In production, validate JWTs from your identity provider (Entra ID, Okta,
+    Google) and check the audience is this server."""
+
+    async def verify_token(self, token: str) -&gt; AccessToken | None:
+        if hmac.compare_digest(token, os.environ["MERIDIAN_MCP_TOKEN"]):
+            return AccessToken(token=token, client_id="deal-desk-pilot",
+                               scopes=["deals:read", "deals:approve"])
+        return None   # -&gt; HTTP 401
+
+
+mcp = MCPServer(
+    "meridian-deal-desk",
+    token_verifier=SharedSecretVerifier(),
+    auth=AuthSettings(
+        issuer_url="https://login.meridian.example",           # your IdP
+        resource_server_url="https://mcp.meridian.example/mcp",
+        required_scopes=["deals:read"],
+    ),
+)
+
+# ... the same @mcp.tool / @mcp.resource / @mcp.prompt functions as before ...
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)</code></pre>
+<p>In plain English: <code>SharedSecretVerifier</code> is the bouncer. Every request's bearer token goes through <code>verify_token</code>; a match returns who the caller is and what scopes they hold, anything else returns <code>None</code> and the request is refused. <code>AuthSettings</code> names your identity provider and this server's public URL, and requires the <code>deals:read</code> scope. The shared secret is a pilot shortcut. For production, verify JWTs issued by your identity provider (Microsoft Entra ID, Okta, Google) and check that each token was issued for this server.</p>
+<h3>Identity, data access and hosting</h3>
+<p>Run the server as a container on Cloud Run, Azure Container Apps, AWS App Runner or your Kubernetes cluster, with TLS at the load balancer. The server talks to the CRM with its own service account, read-only, scoped to the fields the tools return. Pass the end user's identity through from the token so tools can apply row-level rules (a salesperson sees their own accounts) and so every approval ticket records who asked.</p>
+<h3>Cost, monitoring and approvals</h3>
+<p>MCP itself costs nothing to run beyond hosting; model tokens are paid by the host. Watch tool-result size, though, because every byte a tool returns becomes tokens in someone's bill. Log every call with caller, tool, arguments and outcome, and alert on unusual volume. Keep approvals in your workflow system: the server raises tickets, managers decide in the tool they already use, and the agent checks status with another tool.</p>
+<h3>Security checklist for MCP servers</h3>
+<p>Drawn from the MCP security best-practices guide and hard experience. Go through it before any server leaves a laptop.</p>
+<ul class="checklist">
+<li>Remote servers require authentication; no anonymous endpoints, ever.</li>
+<li>Accept only tokens issued for this server (check the audience); never pass a client's token through to downstream APIs. The spec forbids token passthrough.</li>
+<li>Use narrow scopes (read versus approve) and ask for more only when a privileged tool is first used.</li>
+<li>Bind any state handle (cart id, ticket id) to the authenticated user; possession of an id is not proof of identity.</li>
+<li>Validate every input in code: ids, percentages, approver names. The model is not a validation layer.</li>
+<li>Return only the fields the use case needs. Mask personal data covered by the DPDP Act 2023.</li>
+<li>Treat tool descriptions and results as prompt-injection surfaces. Never put instructions from external data into descriptions; sanitise text you return from documents or emails.</li>
+<li>Keep write tools few and explicit, annotate them honestly, and enforce limits server-side.</li>
+<li>For local servers, prefer stdio; if you must use HTTP locally, require a token and bind to localhost. The v2 SDK turns on DNS-rebinding protection for localhost by default.</li>
+<li>Pin SDK versions, review third-party servers before installing them, and only install servers from sources you trust; a local server runs with your user's permissions.</li>
+<li>Log every call and review the logs. Rate-limit per user.</li>
+</ul>
+<p><a href="{{root}}modules/m11-guardrails-and-responsible-ai.html">M11</a> covers prompt injection and least privilege in depth, and <a href="{{root}}modules/m12-deployment-and-llmops.html">M12</a> covers running services like this one.</p>
+</section>
+
+<section id="uses">
+<h2>Management use cases</h2>
+<p>Think of MCP servers as a catalogue of company capabilities that any approved AI app can borrow.</p>
+<div class="table-wrap"><table><thead><tr><th>Function</th><th>Use case</th><th>What the server exposes</th><th>Human checkpoint</th></tr></thead><tbody>
+<tr><td>Sales</td><td>Deal desk everywhere</td><td>Customer lookup, margin maths, approval requests, policy resource</td><td>Sales Manager decides every ticket</td></tr>
+<tr><td>Finance</td><td>Spend and budget queries</td><td>Read-only budget vs actual by cost centre from the ERP</td><td>Controller owns which cost centres each role can see</td></tr>
+<tr><td>HR</td><td>Employee self-service</td><td>Leave balance, policy search, request submission</td><td>Manager approves leave in the HR system as usual</td></tr>
+<tr><td>Customer service</td><td>Order and ticket context</td><td>Order status, ticket history, draft-reply prompt template</td><td>Agent sends replies; refunds above a threshold need a supervisor</td></tr>
+<tr><td>IT</td><td>Service desk</td><td>Knowledge base search, ticket creation, status check</td><td>IT approves access requests in the ITSM tool</td></tr>
+<tr><td>Supply chain</td><td>Inventory visibility</td><td>Stock by warehouse, open POs, supplier lead times</td><td>Planner approves any reorder the agent proposes</td></tr>
+</tbody></table></div>
+<div class="case"><span class="case-tag">Case · Customer service</span><h4>One server, three front doors</h4><p>Imagine an anonymised consumer-electronics brand with service agents in Copilot Studio, a sales team in Claude, and developers in VS Code. All three needed order status. Instead of three integrations, IT published one remote MCP server with read-only order tools behind Entra ID. DLP policies in Power Platform and the server's own scopes decide who sees what, and there's a single audit log for every AI lookup.</p></div>
+</section>
+
+<section id="practice">
+<h2>Practice</h2>
+<ol class="exercises">
+<li><b>Add a resource template</b><p>Add a resource at <code>customer://{customer_id}/summary</code> that returns a one-paragraph summary of a customer. Test it in the Inspector. Why might a host prefer this over the <code>get_customer</code> tool?</p><details><summary>Hint / model answer</summary><p>Decorate a function with <code>@mcp.resource("customer://{customer_id}/summary")</code> taking <code>customer_id: str</code>; the placeholder becomes a parameter. Resources are read-only and attached by the user or host, so they suit "put this context in front of the model" without granting an action. Tools suit "let the model decide to fetch".</p></details></li>
+<li><b>Find the leak</b><p>A colleague's version of <code>get_customer</code> returns the full CRM record, including contact person, mobile number and credit notes. List what's wrong and fix the tool's return value.</p><details><summary>Hint / model answer</summary><p>Personal data (contact name, mobile) isn't needed for a discount decision, so returning it breaks data minimisation under the DPDP Act and puts it into model context and host logs. Credit notes may be confidential. Return only id, name, tier, late payments and margin, which is what the policy needs.</p></details></li>
+<li><b>Plan the remote rollout</b><p>Write a one-page plan to make the Meridian server available to Copilot Studio agents in customer service. Cover hosting, identity, scopes, DLP and logging.</p><details><summary>Hint / model answer</summary><p>Host on a container platform with HTTPS; register the server as an app in Entra ID; issue tokens with a read-only scope for service agents (no <code>request_approval</code>); connect through the Copilot Studio MCP wizard with OAuth 2.0; check your Power Platform DLP policy allows the connector; log caller and tool for every call; review logs weekly for the first month.</p></details></li>
+</ol>
+<div class="quiz">
+  <div class="q" data-answer="c">
+    <p class="q-text">In MCP terms, what is Claude Desktop when it uses the Meridian server?</p>
+    <ol class="q-opts"><li data-k="a">A server</li><li data-k="b">A resource</li><li data-k="c">A host, containing an MCP client</li><li data-k="d">A transport</li></ol>
+    <p class="q-why">The host is the AI app the user sees; it runs one client per server connection. Your code is the server.</p>
+  </div>
+  <div class="q" data-answer="a">
+    <p class="q-text">Why does the server log to standard error instead of using <code>print()</code>?</p>
+    <ol class="q-opts"><li data-k="a">With stdio transport, standard output carries the protocol messages; printing corrupts them</li><li data-k="b">print() is slower</li><li data-k="c">Standard error is encrypted</li><li data-k="d">MCP forbids logging</li></ol>
+    <p class="q-why">The MCP docs warn that writing to stdout breaks a stdio server. Log to stderr or a file.</p>
+  </div>
+  <div class="q" data-answer="d">
+    <p class="q-text">You want Copilot Studio agents to use the Meridian server. What must be true?</p>
+    <ol class="q-opts"><li data-k="a">The server runs over stdio on each user's laptop</li><li data-k="b">The server uses the SSE transport</li><li data-k="c">The server has no authentication, so Copilot can reach it</li><li data-k="d">The server is reachable over Streamable HTTP, with an auth option Copilot Studio supports</li></ol>
+    <p class="q-why">Copilot Studio supports the Streamable transport (SSE is no longer supported) with none, API key or OAuth 2.0 auth. Choosing "none" for a CRM server would be a serious mistake.</p>
+  </div>
+  <div class="q" data-answer="b">
+    <p class="q-text">What does "token passthrough" mean, and what does the MCP spec say about it?</p>
+    <ol class="q-opts"><li data-k="a">Caching tokens to save cost; recommended</li><li data-k="b">Forwarding a client's token, not issued for your server, to downstream APIs; forbidden</li><li data-k="c">Sharing one token across users; optional</li><li data-k="d">Putting tokens in tool descriptions; required</li></ol>
+    <p class="q-why">Servers must accept only tokens issued for them and must not pass client tokens through. It breaks audit trails and invites confused-deputy attacks.</p>
+  </div>
+  <div class="q" data-answer="c">
+    <p class="q-text">You marked <code>get_customer</code> with <code>read_only_hint=True</code>. What does that guarantee?</p>
+    <ol class="q-opts"><li data-k="a">The host will block any write it attempts</li><li data-k="b">The tool can never return personal data</li><li data-k="c">Nothing by itself; it's a hint to hosts, and your code must actually be read-only</li><li data-k="d">The tool is hidden from the model</li></ol>
+    <p class="q-why">Annotations describe behaviour so hosts can decide what to confirm. Enforcement lives in your server code and the permissions of its service account.</p>
+  </div>
+</div>
+</section>
+
+<section id="learn">
+<h2>Watch and read</h2>
+<div class="videos" data-topic="mcp"></div>
+<div class="res-list">
+  <a class="res" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Model Context Protocol</span><span class="res-by">MCP project · concepts, specification and tutorials</span></a>
+  <a class="res" href="https://modelcontextprotocol.io/docs/develop/build-server" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Build an MCP server</span><span class="res-by">MCP project · the official quickstart, with Claude Desktop setup</span></a>
+  <a class="res" href="https://modelcontextprotocol.io/docs/tools/inspector" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">MCP Inspector</span><span class="res-by">MCP project · web, CLI and terminal clients for testing servers</span></a>
+  <a class="res" href="https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices" target="_blank" rel="noopener"><span class="res-kind">Guide</span><span class="res-title">Security best practices</span><span class="res-by">MCP project · confused deputy, token passthrough, SSRF, scope minimisation</span></a>
+  <a class="res" href="https://py.sdk.modelcontextprotocol.io/v2/migration/" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Python SDK v1 to v2 migration</span><span class="res-by">MCP project · FastMCP to MCPServer and other changes</span></a>
+  <a class="res" href="https://github.com/modelcontextprotocol/python-sdk" target="_blank" rel="noopener"><span class="res-kind">Repo</span><span class="res-title">MCP Python SDK</span><span class="res-by">MCP project on GitHub · source and examples</span></a>
+  <a class="res" href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">Connect Copilot Studio to an MCP server</span><span class="res-by">Microsoft Learn · the onboarding wizard and auth options</span></a>
+  <a class="res" href="https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta" target="_blank" rel="noopener"><span class="res-kind">Docs</span><span class="res-title">ChatGPT developer mode and MCP apps</span><span class="res-by">OpenAI Help Center · plans, setup and safety notes</span></a>
+</div>
+<div class="cards">
+  <a class="card" href="{{root}}modules/m09-protocols-mcp-a2a.html"><span class="card-kicker">Module 09</span><b>Protocols: MCP and A2A</b><span>The concepts behind this page, and where A2A fits.</span></a>
+  <a class="card" href="{{root}}methods/claude-agent-sdk.html"><span class="card-kicker">Method · Code</span><b>Claude Agent SDK</b><span>Consume this server from a code agent with hooks for approval.</span></a>
+  <a class="card" href="{{root}}methods/copilot-studio.html"><span class="card-kicker">Method · Low-code</span><b>Copilot Studio</b><span>Add the Meridian server to a low-code agent.</span></a>
+</div>
+<div class="takeaways"><h3>Key takeaways</h3><ul><li>An MCP server exposes tools, resources and prompts once, for every MCP-capable host and framework.</li><li>In the Python SDK v2, FastMCP is now <code>MCPServer</code>; decorators work as before.</li><li>Use stdio for local, single-user servers and Streamable HTTP with OAuth for anything shared.</li><li>Test in the MCP Inspector first, then connect hosts; each host supports a different subset of features.</li><li>A shared server concentrates risk: authenticate, scope narrowly, validate in code, minimise data and log every call.</li></ul></div>
+</section>

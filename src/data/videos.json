@@ -1,0 +1,748 @@
+{
+  "llm-basics": [
+    {
+      "id": "LPZh9BOjkQs",
+      "title": "Large Language Models explained briefly",
+      "channel": "3Blue1Brown",
+      "note": "Best 8-minute visual primer on what an LLM is; start here."
+    },
+    {
+      "id": "5sLYAQS9sWQ",
+      "title": "How Large Language Models Work",
+      "channel": "IBM Technology",
+      "note": "Short whiteboard explainer of data, architecture and training, with business use cases."
+    },
+    {
+      "id": "zjkBMFhNj_g",
+      "title": "[1hr Talk] Intro to Large Language Models",
+      "channel": "Andrej Karpathy",
+      "note": "The classic one-hour non-technical overview; the 'LLM as operating system' section frames agents."
+    },
+    {
+      "id": "7xTGNNLPyMI",
+      "title": "Deep Dive into LLMs like ChatGPT",
+      "channel": "Andrej Karpathy",
+      "note": "Long-form deep dive on pretraining, post-training and hallucinations; watch selectively."
+    },
+    {
+      "id": "wjZofJX0v4M",
+      "title": "Transformers, the tech behind LLMs | Deep Learning Chapter 5",
+      "channel": "3Blue1Brown",
+      "note": "Optional: visual intuition for the transformer architecture behind GPT."
+    },
+    {
+      "id": "EWvNQjAaOHw",
+      "title": "How I use LLMs",
+      "channel": "Andrej Karpathy",
+      "note": "Practical tour of everyday LLM use: tools, search, files, deep research."
+    }
+  ],
+  "agents-intro": [
+    {
+      "id": "F8NKVhkZZWI",
+      "title": "What are AI Agents?",
+      "channel": "IBM Technology",
+      "note": "Clear 12-minute definition of agents vs. compound AI systems; ideal first watch."
+    },
+    {
+      "id": "LP5OCa20Zpg",
+      "title": "Tips for building AI agents",
+      "channel": "Anthropic",
+      "note": "Anthropic engineers on when to use agents, and when a simple workflow is enough."
+    },
+    {
+      "id": "D7_ipDqhtwk",
+      "title": "How We Build Effective Agents: Barry Zhang, Anthropic",
+      "channel": "AI Engineer",
+      "note": "Companion talk to Anthropic's 'Building effective agents' essay: keep agents simple."
+    },
+    {
+      "id": "w7vqXL4PWEE",
+      "title": "Learn to build effective Agentic AI systems with Andrew Ng",
+      "channel": "DeepLearningAI",
+      "note": "Andrew Ng's short intro to agentic AI and his free course."
+    },
+    {
+      "id": "LCEmiRjPEtQ",
+      "title": "Andrej Karpathy: Software Is Changing (Again)",
+      "channel": "Y Combinator",
+      "note": "Software 3.0 and 'partial autonomy' products; strategic framing for managers."
+    }
+  ],
+  "agentic-patterns": [
+    {
+      "id": "sal78ACtGTc",
+      "title": "What's next for AI agentic workflows ft. Andrew Ng of AI Fund",
+      "channel": "Sequoia Capital",
+      "note": "Andrew Ng's four agentic design patterns: reflection, tool use, planning, multi-agent."
+    },
+    {
+      "id": "ZVPlLaehjLk",
+      "title": "Agentic AI Frameworks Explained: Workflows, Multi-Agent, & Production",
+      "channel": "IBM Technology",
+      "note": "Workflows vs. agents vs. multi-agent setups, and how they reach production."
+    },
+    {
+      "id": "MrD9tCNpOvU",
+      "title": "Agentic AI Design Patterns Introduction and walkthrough | Amazon Web Services",
+      "channel": "Amazon Web Services",
+      "note": "AWS walkthrough of common agentic patterns with architecture diagrams."
+    },
+    {
+      "id": "WBgI9ce_7wM",
+      "title": "AI Agentic Design Patterns: ReAct Explained | Reasoning + Acting in AI Agents",
+      "channel": "CodeCraft Academy",
+      "note": "Focused explainer of the ReAct (think, act, observe) loop."
+    }
+  ],
+  "prompting": [
+    {
+      "id": "T9aRN5JkmL8",
+      "title": "AI prompt engineering: A deep dive",
+      "channel": "Anthropic",
+      "note": "Anthropic's prompt experts in a round-table on what good prompting actually is."
+    },
+    {
+      "id": "ysPbXH0LpIE",
+      "title": "Prompting 101 | Code w/ Claude",
+      "channel": "Anthropic",
+      "note": "Hands-on walk-through that builds a real prompt step by step."
+    },
+    {
+      "id": "1c9iyoVIwDs",
+      "title": "4 Methods of Prompt Engineering",
+      "channel": "IBM Technology",
+      "note": "Quick primer on RAG, chain-of-thought, ReAct and directional-stimulus prompting."
+    }
+  ],
+  "tool-calling": [
+    {
+      "id": "h8gMhXYAv1k",
+      "title": "What is Tool Calling? Connecting LLMs to Your Data",
+      "channel": "IBM Technology",
+      "note": "How an LLM decides to call a tool and uses the result; whiteboard style."
+    },
+    {
+      "id": "U7PXtRazU94",
+      "title": "What is Tool Calling?",
+      "channel": "IBM Technology",
+      "note": "Short companion explainer of function/tool calling basics."
+    },
+    {
+      "id": "7j1t3UZA1TY",
+      "title": "MCP vs API: Simplifying AI Agent Integration with External Data",
+      "channel": "IBM Technology",
+      "note": "Shows why standardised tool interfaces matter; bridge to the MCP module."
+    }
+  ],
+  "rag": [
+    {
+      "id": "T-D1OfcDW1M",
+      "title": "What is Retrieval-Augmented Generation (RAG)?",
+      "channel": "IBM Technology",
+      "note": "The standard six-minute RAG explainer."
+    },
+    {
+      "id": "00Q0G84kq3M",
+      "title": "RAG vs. Fine Tuning",
+      "channel": "IBM Technology",
+      "note": "When to retrieve and when to fine-tune: a useful decision frame for managers."
+    },
+    {
+      "id": "sVcwVQRHIc8",
+      "title": "Learn RAG From Scratch – Python AI Tutorial from a LangChain Engineer",
+      "channel": "freeCodeCamp.org",
+      "note": "Full technical course; for students who want to build RAG pipelines."
+    },
+    {
+      "id": "KE7iHWzyc3A",
+      "title": "New course: Building Agentic RAG with LlamaIndex",
+      "channel": "DeepLearningAI",
+      "note": "Short trailer explaining agentic RAG (an agent that decides how to retrieve)."
+    }
+  ],
+  "memory": [
+    {
+      "id": "BacJ6sEhqMo",
+      "title": "The Four Types of Memory Every AI Agent Needs",
+      "channel": "IBM Technology",
+      "note": "Short-term, long-term, episodic and procedural memory explained simply."
+    },
+    {
+      "id": "52xTxeqT4ws",
+      "title": "How memory makes AI agents more effective",
+      "channel": "Google Cloud Tech",
+      "note": "Google's take on session vs. long-term memory for agents."
+    },
+    {
+      "id": "WsGVXiWzTpI",
+      "title": "Build Hour: Agent Memory Patterns",
+      "channel": "OpenAI",
+      "note": "OpenAI session on practical memory and context patterns for agents."
+    },
+    {
+      "id": "4GiqzUHD5AA",
+      "title": "Context Engineering for Agents",
+      "channel": "LangChain",
+      "note": "How to write, select, compress and isolate context: the 'context engineering' view of memory."
+    },
+    {
+      "id": "9E1e3ZW3-pw",
+      "title": "New course with LangChain! Long-Term Agentic Memory with LangGraph",
+      "channel": "DeepLearningAI",
+      "note": "Short intro to semantic, episodic and procedural memory in LangGraph."
+    }
+  ],
+  "multi-agent": [
+    {
+      "id": "sWH0T4Zez6I",
+      "title": "Multi Agent Systems Explained: How AI Agents & LLMs Work Together",
+      "channel": "IBM Technology",
+      "note": "What multi-agent systems are and how agents coordinate."
+    },
+    {
+      "id": "kYkZI3oj2W4",
+      "title": "Multi AI Agent Systems: When One AI Brain Isn’t Enough",
+      "channel": "IBM Technology",
+      "note": "When splitting work across several agents pays off, and when it does not."
+    },
+    {
+      "id": "0Z0GUDakR_A",
+      "title": "Intro to multi-agent systems with ADK",
+      "channel": "Google Cloud Tech",
+      "note": "Concrete orchestrator and sub-agent example using Google ADK."
+    },
+    {
+      "id": "d3WiKofD-34",
+      "title": "Learn Multi AI Agent Systems with crewAI: Lesson 1",
+      "channel": "DeepLearningAI",
+      "note": "Role-based agent teams, first lesson of the DeepLearning.AI crewAI course."
+    }
+  ],
+  "mcp": [
+    {
+      "id": "eur8dUO9mvE",
+      "title": "What is MCP? Integrate AI Agents with Databases & APIs",
+      "channel": "IBM Technology",
+      "note": "Clear conceptual intro to the Model Context Protocol."
+    },
+    {
+      "id": "7j1t3UZA1TY",
+      "title": "MCP vs API: Simplifying AI Agent Integration with External Data",
+      "channel": "IBM Technology",
+      "note": "Why MCP is not 'just another API': the USB-C analogy."
+    },
+    {
+      "id": "kQmXtrmQ5Zg",
+      "title": "Building Agents with Model Context Protocol - Full Workshop with Mahesh Murag of Anthropic",
+      "channel": "AI Engineer",
+      "note": "Authoritative workshop from the Anthropic team behind MCP; watch the first 20 minutes for the 'why'."
+    },
+    {
+      "id": "HyzlYwjoXOQ",
+      "title": "Claude's Model Context Protocol is here... Let's test it",
+      "channel": "Fireship",
+      "note": "Fast, fun hands-on demo of an MCP server in action."
+    }
+  ],
+  "a2a": [
+    {
+      "id": "4gYm0Rp7VHc",
+      "title": "Use A2A to connect agents across different frameworks and teams",
+      "channel": "DeepLearningAI",
+      "note": "Intro to Agent2Agent from the DeepLearning.AI course built with Google."
+    },
+    {
+      "id": "-MME36Ft9Gc",
+      "title": "Build a multi-agent system: A2A & Agent Registry",
+      "channel": "Google Cloud Tech",
+      "note": "Google demo of agents discovering and calling each other via A2A."
+    },
+    {
+      "id": "M1UvfLUWHz0",
+      "title": "MCP vs A2A vs ACP: How AI Agents Communicate",
+      "channel": "DataStax",
+      "note": "Compares the three agent protocols; good for placing A2A next to MCP."
+    },
+    {
+      "id": "-vKztdD2XEc",
+      "title": "A2A Vs MCP - Do You Need Both Agent2Agent and Model Context Protocol?",
+      "channel": "Cloud With Raj",
+      "note": "Plain-language comparison of when to use A2A and when to use MCP."
+    }
+  ],
+  "evals": [
+    {
+      "id": "BsWxPI9UM4c",
+      "title": "Why AI evals are the hottest new skill for product builders | Hamel Husain & Shreya Shankar",
+      "channel": "Lenny's Podcast",
+      "note": "Product-manager view of evals from the two leading practitioners."
+    },
+    {
+      "id": "GL0XhAj5LPE",
+      "title": "LLM Evals: Common Mistakes",
+      "channel": "Hamel Husain",
+      "note": "Short list of the most common evaluation pitfalls."
+    },
+    {
+      "id": "q2JrUKBMf0w",
+      "title": "The Future of Evals: From LLM as a Judge to Agent as a Judge — Aparna Dhinakaran, Arize AI",
+      "channel": "AI Engineer",
+      "note": "How LLM-as-judge works and how it extends to evaluating agents."
+    },
+    {
+      "id": "ABVDjdPMccE",
+      "title": "LLM as a judge & other ways to evaluate agents",
+      "channel": "Data Science Dojo",
+      "note": "Survey of agent evaluation methods: trajectory, outcome and judge-based."
+    }
+  ],
+  "security": [
+    {
+      "id": "FgxwCaL6UTA",
+      "title": "Prompt Injection, explained",
+      "channel": "Simon Willison",
+      "note": "From the person who coined the term; essential context for agent risk."
+    },
+    {
+      "id": "VQdim50QJw8",
+      "title": "What Is Prompt Injection? The Real Risk in AI Agents",
+      "channel": "KodeKloud",
+      "note": "Accessible explainer of direct and indirect injection against agents."
+    },
+    {
+      "id": "jZXvqEqJT7o",
+      "title": "How to secure your AI Agents: A Technical Deep-dive",
+      "channel": "Google for Developers",
+      "note": "Google's layered defences: identity, least privilege, guardrails."
+    },
+    {
+      "id": "lWusxShSzEI",
+      "title": "C&C - Ep. 2 | Securing Agentic AI: The OWASP Approach with Steve Wilson",
+      "channel": "Alice (Formerly: ActiveFence)",
+      "note": "OWASP GenAI project lead on agentic threat categories."
+    }
+  ],
+  "deployment": [
+    {
+      "id": "j1wfE0SOBbE",
+      "title": "5 Tips for Deploying AI Agents to Production",
+      "channel": "AWS Developers",
+      "note": "Concise, practical checklist for moving from prototype to production."
+    },
+    {
+      "id": "-gLH_okCcBA",
+      "title": "AI Agents in Production: Lessons from Rippling and LangChain",
+      "channel": "LangChain",
+      "note": "Real-world case study of running agents at a SaaS company."
+    },
+    {
+      "id": "oDjESsByBmM",
+      "title": "AWS re:Invent 2025 - Bridging from POC to production: An intro to Amazon Bedrock AgentCore (AIM2204)",
+      "channel": "AWS Events",
+      "note": "The runtime, identity, memory and observability pieces a production agent needs."
+    },
+    {
+      "id": "NrgoZLcY3Kk",
+      "title": "Introduction to Vertex AI Agent Engine",
+      "channel": "Google Cloud Tech",
+      "note": "Google's managed runtime for deploying and scaling agents."
+    }
+  ],
+  "business": [
+    {
+      "id": "ASABxNenD_U",
+      "title": "Vertical AI Agents Could Be 10X Bigger Than SaaS",
+      "channel": "Y Combinator",
+      "note": "YC partners on why vertical agents may replace SaaS plus headcount; great for case discussion."
+    },
+    {
+      "id": "pBBe1pk8hf4",
+      "title": "What's next for AI agents ft. LangChain's Harrison Chase",
+      "channel": "Sequoia Capital",
+      "note": "Planning, UX and memory as the frontier for agent products."
+    },
+    {
+      "id": "irdNqlytsLc",
+      "title": "What Is Agentforce and How Businesses Use AI Agents | Dreamforce 2024",
+      "channel": "Salesforce",
+      "note": "Vendor view of agents in sales and service workflows."
+    },
+    {
+      "id": "HXy3J1mGHRE",
+      "title": "AI and automation expert on how leaders use AI agents to get ahead | Pascal Bornet",
+      "channel": "Microsoft",
+      "note": "Leadership-level discussion of adopting agents in organisations."
+    },
+    {
+      "id": "96jN2OCOfLs",
+      "title": "Andrej Karpathy: From Vibe Coding to Agentic Engineering w/ Stephanie Zhan",
+      "channel": "Sequoia Capital",
+      "note": "Karpathy on how agentic tools are changing knowledge work."
+    }
+  ],
+  "langgraph": [
+    {
+      "id": "29XE10U6ooc",
+      "title": "LangChain Academy New Course: Introduction to LangGraph",
+      "channel": "LangChain",
+      "note": "Official overview of the free LangChain Academy LangGraph course."
+    },
+    {
+      "id": "jGg_1h0qzaM",
+      "title": "LangGraph Complete Course for Beginners – Complex AI Agents with Python",
+      "channel": "freeCodeCamp.org",
+      "note": "Full beginner course: state, nodes, edges, tools and a RAG agent."
+    },
+    {
+      "id": "4GiqzUHD5AA",
+      "title": "Context Engineering for Agents",
+      "channel": "LangChain",
+      "note": "LangChain's guide to managing context in LangGraph agents."
+    }
+  ],
+  "crewai": [
+    {
+      "id": "d3WiKofD-34",
+      "title": "Learn Multi AI Agent Systems with crewAI: Lesson 1",
+      "channel": "DeepLearningAI",
+      "note": "Official course lesson taught with crewAI's founder; roles, tasks and crews."
+    },
+    {
+      "id": "Dc99-zTMyMg",
+      "title": "Using agents to build an agent company: Joao Moura",
+      "channel": "AI Engineer",
+      "note": "crewAI founder on building and scaling with agent crews."
+    },
+    {
+      "id": "sPzc6hMg7So",
+      "title": "CrewAI Tutorial: Complete Crash Course for Beginners",
+      "channel": "aiwithbrandon",
+      "note": "Step-by-step hands-on crash course."
+    },
+    {
+      "id": "8PtGcNE01yo",
+      "title": "CrewAI Flows Crash Course",
+      "channel": "aiwithbrandon",
+      "note": "Event-driven Flows for more controllable crewAI workflows."
+    }
+  ],
+  "autogen": [
+    {
+      "id": "JlzteydCK_Q",
+      "title": "Deep Dive into Microsoft Agent Framework for AutoGen Users",
+      "channel": "Microsoft Developer",
+      "note": "Official guide to how AutoGen concepts map onto the new Microsoft Agent Framework."
+    },
+    {
+      "id": "TvgUim_3vrU",
+      "title": "Build an AI agent with Microsoft Agent Framework, PostgreSQL, and API Management",
+      "channel": "Microsoft Reactor",
+      "note": "Microsoft Reactor build session with the new framework."
+    },
+    {
+      "id": "MCYzYzaWChY",
+      "title": "AutoGen: A Multi-Agent AI Framework - Victor Dibia & Chi Wang, Microsoft",
+      "channel": "The Linux Foundation",
+      "note": "AutoGen's creators on its multi-agent conversation design."
+    },
+    {
+      "id": "u1YOPRdGqxQ",
+      "title": "AI Show: On Demand | Agent Framework Lab - The Experimental Modules of Microsoft Agent Framework",
+      "channel": "The AI Show",
+      "note": "Microsoft AI Show segment on the framework's lab modules."
+    }
+  ],
+  "openai-sdk": [
+    {
+      "id": "tK32trvj_b4",
+      "title": "Build Hour: Agents SDK",
+      "channel": "OpenAI",
+      "note": "Official OpenAI session on agents, tools, handoffs and guardrails in the SDK."
+    },
+    {
+      "id": "sAitLFLbgDA",
+      "title": "Build Hour: AgentKit",
+      "channel": "OpenAI",
+      "note": "Official walkthrough of Agent Builder, ChatKit and evals in AgentKit."
+    },
+    {
+      "id": "DwGNK1DUFsM",
+      "title": "AgentKit Demo",
+      "channel": "OpenAI",
+      "note": "Short official demo of building an agent visually with AgentKit."
+    },
+    {
+      "id": "35nxORG1mtg",
+      "title": "Agents SDK from OpenAI! | Full Tutorial",
+      "channel": "James Briggs",
+      "note": "Clear independent code tutorial of the Python Agents SDK."
+    }
+  ],
+  "claude-sdk": [
+    {
+      "id": "TqC1qOfiVcQ",
+      "title": "Claude Agent SDK [Full Workshop] — Thariq Shihipar, Anthropic",
+      "channel": "AI Engineer",
+      "note": "Anthropic's own workshop on building agents with the Claude Agent SDK."
+    },
+    {
+      "id": "gv0WHhKelSE",
+      "title": "Claude Code best practices | Code w/ Claude",
+      "channel": "Anthropic",
+      "note": "How to work effectively with Claude Code, the harness the Agent SDK is built on."
+    },
+    {
+      "id": "iF9iV4xponk",
+      "title": "The future of agentic coding with Claude Code",
+      "channel": "Anthropic",
+      "note": "Anthropic team on where agentic coding is heading."
+    }
+  ],
+  "adk": [
+    {
+      "id": "44C8u0CDtSo",
+      "title": "Getting started with Agent Development Kit",
+      "channel": "Google for Developers",
+      "note": "Official ADK quick-start."
+    },
+    {
+      "id": "0Z0GUDakR_A",
+      "title": "Intro to multi-agent systems with ADK",
+      "channel": "Google Cloud Tech",
+      "note": "Building coordinator and sub-agent systems in ADK."
+    },
+    {
+      "id": "P4VFL9nIaIA",
+      "title": "Agent Development Kit (ADK) Masterclass: Build AI Agents & Automate Workflows (Beginner to Pro)",
+      "channel": "aiwithbrandon",
+      "note": "Long hands-on masterclass covering tools, state, callbacks and multi-agent."
+    },
+    {
+      "id": "wgOCzHXKw4c",
+      "title": "Google ADK Tutorial: Build Multi-Agent AI Systems from Scratch",
+      "channel": "KodeKloud",
+      "note": "Beginner-friendly build-along."
+    }
+  ],
+  "llamaindex": [
+    {
+      "id": "AxW8gIQ-z5Y",
+      "title": "Workshop: building agents and multi-agent systems with AgentWorkflow in LlamaIndex",
+      "channel": "LlamaIndex",
+      "note": "Official LlamaIndex workshop on AgentWorkflow."
+    },
+    {
+      "id": "zeAyuLc_f3Q",
+      "title": "The Future of Knowledge Assistants: Jerry Liu",
+      "channel": "AI Engineer",
+      "note": "LlamaIndex CEO on moving from RAG to agentic knowledge assistants."
+    },
+    {
+      "id": "KE7iHWzyc3A",
+      "title": "New course: Building Agentic RAG with LlamaIndex",
+      "channel": "DeepLearningAI",
+      "note": "Short intro to the DeepLearning.AI agentic-RAG course with LlamaIndex."
+    },
+    {
+      "id": "j5_7Q-7VTS0",
+      "title": "Getting Started with AI Agents Using LlamaIndex | Generative AI Hands-On Tutorial",
+      "channel": "Siddhardhan",
+      "note": "Hands-on beginner code tutorial."
+    }
+  ],
+  "n8n": [
+    {
+      "id": "GuaKeDS6UKU",
+      "title": "n8n Quick Start Tutorial: Build Your First AI Agent [2026]",
+      "channel": "n8n",
+      "note": "Official n8n quick start, the right first build for no-code students."
+    },
+    {
+      "id": "dpoMEcXjVH8",
+      "title": "n8n Tutorial for Beginners - Build Your First Free AI Agent",
+      "channel": "Kevin Stratvert",
+      "note": "Very clear beginner walk-through by a well-known tutor."
+    },
+    {
+      "id": "Ey18PDiaAYI",
+      "title": "Build & Sell n8n AI Agents (8+ Hour Course, No Code)",
+      "channel": "Nate Herk | AI Automation",
+      "note": "Comprehensive course; use for lab projects and business-use ideas."
+    }
+  ],
+  "copilot-studio": [
+    {
+      "id": "RF9RBhPp6v8",
+      "title": "Creating agents with Microsoft Copilot Studio",
+      "channel": "Microsoft Community Learning",
+      "note": "Microsoft walk-through of building an agent in Copilot Studio."
+    },
+    {
+      "id": "l69Pwwr3ntE",
+      "title": "Getting started with the Copilot Studio Agent Builder in Microsoft 365 Copilot",
+      "channel": "Microsoft Community Learning",
+      "note": "Lightweight agent builder inside Microsoft 365 Copilot."
+    },
+    {
+      "id": "211EGT_2x9c",
+      "title": "Build Your Own AI Agents with Microsoft 365 Copilot",
+      "channel": "Lisa Crosbie",
+      "note": "Clear business-user walk-through by a Microsoft MVP."
+    },
+    {
+      "id": "oDWpOet-2Ek",
+      "title": "Build Your First Agent in the New Copilot Studio",
+      "channel": "Anders Jensen",
+      "note": "Step-by-step build in the redesigned Copilot Studio."
+    }
+  ],
+  "custom-gpt": [
+    {
+      "id": "p6Z2d3T-fLM",
+      "title": "How to Build a Custom GPT in ChatGPT [Beginner Tutorial]",
+      "channel": "Anders Jensen",
+      "note": "Step-by-step Custom GPT build: instructions, knowledge, actions."
+    },
+    {
+      "id": "GJ5jTgcbRHA",
+      "title": "Getting started with projects in Claude.ai",
+      "channel": "Anthropic",
+      "note": "Official intro to Claude Projects: custom instructions plus a knowledge base."
+    },
+    {
+      "id": "w7_yWjYyxjE",
+      "title": "How to Use Claude Projects (Full Tutorial)",
+      "channel": "Kevin Stratvert",
+      "note": "Fuller walk-through of Claude Projects."
+    },
+    {
+      "id": "z-R_GGz0oag",
+      "title": "How to build & use Gemini Gems (Beginners Guide to Business Gems)",
+      "channel": "Stewart Gauld",
+      "note": "Gemini Gems for business use cases."
+    },
+    {
+      "id": "U9mJuUkhUzk",
+      "title": "OpenAI DevDay: Opening Keynote",
+      "channel": "OpenAI",
+      "note": "Historic: the 2023 keynote where GPTs were launched (GPTs segment)."
+    }
+  ],
+  "voice": [
+    {
+      "id": "mwL5Yzg6UJE",
+      "title": "Building AI Voice Agents for Production",
+      "channel": "DeepLearningAI",
+      "note": "Intro to the DeepLearning.AI voice-agent course built with LiveKit."
+    },
+    {
+      "id": "fnivYSh0Cqk",
+      "title": "Build Your First Conversational Voice Agent with ElevenLabs – Complete Setup Guide",
+      "channel": "ElevenLabs",
+      "note": "Official no-code setup of an ElevenLabs voice agent."
+    },
+    {
+      "id": "qUQLbPWxbdk",
+      "title": "How to build AI voice agents with Vapi (Full course)",
+      "channel": "Sandeep Kaistha | Flipbytes",
+      "note": "Full Vapi course: assistants, tools and phone numbers."
+    },
+    {
+      "id": "b-DP0xPBwmI",
+      "title": "How to Build an AI Agent Using OpenAI Realtime API (Step-by-step Guide)",
+      "channel": "Bo Sar",
+      "note": "Developer walk-through of the OpenAI Realtime API."
+    }
+  ],
+  "computer-use": [
+    {
+      "id": "CSE77wAdDLg",
+      "title": "Introduction to Operator & Agents",
+      "channel": "OpenAI",
+      "note": "OpenAI's launch of Operator, its browser-using agent."
+    },
+    {
+      "id": "2wzGS_WUZYQ",
+      "title": "A Look at ChatGPT agent",
+      "channel": "OpenAI",
+      "note": "Official demo of ChatGPT agent combining browsing, terminal and connectors."
+    },
+    {
+      "id": "ODaHJzOyVCQ",
+      "title": "Claude | Computer use for automating operations",
+      "channel": "Anthropic",
+      "note": "Official Anthropic demo of Claude operating a desktop to complete a task."
+    },
+    {
+      "id": "hav6hPF7LCE",
+      "title": "Computer Use: How AI agents can automate almost anything",
+      "channel": "Red Hat Developer",
+      "note": "Neutral explainer of how computer-use agents work and their limits."
+    }
+  ],
+  "enterprise": [
+    {
+      "id": "irdNqlytsLc",
+      "title": "What Is Agentforce and How Businesses Use AI Agents | Dreamforce 2024",
+      "channel": "Salesforce",
+      "note": "Salesforce Agentforce overview."
+    },
+    {
+      "id": "oDjESsByBmM",
+      "title": "AWS re:Invent 2025 - Bridging from POC to production: An intro to Amazon Bedrock AgentCore (AIM2204)",
+      "channel": "AWS Events",
+      "note": "Amazon Bedrock AgentCore from AWS."
+    },
+    {
+      "id": "8rlNdKywldQ",
+      "title": "Building AI agents on Google Cloud",
+      "channel": "Google Cloud Tech",
+      "note": "Google Cloud's agent stack: Vertex AI, ADK and Agent Engine."
+    },
+    {
+      "id": "URJbG8HF5D0",
+      "title": "Now Assist AI agents",
+      "channel": "ServiceNow Documentation",
+      "note": "ServiceNow's Now Assist AI agents for IT and service workflows."
+    },
+    {
+      "id": "rF5cub9WSYo",
+      "title": "How Salesforce Uses Agentforce for Service | Agentforce",
+      "channel": "Salesforce Support",
+      "note": "Case study: Salesforce running Agentforce on its own support."
+    }
+  ],
+  "chatbots": [
+    {
+      "id": "3ctFWU492xk",
+      "title": "Building a RAG-powered AI chat app with Python and VS Code",
+      "channel": "Visual Studio Code",
+      "note": "Microsoft's hands-on build of a RAG chat app."
+    },
+    {
+      "id": "K45_KS4AlD8",
+      "title": "Build a Conversational AI Agent on Google Cloud in 5 Minutes (Powered by Gemini)",
+      "channel": "Google Cloud",
+      "note": "Low-code chatbot build with Google Cloud Conversational Agents."
+    },
+    {
+      "id": "50EJft0ILUI",
+      "title": "How to build better conversational experiences with generative AI",
+      "channel": "Google Cloud Tech",
+      "note": "Design principles for generative chatbots."
+    },
+    {
+      "id": "SkY2u4UUr6M",
+      "title": "How to Build an AI Chatbot: RAG with LangChain & Streamlit. LLM chatbot tutorial for beginners",
+      "channel": "AI Product Builders",
+      "note": "Beginner code build of a RAG chatbot with a web UI."
+    },
+    {
+      "id": "Yh1GEWqgkt0",
+      "title": "Build your own RAG (retrieval augmented generation) AI Chatbot using Python | Simple walkthrough",
+      "channel": "Avra",
+      "note": "Simple Python walk-through of a document-grounded chatbot."
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+<!--META {"title":"Choose your method","h1":"Fifteen ways to build an agent. Which one is <em>yours</em>?","eyebrow":"Build methods · Overview","lede":"Answer six questions for a ranked shortlist, compare every method side by side, and see why most companies end up using more than one.","minutes":15,"scripts":["assets/chooser.js"]} -->
+<section id="chooser-sec">
+<h2>The method chooser</h2>
+<p>The answers below are an example (a Microsoft 365 company, spreadsheet-level skills, an agent for a department). Change them to match your situation; the shortlist updates as you click.</p>
+<form class="chooser" id="chooser" onsubmit="return false">
+  <fieldset><legend>1. What skills does the team building it have?</legend><div class="opts">
+    <label><input type="radio" name="skills" value="none" data-why="No coding skills needed"> None, we use apps</label>
+    <label><input type="radio" name="skills" value="sheet" checked data-why="Suits spreadsheet-level skills"> Spreadsheets and formulas</label>
+    <label><input type="radio" name="skills" value="python" data-why="Matches some Python"> Some Python</label>
+    <label><input type="radio" name="skills" value="dev" data-why="Uses a real developer team"> A developer team</label>
+  </div></fieldset>
+  <fieldset><legend>2. Where does the data and work mostly live?</legend><div class="opts">
+    <label><input type="radio" name="data" value="m365" checked data-why="Lives in Microsoft 365"> Microsoft 365</label>
+    <label><input type="radio" name="data" value="google" data-why="Lives in Google Workspace or Cloud"> Google Workspace</label>
+    <label><input type="radio" name="data" value="crm" data-why="Data is in the CRM"> Salesforce / CRM</label>
+    <label><input type="radio" name="data" value="erp" data-why="Data is in ITSM or ERP"> ServiceNow / SAP</label>
+    <label><input type="radio" name="data" value="own" data-why="Your own systems and APIs"> Our own databases and APIs</label>
+    <label><input type="radio" name="data" value="cloud" data-why="Already on a hyperscaler"> AWS / Azure / Google Cloud</label>
+    <label><input type="radio" name="data" value="docs" data-why="Mostly documents and PDFs"> Mostly documents and PDFs</label>
+  </div></fieldset>
+  <fieldset><legend>3. Where will people use it?</legend><div class="opts">
+    <label><input type="radio" name="channel" value="chat" data-why="Personal chat assistant"> Each person in a chat app</label>
+    <label><input type="radio" name="channel" value="teams" checked data-why="Inside Teams or Slack"> Teams or Slack</label>
+    <label><input type="radio" name="channel" value="web" data-why="Website or WhatsApp"> Website or WhatsApp</label>
+    <label><input type="radio" name="channel" value="phone" data-why="Phone calls"> Phone calls</label>
+    <label><input type="radio" name="channel" value="bg" data-why="Runs in the background"> Nobody, it runs in the background</label>
+    <label><input type="radio" name="channel" value="ui" data-why="Has to drive an old system's screens"> It must operate an old system's screens</label>
+  </div></fieldset>
+  <fieldset><legend>4. How much is riding on it?</legend><div class="opts">
+    <label><input type="radio" name="control" value="proto" data-why="Prototype stage"> A prototype to learn from</label>
+    <label><input type="radio" name="control" value="dept" checked data-why="Departmental with approvals"> A departmental tool with approvals</label>
+    <label><input type="radio" name="control" value="core" data-why="Core, audited process"> A core, audited business process</label>
+  </div></fieldset>
+  <fieldset><legend>5. What is its main job?</legend><div class="opts">
+    <label><input type="radio" name="job" value="docs" data-why="Answers from documents"> Answer questions from documents</label>
+    <label><input type="radio" name="job" value="act" checked data-why="Takes actions across apps"> Take actions across apps</label>
+    <label><input type="radio" name="job" value="research" data-why="Research and writing"> Research and write</label>
+    <label><input type="radio" name="job" value="ui" data-why="Clicks through user interfaces"> Click through user interfaces</label>
+  </div></fieldset>
+  <fieldset><legend>6. What can you spend?</legend><div class="opts">
+    <label><input type="radio" name="budget" value="free" data-why="Low budget"> As close to free as possible</label>
+    <label><input type="radio" name="budget" value="lic" checked data-why="Licences already in place"> Per-user licences are fine</label>
+    <label><input type="radio" name="budget" value="eng" data-why="Engineering time is available"> Engineering time, not licences</label>
+  </div></fieldset>
+  <button class="btn sm ghost" type="button" id="chooser-reset">Clear answers</button>
+</form>
+<h3>Your shortlist</h3>
+<div id="chooser-out" aria-live="polite"></div>
+</section>
+
+<section id="compare">
+<h2>All fifteen, side by side</h2>
+<p>Pulled straight from the spec strip at the top of each method page, so the two always agree.</p>
+{{methods_table}}
+</section>
+
+<section id="principles">
+<h2>Five rules of thumb</h2>
+<ol class="steps">
+<li><b>Follow the data</b><p>The method that sits closest to the data and the people usually wins. A brilliant agent that can't read the CRM loses to an average one that can.</p></li>
+<li><b>Prototype cheap, rebuild if it earns it</b><p>Prove the value in a configured assistant or a workflow tool in a week. Only move to code or a platform when the pilot numbers justify it. The design (instructions, tools, tests) carries over; the plumbing doesn't need to.</p></li>
+<li><b>Start with one agent and a few tools</b><p>Multi-agent setups cost more tokens and are harder to debug. Reach for them when one agent's instructions get too long to follow or the jobs need different permissions.</p></li>
+<li><b>Put your tools behind MCP</b><p>If you expect more than one agent to need the same systems, build the integration once as an <a href="{{root}}methods/mcp.html">MCP server</a>. It cuts lock-in more than any framework choice.</p></li>
+<li><b>Choose for the people who will maintain it</b><p>A LangGraph agent with no Python team behind it is a liability by month three. A Copilot Studio agent in a company with a strong Power Platform team can run for years.</p></li>
+</ol>
+<figure class="fig">
+<svg viewBox="0 0 720 300" role="img" aria-label="A typical company uses three layers of agent building">
+  <rect class="fx-box k1" x="20" y="24" width="680" height="70" rx="8"/>
+  <text class="fx-tb" x="40" y="52">Personal assistants for everyone</text>
+  <text class="fx-ts" x="40" y="74">Configured assistants, M365 Copilot agents · many users, low risk, owned by each employee</text>
+  <rect class="fx-box k4" x="20" y="114" width="680" height="70" rx="8"/>
+  <text class="fx-tb" x="40" y="142">Departmental agents</text>
+  <text class="fx-ts" x="40" y="164">Copilot Studio, n8n, Agentforce, ServiceNow · tens of agents, owned by business teams, governed by IT</text>
+  <rect class="fx-box k3" x="20" y="204" width="680" height="70" rx="8"/>
+  <text class="fx-tb" x="40" y="232">Core process agents</text>
+  <text class="fx-ts" x="40" y="254">Frameworks or raw API, MCP tools, full evals and tracing · a handful, owned by product and engineering</text>
+</svg>
+<figcaption>Most organisations end up with all three layers. The skill is knowing which layer a new idea belongs in, and when a departmental agent has become important enough to move down a layer.</figcaption>
+</figure>
+</section>
+
+<section id="all">
+<h2>Every method page</h2>
+<h3>No-code and low-code</h3>
+<div class="cards">
+  <a class="card" href="{{root}}methods/no-code-assistants.html"><span class="card-kicker">Method A</span><b>Configured assistants</b><span>ChatGPT workspace agents, Claude Projects, Gemini Gems.</span></a>
+  <a class="card" href="{{root}}methods/copilot-studio.html"><span class="card-kicker">Method B</span><b>Microsoft Copilot Studio</b><span>Agents for Teams and M365 with flows and approvals.</span></a>
+  <a class="card" href="{{root}}methods/workflow-automation.html"><span class="card-kicker">Method C</span><b>Workflow automation</b><span>n8n, Zapier, Make, Power Automate.</span></a>
+  <a class="card" href="{{root}}methods/enterprise-platforms.html"><span class="card-kicker">Method D</span><b>Enterprise platforms</b><span>Agentforce, ServiceNow, SAP Joule, AgentCore, Gemini Enterprise, Foundry.</span></a>
+  <a class="card" href="{{root}}methods/voice-agents.html"><span class="card-kicker">Method E</span><b>Voice agents</b><span>Phone agents, latency budgets, Indian languages.</span></a>
+  <a class="card" href="{{root}}methods/computer-use.html"><span class="card-kicker">Method F</span><b>Computer use</b><span>Browser and desktop agents for systems without APIs.</span></a>
+</div>
+<h3>Code</h3>
+<div class="cards">
+  <a class="card" href="{{root}}methods/api-tool-use.html"><span class="card-kicker">Method G</span><b>Raw API loop</b><span>Anthropic and OpenAI tool calling, by hand.</span></a>
+  <a class="card" href="{{root}}methods/langgraph.html"><span class="card-kicker">Method H</span><b>LangGraph</b><span>StateGraph, checkpoints, interrupts.</span></a>
+  <a class="card" href="{{root}}methods/crewai.html"><span class="card-kicker">Method I</span><b>CrewAI</b><span>Crews and Flows.</span></a>
+  <a class="card" href="{{root}}methods/microsoft-agent-framework.html"><span class="card-kicker">Method J</span><b>Microsoft Agent Framework</b><span>Agents and workflows; AutoGen's successor.</span></a>
+  <a class="card" href="{{root}}methods/openai-agents-sdk.html"><span class="card-kicker">Method K</span><b>OpenAI Agents SDK</b><span>Handoffs, guardrails, sessions, tracing.</span></a>
+  <a class="card" href="{{root}}methods/claude-agent-sdk.html"><span class="card-kicker">Method L</span><b>Claude Agent SDK</b><span>Tools, hooks, subagents, skills.</span></a>
+  <a class="card" href="{{root}}methods/google-adk.html"><span class="card-kicker">Method M</span><b>Google ADK</b><span>Agents, workflows, dev UI, A2A.</span></a>
+  <a class="card" href="{{root}}methods/llamaindex.html"><span class="card-kicker">Method N</span><b>LlamaIndex</b><span>Document agents and query-engine tools.</span></a>
+  <a class="card" href="{{root}}methods/mcp.html"><span class="card-kicker">Method O</span><b>MCP server</b><span>Your tools, available to every agent.</span></a>
+</div>
+</section>
